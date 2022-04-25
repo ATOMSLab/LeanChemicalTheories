@@ -1,9 +1,7 @@
-import analysis.complex.basic
-namespace nnreal
-open_locale nnreal big_operators
+import data.real.basic
 
 -- Variables
-lemma Charles (P1 P2 V1 V2 T1 T2 n1 n2 R : ℝ≥0 )
+lemma Charles (P1 P2 V1 V2 T1 T2 n1 n2 R : ℝ)
 
 -- Assumptions
 (a1: P1*V1=n1*R*T1)  -- Gas 1 is ideal
