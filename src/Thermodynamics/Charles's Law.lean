@@ -11,7 +11,7 @@ lemma Charles (P1 P2 V1 V2 T1 T2 n1 n2 R : ℝ≥0 )
 (a3: P1=P2)  -- Pressure is constant
 (a4: n1=n2)   -- Number of moles is equal
 
---
+-- Constraints
 (hT2: T2 ≠ 0)
 (hP2: P2 ≠ 0)
 (hT1: T1 ≠ 0)
