@@ -2,7 +2,7 @@ import data.real.basic
 import analysis.complex.basic
 
 
-namespace real  --real.sqrt, will return 0 for negative inputs
+open real  --real.sqrt, will return 0 for negative inputs
  
 lemma LJTranslationInvariance1D (r x y t rt E a b Et : ℝ )
 
@@ -43,4 +43,38 @@ begin
  exact a2,
 end
 
-end real
+------------
+
+lemma TranslationInvariance (d dt t x y : ℝ )
+
+( a1: d = sqrt ((x-y)^2) ) -- pairwise distance
+( a2: dt = sqrt (((x+t) - (y+t))^2)  ) --- pairwise distance after translation t
+:
+--Conjecture
+d = dt
+:=
+
+begin
+ simp at a2,
+ rw ← a2 at a1,
+ exact a1,
+end
+
+lemma LJInvariance (a b r rt x y t E Et : ℝ )
+( a1: r = sqrt ((x-y)^2) ) -- pairwise distance
+( a2: rt = sqrt (((x+t) - (y+t))^2)  ) --- pairwise distance after translation
+( a3: E = a/r^12 - b/r^6 ) -- LJ potential
+( a4: Et = a/rt^12 - b/rt^6 ) -- LJ potential after translation t
+:
+--Conjecture
+E = Et
+:=
+
+begin
+  have ht: r=rt,
+  finish using TranslationInvariance,
+  rw ht at a3,
+  exact (rfl.congr (eq.symm a4)).mp a3,  
+end
+
+
