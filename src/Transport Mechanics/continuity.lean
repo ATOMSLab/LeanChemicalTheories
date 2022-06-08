@@ -1,13 +1,19 @@
 --The continuity equation for mass over a control volume
+--this uses stuff from the sphere eversion project
+
 import data.real.basic
 import analysis.calculus.fderiv
 import analysis.calculus.deriv
 import measure_theory.integral.interval_integral
 import analysis.calculus.parametric_integral
+import measure_theory.function.strongly_measurable
 
 
-open measure_theory 
-open_locale big_operators 
+
+
+open topological_space measure_theory filter metric 
+open_locale big_operators topological_space filter interval
+
 
 
 local notation `ℝ³` := fin 3 → ℝ
@@ -15,11 +21,14 @@ local notation `ℝ² ` := fin (2) → ℝ
 
 theorem some_name 
 (μ : measure_theory.measure ℝ³ . measure_theory.volume_tac)
-(ρ : ℝ → ℝ³ → ℝ ) -- Mass, density
-(M : ℝ → ℝ)
-(t : ℝ)
-(V1 V2: (ℝ³))  -- consider a finite volume V which is defined on ℝ³ FOr Lean we define V as V2 - V1
-(V : ℝ³) (hV : V1 ≤ V2)
+{V1 V2 V : (ℝ³)}{t0 ε: ℝ} [linear_order ℝ³] (ε_pos : 0 < ε) {bound : ℝ³ → ℝ}
+(ρ ρ': ℝ → ℝ³ → ℝ )(M : ℝ → ℝ) (hV : V1 ≤ V2) 
+(hρ_meas : ∀ᶠ (t : ℝ) in nhds t0, ae_measurable (ρ t) (μ.restrict (set.interval_oc V1 V2)))
+(hρ_int : interval_integrable (ρ t0) μ V1 V2)
+(hρ'_meas : ae_measurable (ρ' t0) (μ.restrict (set.interval_oc V1 V2)))
+(h_bound : ∀ᵐ (V : ℝ³) ∂μ, V ∈ set.interval_oc V1 V2 → ∀ (t : ℝ), t ∈ metric.ball t0 ε → ∥ρ' t V∥ ≤ bound V)
+(bound_integrable : interval_integrable bound μ V1 V2)
+(h_diff : ∀ᵐ (V : ℝ³) ∂μ, V ∈ set.interval_oc V1 V2 → ∀ (t : ℝ), t ∈ ball t0 ε → has_deriv_at (λ (t : ℝ), (ρ t V)) (ρ' t V) t)
 
 (F : ℝ³ → ℝ³) -- flux of our fluid
 (F' : (ℝ³) → (ℝ³) →L[ℝ] ℝ³) -- a partial derivatvie of our vector
@@ -45,27 +54,86 @@ theorem some_name
 ∀ t: ℝ, ∫ (x : ℝ³) in set.Icc V1 V2, deriv (λ t, ρ t V) t + ∑(i : fin 3), (F' x) (pi.single i 1) i = 0
 :=
 begin
-have hM' : ∀ t : ℝ, deriv M t = ∫ (V : ℝ³) in set.Icc V1 V2,(deriv(λ t, ρ t V) t),
+have hM' :  deriv M t0 = ∫ (V : ℝ³) in V1..V2,(ρ' t0 V) ∂μ,
 {
-sorry,
+  
 },
-
 intro t1,
 rw measure_theory.integral_Icc_eq_integral_Ioc,
 rw ← interval_integral.integral_of_le, 
 rw interval_integral.integral_add,
 rw ← hM',
 end
-universe u1
-theorem eq_integral_to_deriv_eq_integral_of_deriv
-{E : Type u1} [nondiscrete_normed_field E] [normed_group E] [complete_space E] [normed_space E ℝ]
-(ρ : E → ℝ³ → ℝ )(M : E → ℝ)(V1 V2: (ℝ³)) (hV : V1 ≤ V2)
+theorem has_deriv_at_deriv_for_all
+(f : ℝ → ℝ) (f' : ℝ) (h : ∀ (x : ℝ), has_deriv_at f f' x)
 :
- (M = λ (t : E),∫ (V : ℝ³) in set.Icc V1 V2,( ρ t V)) →  (∀ (t:E), deriv M t = ∫ (V : ℝ³) in set.Icc V1 V2,(deriv(λ t, ρ t (V2-V1)) t))
+∀ (x : ℝ), deriv f x = f'
 :=
 begin
-intro h,
-rw h,
+intro x,
+rw has_deriv_at.deriv,
+apply h,
+end
 
-rw interval_integral.integral_const,
+theorem eq_integral_to_deriv_eq_integral_of_deriv
+{μ : measure_theory.measure ℝ³} {V1 V2 : (ℝ³)}{t0 ε: ℝ} [linear_order ℝ³] (ε_pos : 0 < ε) {bound : ℝ³ → ℝ}
+(ρ ρ': ℝ → ℝ³ → ℝ )(M : ℝ → ℝ) (hV : V1 ≤ V2) 
+(hρ_meas : ∀ᶠ (t : ℝ) in nhds t0, ae_measurable (ρ t) (μ.restrict (set.interval_oc V1 V2)))
+(hρ_int : interval_integrable (ρ t0) μ V1 V2)
+(hρ'_meas : ae_measurable (ρ' t0) (μ.restrict (set.interval_oc V1 V2)))
+(h_bound : ∀ᵐ (V : ℝ³) ∂μ, V ∈ set.interval_oc V1 V2 → ∀ (t : ℝ), t ∈ metric.ball t0 ε → ∥ρ' t V∥ ≤ bound V)
+(bound_integrable : interval_integrable bound μ V1 V2)
+(h_diff : ∀ᵐ (V : ℝ³) ∂μ, V ∈ set.interval_oc V1 V2 → ∀ (t : ℝ), t ∈ ball t0 ε → has_deriv_at (λ (t : ℝ), (ρ t V)) (ρ' t V) t)
+:
+(M = λ (t : ℝ),∫ (V : ℝ³) in V1..V2,( ρ t V) ∂μ) →   deriv M t0 = ∫ (V : ℝ³) in V1..V2,(ρ' t0 V) ∂μ
+:=
+begin
+  have h1 : interval_integrable (ρ' t0) μ V1 V2 ∧ has_deriv_at (λ (t : ℝ), ∫ (V : fin 3 → ℝ) in V1..V2, ρ t V ∂μ) (∫ (V : fin 3 → ℝ) in V1..V2, ρ' t0 V ∂μ) t0,
+    {
+      rw ← ae_restrict_iff at *,
+      simp only [interval_integrable_iff, interval_integral.interval_integral_eq_integral_interval_oc, ← ae_restrict_iff measurable_set_interval_oc] at *,
+      have := has_deriv_at_integral_of_dominated_loc_of_deriv_le ε_pos hρ_meas hρ_int hρ'_meas h_bound bound_integrable h_diff,
+      exact ⟨this.1, this.2.const_smul _⟩,
+      have h1 : measurable_set {x : fin 3 → ℝ | ∀ (t : ℝ), t ∈ ball t0 ε → has_deriv_at (λ (t : ℝ), ρ t x) (ρ' t x) t},
+      {
+        
+      },
+      rw set_of,
+      sorry,
+      sorry,
+    },
+  intro h,
+  rw h,
+  cases h1 with h2 h3,
+  rw has_deriv_at.deriv,
+  apply h3,
+end
+
+
+theorem some_name_2
+{μ : measure_theory.measure ℝ³} {V1 V2 : (ℝ³)}{ε: ℝ} {bound : ℝ³ → ℝ}{ρ ρ': ℝ → ℝ³ → ℝ }{M : ℝ → ℝ}
+[linear_order ℝ³] (ε_pos : 0 < ε) (hV : V1 ≤ V2) 
+(hρ_meas :  ∀ᶠ (t : ℝ) in  nhds t0, ae_measurable (ρ t) (μ.restrict (set.interval_oc V1 V2)))
+(hρ_int : ∀ (t0 : ℝ), interval_integrable (ρ t0) μ V1 V2)
+(hρ'_meas : ∀ (t0 : ℝ), ae_measurable (ρ' t0) (μ.restrict (set.interval_oc V1 V2)))
+(h_bound : ∀ (t0: ℝ), (∀ᵐ (V : ℝ³) ∂μ, V ∈ set.interval_oc V1 V2 → ∀ (t : ℝ), t ∈ metric.ball t0 ε → ∥ρ' t V∥ ≤ bound V))
+(bound_integrable : interval_integrable bound μ V1 V2)
+(h_diff : ∀ᵐ (V : ℝ³) ∂μ, V ∈ set.interval_oc V1 V2 → ∀ (t : ℝ), has_deriv_at (λ (t : ℝ), (ρ t V)) (ρ' t V) t)
+:
+(M = λ (t : ℝ),∫ (V : ℝ³) in V1..V2,( ρ t V) ∂μ) →   ∀ t, deriv M t = ∫ (V : ℝ³) in V1..V2,(ρ' t V) ∂μ
+:=
+begin
+have h1 : ∀ (t : ℝ), interval_integrable (ρ' t) μ V1 V2 ∧ has_deriv_at (λ (t : ℝ), ∫ (V : fin 3 → ℝ) in V1..V2, ρ t V ∂μ) (∫ (V : fin 3 → ℝ) in V1..V2, ρ' t V ∂μ) t,
+{
+  intro t0,
+  specialize hρ_meas t0,
+  specialize hρ_int t0,
+  specialize hρ'_meas t0,
+  specialize h_bound t0,
+  rw ← ae_restrict_iff at *,
+  simp only [interval_integrable_iff, interval_integral.interval_integral_eq_integral_interval_oc, ← ae_restrict_iff measurable_set_interval_oc] at *,
+  have := has_deriv_at_integral_of_dominated_loc_of_deriv_le ε_pos hρ_meas hρ_int hρ'_meas h_bound bound_integrable h_diff,
+  exact ⟨this.1, this.2.const_smul _⟩,
+
+}
 end
