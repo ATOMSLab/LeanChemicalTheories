@@ -6,7 +6,7 @@ local notation `ℝ^n ` := fin (n) → ℝ
 theorem norm_trans_invar 
 
 :
-∀ (n : ℕ ) (x y t : ℝ^n), has_dist.dist x y = has_dist.dist (x+t) (y+t)
+∀ (x y t : ℝ^n), has_dist.dist x y = has_dist.dist (x+t) (y+t)
 :=
 begin
   repeat {intro},
