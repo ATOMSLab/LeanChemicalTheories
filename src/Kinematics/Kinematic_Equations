@@ -1,1 +1,84 @@
+import analysis.calculus.deriv
+import measure_theory.integral.interval_integral
+import Calculus.anti_deriv
+open_locale big_operators
+variables
+{α : ℝ} 
+(x v a : ℝ → ℝ) --Position, velocity, and acceleration are functions which take in a 
+--real number (time) and outputs a realnumber (position, velocity, or acceleration)
+
+theorem velocity_eq_const_accel_mul_time
+(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
+(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
+(accel_const : a = λ (t : ℝ), α)
+
+:
+∃ v₀, v =  λ t:ℝ, α*t + v₀
+:=
+begin
+  apply anti_deriv_const,
+  exact hf'',
+  simp,
+  exact accel_const,
+end
+
+theorem pos_eq_const_accel_mul_time_sqr_add_velocity_mul_time
+(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
+(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
+(accel_const : a = λ (t : ℝ), α)
+:
+∃ v₀ x₀, x =  λ t:ℝ, (α*t^2)/2 + v₀*t + x₀
+:=
+begin
+have h1 : ∃ v₀, v =  λ t:ℝ, α*t + v₀, 
+{
+  apply velocity_eq_const_accel_mul_time,
+  apply hf',
+  apply hf'',
+  apply accel_const,
+},
+cases h1 with v₀ h1,
+use v₀,
+apply anti_deriv_first_order_poly,
+exact hf',
+apply h1,
+end
+
+lemma pos_eq_velocity_add_initial_mul_time
+(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
+(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
+(accel_const : a = λ (t : ℝ), α)
+:
+∀ t, ∃ v₀ x₀, x t =  ((v t) + v₀)*t/2 + x₀
+:=
+begin
+have h1 : ∃ v₀, v =  λ t:ℝ, α*t + v₀, 
+{
+  apply velocity_eq_const_accel_mul_time,
+  apply hf',
+  apply hf'',
+  apply accel_const,
+},
+intro t,
+cases h1 with v₀ h1,
+use v₀,
+rw h1,
+simp,
+ring_nf,
+have h2 : ∃ (x₀ : ℝ), x = λ (t : ℝ), α * t ^ 2 / 2 + v₀ * t + x₀,
+{
+  apply anti_deriv_first_order_poly,
+  exact hf',
+  apply h1,
+},
+cases h2 with x₀ h2,
+use x₀,
+rw h2,
+simp,
+ring,
+end
+
+
+
+
 
