@@ -7,11 +7,11 @@ theorem anti_deriv_const
 (hf : ∀ x, has_deriv_at f (f' x) x)
 (hf' :  f' = λ x, k)
 :
-∃(C:ℝ), f = λ x, (k*x) + C
+∃(C:ℝ), (f = λ x, (k*x) + C )∧ (C = f 0)
 :=
 begin
    have h1: ∀(x y : ℝ), f x - (x*k) = f y - (y*k),
-  { 
+   { 
     apply is_const_of_deriv_eq_zero,
     {
       rw differentiable,
@@ -39,12 +39,14 @@ begin
     simp,
   },
   use f 0,
+  split,
   ext z,
   specialize h1 z 0,
   apply eq_add_of_sub_eq',
   simp at h1,
   rw mul_comm at h1,
   exact h1,
+  refl,
 end
 
 theorem anti_deriv_nat_pow 
@@ -52,7 +54,7 @@ theorem anti_deriv_nat_pow
 (hf : ∀ x, has_deriv_at f (f' x) x)
 (hf' : ∀ n:ℕ, f' = λ x, x^n)
 :
-∀(n:ℕ),∃(C:ℝ), f = λ x, (x^(n+1))/↑(n+1) + C
+∀(n:ℕ),∃(C:ℝ), (f = λ x, (x^(n+1))/↑(n+1) + C) ∧ (C = f 0)
 :=
 begin
   have h1: ∀ (n:ℕ) (x y : ℝ), f x - (x^(n+1))/↑(n+1) = f y - (y^(n+1))/↑(n+1),
@@ -94,10 +96,12 @@ begin
   },
   intro n,
   use f 0,
+  split,
   ext z,
   specialize h1 n z 0,
   apply eq_add_of_sub_eq',
   simpa using h1,
+  refl,
 end
 
 theorem anti_deriv_zpow
@@ -105,7 +109,7 @@ theorem anti_deriv_zpow
 (hf : ∀ x, x ≠ 0 ∧ has_deriv_at f (f' x) x)
 (hf' : ∀ z:ℤ, f' = λ x, x^z)
 :
-∃(C:ℝ),∀(z:ℤ), ↑z + (1:ℝ) ≠ 0  → f = λ x, (x^(z+1))/↑(z+1) + C
+∃(C:ℝ),∀(z:ℤ), (↑z + (1:ℝ) ≠ 0  → f = λ x, (x^(z+1))/↑(z+1) + C) ∧ (C = f 0)
 :=
 begin
   have h1: ∀ (z:ℤ), ↑z + (1:ℝ) ≠ 0  → ∀ (x y : ℝ), f x - (x^(z+1))/↑(z+1) = f y - (y^(z+1))/↑(z+1),
@@ -151,6 +155,7 @@ begin
   },
   use f 0,
   intro z,
+  split,
   intro h,
   ext v,
   specialize h1 z h v 0,
@@ -158,6 +163,7 @@ begin
   rw zero_zpow at h1,
   simpa using h1,
   norm_cast at *, 
+  refl,
 end
 
 lemma anti_deriv_first_order_poly
@@ -166,7 +172,7 @@ lemma anti_deriv_first_order_poly
 (hf : ∀ x, has_deriv_at f (f' x) x)
 (hf' :f' = λ x, j*x + k)
 :
-∃(C:ℝ), f = λ x, j*(x^2)/2 + k*x + C
+∃(C:ℝ), (f = λ x, j*(x^2)/2 + k*x + C)∧ (C = f 0)
 :=
 begin
   conv{
@@ -206,8 +212,10 @@ begin
     finish,
   },
   use f 0,
+  split,
   ext z,
   specialize h1 z 0,
   apply eq_add_of_sub_eq',
   simpa using h1,
+  refl,
 end
