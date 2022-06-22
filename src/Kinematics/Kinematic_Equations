@@ -1,24 +1,25 @@
 import Calculus.anti_deriv
-open_locale big_operators
+
 variables
 {α : ℝ} --α is a real number, for us it will take on the value of the constant acceleration
 (x v a : ℝ → ℝ) --Position, velocity, and acceleration are functions which take in a 
---real number (time) and outputs a realnumber (position, velocity, or acceleration)
+--real number (time) and outputs a real number (position, velocity, or acceleration)
 
 theorem velocity_eq_const_accel_mul_time
 (hf' : ∀(t : ℝ), has_deriv_at x (v t) t) /- We say that for all t, where t is a real number,
 x, our position function, has a derivative and that derivative is the function v, which
 is our velocity function. At each t, v t is the evaluation of the velocity function
-at t which is the slope of the tangent line-/
+at t which is the slope of the tangent line, basically saying x(t) = dv(t)/dt-/
 (hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)/- We say that for all t, where t is a real number,
 v, our velocity function, has a derivative and that derivative is the function a, which
 is our acceleration function. At each t, a t is the evaluation of the acceleration function
-at t which is the slope of the tangent line-/
+at t which is the slope of the tangent line, basically saying v(t) = da(t)/dt-/
 (accel_const : a = λ (t : ℝ), α) /-we say that a, which is our acceleration function, is equal
 to the lamda function which takes in a t and outputs α. This function is a constant function,
-because no matter what value of t is put in, it always outputs the same value, α.-/
+because no matter what value of t is put in, it always outputs the same value, α. da/dt = 0,
+a(t) = α-/
 :
-∃ v₀, v =  λ t:ℝ, α*t + v₀ /- we say that our velocity function is a linear function with slope
+∃ v₀, (v =  λ t, α*t + v₀) ∧ v₀ = v 0 /- we say that our velocity function is a linear function with slope
 α and intercept v₀, which is our initial velocity. We say there exists a v₀, which is our
 integration constant.-/
 :=
@@ -29,15 +30,15 @@ begin
   exact accel_const,
 end
 
-theorem pos_eq_const_accel_mul_time_sqr_add_velocity_mul_time
+lemma pos_eq_const_accel_mul_time_sqr_add_velocity_mul_time
 (hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
 (hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
 (accel_const : a = λ (t : ℝ), α)
 :
-∃ v₀ x₀, x =  λ t:ℝ, (α*t^2)/2 + v₀*t + x₀
+∃ v₀, (∃ x₀, x = (λ t:ℝ, (α*t^2)/2 + v₀*t + x₀) ∧ (x₀ = x 0))∧ v₀ = v 0
 :=
 begin
-have h1 : ∃ v₀, v =  λ t:ℝ, α*t + v₀, 
+have h1 : ∃ v₀, (v =  λ t:ℝ, α*t + v₀) ∧ v₀ = v 0, 
 {
   apply velocity_eq_const_accel_mul_time,
   apply hf',
@@ -46,9 +47,13 @@ have h1 : ∃ v₀, v =  λ t:ℝ, α*t + v₀,
 },
 cases h1 with v₀ h1,
 use v₀,
+split,
 apply anti_deriv_first_order_poly,
 exact hf',
+cases h1 with h1 v1,
 apply h1,
+cases h1 with h1 v1,
+exact v1,
 end
 
 lemma pos_eq_velocity_add_initial_mul_time
@@ -59,7 +64,7 @@ lemma pos_eq_velocity_add_initial_mul_time
 ∀ t, ∃ v₀ x₀, x t =  ((v t) + v₀)*t/2 + x₀
 :=
 begin
-have h1 : ∃ v₀, v =  λ t:ℝ, α*t + v₀, 
+have h1 : ∃ v₀, (v =  λ t:ℝ, α*t + v₀) ∧ v₀ = v 0, 
 {
   apply velocity_eq_const_accel_mul_time,
   apply hf',
@@ -69,23 +74,25 @@ have h1 : ∃ v₀, v =  λ t:ℝ, α*t + v₀,
 intro t,
 cases h1 with v₀ h1,
 use v₀,
-rw h1,
+cases h1 with h1 v1,
+rw h1, 
 simp,
-ring_nf,
-have h2 : ∃ (x₀ : ℝ), x = λ (t : ℝ), α * t ^ 2 / 2 + v₀ * t + x₀,
+ring_nf, 
+have h2 : ∃ (x₀ : ℝ), (x = λ (t : ℝ), α * t ^ 2 / 2 + v₀ * t + x₀) ∧ x₀ = x 0,
 {
-  apply anti_deriv_first_order_poly,
-  exact hf',
+  apply anti_deriv_first_order_poly, 
+  exact hf', 
   apply h1,
-},
-cases h2 with x₀ h2,
+}, 
+cases h2 with x₀ h2, 
 use x₀,
-rw h2,
+cases h2 with h2 v1,
+rw h2, 
 simp,
 ring,
 end
 
-lemma velocity_pow_two_eq_velocity_initial_pow_two_add_accel_mul_pos
+lemma velocity_pow_two_eq_velocity_initial_pow_two_add_accel_mul_pos 
 (hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
 (hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
 (accel_const : a = λ (t : ℝ), α)
@@ -93,7 +100,7 @@ lemma velocity_pow_two_eq_velocity_initial_pow_two_add_accel_mul_pos
 ∀ t, ∃ v₀ x₀, (v t)^2 = v₀^2 + 2*(a t)*((x t) - x₀)
 :=
 begin
-have h1 : ∃ v₀, v =  λ t:ℝ, α*t + v₀, 
+have h1 : ∃ v₀, (v =  λ t:ℝ, α*t + v₀) ∧ v₀ = v 0, 
 {
   apply velocity_eq_const_accel_mul_time,
   apply hf',
@@ -102,9 +109,10 @@ have h1 : ∃ v₀, v =  λ t:ℝ, α*t + v₀,
 },
 intro t,
 cases h1 with v₀ h1,
+cases h1 with h1 v1,
 use v₀,
 rw h1,
-have h2 : ∃ (x₀ : ℝ), x = λ (t : ℝ), α * t ^ 2 / 2 + v₀ * t + x₀,
+have h2 : ∃ (x₀ : ℝ), (x = λ (t : ℝ), α * t ^ 2 / 2 + v₀ * t + x₀) ∧ (x₀ = x 0) ,
 {
   apply anti_deriv_first_order_poly,
   exact hf',
@@ -112,6 +120,7 @@ have h2 : ∃ (x₀ : ℝ), x = λ (t : ℝ), α * t ^ 2 / 2 + v₀ * t + x₀,
 },
 cases h2 with x₀ h2,
 use x₀,
+cases h2 with h2 v1,
 rw h2,
 rw accel_const,
 ring_nf,
