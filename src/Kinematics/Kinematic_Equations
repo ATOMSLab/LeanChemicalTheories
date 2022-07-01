@@ -1,4 +1,5 @@
-import Calculus.anti_deriv
+import math.anti_deriv
+
 
 variables
 {α : ℝ} --α is a real number, for us it will take on the value of the constant acceleration
@@ -19,15 +20,14 @@ to the lamda function which takes in a t and outputs α. This function is a cons
 because no matter what value of t is put in, it always outputs the same value, α. da/dt = 0,
 a(t) = α-/
 :
-∃ v₀, (v =  λ t, α*t + v₀) ∧ v₀ = v 0 /- we say that our velocity function is a linear function with slope
+v =  λ t, α*t + v 0 /- we say that our velocity function is a linear function with slope
 α and intercept v₀, which is our initial velocity. We say there exists a v₀, which is our
 integration constant.-/
 :=
 begin
-  apply anti_deriv_const,
+  apply antideriv_const,
+  rw accel_const at hf'',
   exact hf'',
-  simp,
-  exact accel_const,
 end
 
 lemma pos_eq_const_accel_mul_time_sqr_add_velocity_mul_time
@@ -35,25 +35,21 @@ lemma pos_eq_const_accel_mul_time_sqr_add_velocity_mul_time
 (hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
 (accel_const : a = λ (t : ℝ), α)
 :
-∃ v₀, (∃ x₀, x = (λ t:ℝ, (α*t^2)/2 + v₀*t + x₀) ∧ (x₀ = x 0))∧ v₀ = v 0
+x = (λ t:ℝ, (α*t^2)/2 + (v 0)*t + (x 0)) 
 :=
 begin
-have h1 : ∃ v₀, (v =  λ t:ℝ, α*t + v₀) ∧ v₀ = v 0, 
+conv{
+  find ((v 0)*_) {rw ← pow_one t,}
+},
+have h1 :v =  λ t:ℝ, α*t + v 0, 
 {
   apply velocity_eq_const_accel_mul_time,
   apply hf',
   apply hf'',
   apply accel_const,
 },
-cases h1 with v₀ h1,
-use v₀,
-split,
-apply anti_deriv_first_order_poly,
 exact hf',
-cases h1 with h1 v1,
-apply h1,
-cases h1 with h1 v1,
-exact v1,
+exact h1,
 end
 
 lemma pos_eq_velocity_add_initial_mul_time
@@ -61,10 +57,10 @@ lemma pos_eq_velocity_add_initial_mul_time
 (hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
 (accel_const : a = λ (t : ℝ), α)
 :
-∀ t, ∃ v₀ x₀, x t =  ((v t) + v₀)*t/2 + x₀
+∀ t, x t =  ((v t) + (v 0))*t/2 + (x 0)
 :=
 begin
-have h1 : ∃ v₀, (v =  λ t:ℝ, α*t + v₀) ∧ v₀ = v 0, 
+have h1 : v =  λ t:ℝ, α*t + v 0, 
 {
   apply velocity_eq_const_accel_mul_time,
   apply hf',
@@ -72,24 +68,17 @@ have h1 : ∃ v₀, (v =  λ t:ℝ, α*t + v₀) ∧ v₀ = v 0,
   apply accel_const,
 },
 intro t,
-cases h1 with v₀ h1,
-use v₀,
-cases h1 with h1 v1,
 rw h1, 
 simp,
 ring_nf, 
-have h2 : ∃ (x₀ : ℝ), (x = λ (t : ℝ), α * t ^ 2 / 2 + v₀ * t + x₀) ∧ x₀ = x 0,
+have h2 :  x = λ (t : ℝ), α * t ^ 2 / 2 + (v 0) * t + x 0,
 {
-  apply anti_deriv_first_order_poly, 
+  apply antideriv_first_order_poly, 
+  rw h1 at hf',
   exact hf', 
-  apply h1,
 }, 
-cases h2 with x₀ h2, 
-use x₀,
-cases h2 with h2 v1,
 rw h2, 
-simp,
-ring,
+ring_nf,
 end
 
 lemma velocity_pow_two_eq_velocity_initial_pow_two_add_accel_mul_pos 
@@ -97,10 +86,10 @@ lemma velocity_pow_two_eq_velocity_initial_pow_two_add_accel_mul_pos
 (hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
 (accel_const : a = λ (t : ℝ), α)
 :
-∀ t, ∃ v₀ x₀, (v t)^2 = v₀^2 + 2*(a t)*((x t) - x₀)
+∀ t,(v t)^2 = (v 0)^2 + 2*(a t)*((x t) - (x 0))
 :=
 begin
-have h1 : ∃ v₀, (v =  λ t:ℝ, α*t + v₀) ∧ v₀ = v 0, 
+have h1 :v =  λ t:ℝ, α*t + v 0, 
 {
   apply velocity_eq_const_accel_mul_time,
   apply hf',
@@ -108,20 +97,42 @@ have h1 : ∃ v₀, (v =  λ t:ℝ, α*t + v₀) ∧ v₀ = v 0,
   apply accel_const,
 },
 intro t,
-cases h1 with v₀ h1,
-cases h1 with h1 v1,
-use v₀,
 rw h1,
-have h2 : ∃ (x₀ : ℝ), (x = λ (t : ℝ), α * t ^ 2 / 2 + v₀ * t + x₀) ∧ (x₀ = x 0) ,
+have h2 :x = λ (t : ℝ), α * t ^ 2 / 2 + (v 0) * t + x 0 ,
 {
-  apply anti_deriv_first_order_poly,
+  apply antideriv_first_order_poly,
+  rw h1 at hf',
   exact hf',
-  apply h1,
 },
-cases h2 with x₀ h2,
-use x₀,
-cases h2 with h2 v1,
 rw h2,
 rw accel_const,
 ring_nf,
+end
+
+variables
+{𝔸 : fin 3 → ℝ}
+(𝕩 𝕧 𝕒 : ℝ → (fin 3 → ℝ))--Position, velocity, and acceleration are functions which take in a 
+--real number (time) and outputs a real number (position, velocity, or acceleration)
+theorem vector_velocity_eq_const_accel_mul_time
+(hf' : ∀(t : ℝ), has_deriv_at 𝕩 (𝕧 t) t) /- We say that for all t, where t is a real number,
+x, our position function, has a derivative and that derivative is the function v, which
+is our velocity function. At each t, v t is the evaluation of the velocity function
+at t which is the slope of the tangent line, basically saying x(t) = dv(t)/dt-/
+(hf'' : ∀(t : ℝ), has_deriv_at 𝕧 (𝕒 t) t)/- We say that for all t, where t is a real number,
+v, our velocity function, has a derivative and that derivative is the function a, which
+is our acceleration function. At each t, a t is the evaluation of the acceleration function
+at t which is the slope of the tangent line, basically saying v(t) = da(t)/dt-/
+(accel_const : 𝕒 = λ (t : ℝ), 𝔸) /-we say that a, which is our acceleration function, is equal
+to the lamda function which takes in a t and outputs α. This function is a constant function,
+because no matter what value of t is put in, it always outputs the same value, α. da/dt = 0,
+a(t) = α-/
+:
+𝕧 =  λ t, t•𝔸 + 𝕧 0 /- we say that our velocity function is a linear function with slope
+α and intercept v₀, which is our initial velocity. We say there exists a v₀, which is our
+integration constant.-/
+:=
+begin
+  apply antideriv_const,
+  rw accel_const at hf'',
+  exact hf'',
 end
