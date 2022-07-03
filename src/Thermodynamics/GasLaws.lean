@@ -1,6 +1,7 @@
 import data.real.basic
 import data.real.nnreal
 open nnreal
+universe u_1
 local notation `ℝ≥0` := {r : ℝ // 0 ≤ r}
 theorem exist_mul_eq_const_to_binary_relation
 {C : ℝ≥0}
@@ -50,6 +51,30 @@ begin
     
 end
 
+lemma Boyle's_Law_2
+{k : ℝ}
+{P V: ℕ → ℝ}
+(hV : ∀ n, (V n) ≠ 0)
+(h1 : ∀ n, P n = k/(V n)) --n is the state of our system
+:
+(P 1)*(V 1) = (P 2)*(V 2)
+:=
+begin
+have h2 : ∀ n m, (P n)*(V n) = (P m)*(V m),
+{ intros n m, 
+  have h1' : ∀ n, P n = k/(V n) := h1,
+  specialize h1 n,
+  specialize h1' m,
+  simp_rw [h1, h1'],
+  field_simp,
+  iterate 2 {rw [mul_div_assoc, div_self]},
+  iterate 2 {apply hV},
+},
+specialize h2 1,
+specialize h2 2,
+exact h2,
+end
+
 lemma Charle's_Law 
 {k : ℝ≥0}
 (h1 : ∃(V T: ℝ≥0), V/T = k)
@@ -61,29 +86,33 @@ begin
     exact h1,
 end
 
-theorem Avagadro's_Law 
+lemma Avagadro's_Law 
 {k : ℝ≥0}
-(h1 : ∃(n V : ℝ≥0), V/n = k)
+(h1 : ∃(V n : ℝ≥0), V/n = k)
 :
 ∃ (V1 V2 n1 n2 : ℝ≥0), V1/n1 = V2/n2 
 :=
 begin
-    have h2 :  ∃(n V : ℝ≥0), V/n = k,
-    exact h1,
-    cases h1 with n1 h1,
-    cases h1 with V1 h1,
-    cases h2 with n2 h2,
-    cases h2 with V2 h2,
-    rw ← h1 at h2,
-    use V1, use V2, use n1, use n2,
-    symmetry,
-    exact h2,
+  apply exist_div_eq_const_to_binary_relation,
+  exact h1,
 end
-theorem Ideal_Gas_Law
-{R : ℝ≥0}
 
+lemma Gay_Lussac_law
+{k : ℝ≥0}
+(h1 : ∃(P T :ℝ≥0), P/T = k)
 :
+∃ (P1 P2 T1 T2 : ℝ≥0), P1/T1 = P2/T2 
+:=
+begin
+  apply exist_div_eq_const_to_binary_relation,
+  exact h1,
+end
 
+theorem Ideal_Gas_Law
+{kb kc ka P V: ℝ≥0}
+(hb : P ∝ 1/V )
+:
+∃(P V T n), P*V = kb*kc*ka*n*T
 :=
 begin
 
