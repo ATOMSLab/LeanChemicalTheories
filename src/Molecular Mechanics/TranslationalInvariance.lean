@@ -43,7 +43,7 @@ begin
  exact a2,
 end
 
-------------
+--separately proves invariance and uses the lemma to prove LJinvariance
 
 lemma TranslationInvariance (d dt t x y : ℝ )
 
