@@ -36,7 +36,7 @@ begin
   -- simp at a2,
   -- finish,
 
---(alternative proof: introduces a hypothesis (r=rt) invokes the previous proof)
+--(alternative proof: introduces a hypothesis (r=rt) invokes the lemma norm_trans_invar)
   -- have ht: r=rt,
   -- finish using norm_trans_invar n,
   -- rw ht at a3,
