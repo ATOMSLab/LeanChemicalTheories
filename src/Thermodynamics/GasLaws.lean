@@ -39,6 +39,7 @@ begin
     symmetry,
     exact h2,
 end
+
 lemma Boyle's_Law 
 {k : ℝ≥0}
 (h1 : ∃(P V : ℝ≥0), P*V = k)
@@ -108,12 +109,19 @@ begin
   exact h1,
 end
 
-theorem Ideal_Gas_Law
-{kb kc ka P V: ℝ≥0}
-(hb : P ∝ 1/V )
+lemma ideal_gas_law
+{kb kc ka kg R: ℝ}
+{P V T N: ℕ → ℝ}
+(hV : ∀ n, (V n) ≠ 0)
+(hb : ∀ n, P n = kb/(V n))
+(hc : ∀ n, T n = kc*(V n))
+(ha : ∀ n, V n = ka*(N n))
+(hg : ∀ n, P n = kg*(T n))
 :
-∃(P V T n), P*V = kb*kc*ka*n*T
+∀ n, (P n)*(V n) = R*(N n)*(T n) 
 :=
 begin
+intro n,
+rw [hb n, hc n, ha n],
 
 end

@@ -1,121 +1,104 @@
 import analysis.complex.basic
 import data.real.basic
-namespace nnreal
-open_locale nnreal big_operators
-
-theorem nnreal.tsum_coe_mul_geometric_of_norm_lt_1 {r : ℝ≥0} (hr : r < 1) :
-∑' (n : ℕ), (↑n) * r ^ n = r / (1 - r) ^ 2 :=
-begin
-have hr' : ∥(r : ℝ)∥ < 1,
-{ rw [real.norm_eq_abs, abs_lt],
-split,
-{ refine lt_of_lt_of_le _ r.coe_nonneg, norm_num },
-{ exact_mod_cast hr } },
-apply nnreal.coe_injective,
-convert tsum_coe_mul_geometric_of_norm_lt_1 hr',
-{ norm_cast },
-{ push_cast,
-rw nnreal.coe_sub hr.le,
-norm_cast },
-end
-
-theorem nnreal.tsum_eq_zero_add {f : ℕ → ℝ≥0} (hf : summable f) :
-∑' (b : ℕ), f b = f 0 + ∑' (b : ℕ), f (b + 1) :=
-begin
-  apply subtype.ext,
-  push_cast,
-  let g : ℕ → ℝ := λ n, f n,
-  have hg : summable g,
-  { apply summable.map hf (nnreal.to_real_hom : ℝ≥0 →+ ℝ) continuous_induced_dom },
-  exact tsum_eq_zero_add hg,
-end
-
-lemma some_name (θ : ℕ → ℝ≥0 )(k1 k2 kads kdes a b C P q A V₀ Vads x y c: ℝ≥0  )
+import algebra.ring.basic
+open_locale big_operators
+theorem BET 
+(θ : ℕ → ℝ ){ k1 k2 kads kdes a b C P q A V₀ Vads x y c : ℝ}
+(hsum : summable (λ (b : ℕ), ↑b * θ b))
+(hsum2 : summable (λ (b : ℕ), θ b))
 -- Equations
-(h1 : ∀ k, θ (k+1) = C * (θ 0 * x ^ (k+1))) (hA : A = ∑' (k : ℕ), θ k)
-(hVads : Vads = 0 * θ 0 + ∑' (k : ℕ), C * ( θ 0 * (k * x ^ k)))(hq : q/V₀ = Vads / A)
+(h1 : ∀ k, θ (k+1) = (x ^ (k+1)) * C * θ 0) 
+(hA : A = ∑' (k : ℕ), θ k)
+(hVads : Vads =  V₀ * ∑' (k : ℕ), k * θ k)
+(hq : q = Vads/A)
 -- Definitions
-(hC: C= y/x)
-(hy: y= (k1/k2)*P)
-(hx: x=(kads/kdes)*P)
---
-(hc: c=k1/k2)
-(ha: a=c*V₀)
-(hb: b= kads/kdes)
+(hC: C = y/(x))
+(hy: y = (k1/k2)*P)
+(hx: x = (kads/kdes)*P)
+(hc: c = k1/k2)
+(ha: a = V₀*c)
+(hb: b = kads/kdes)
 -- Constraints
-(hθ: θ 0 ≠ 0)
-(hx2: x<1)
-(hp: P ≠ 0)
-(hx1: x ≠ 0)
-(hv: V₀ ≠ 0)
+(hx1: x<1)
+(hx2 : 0 < x)
+(hV₀ : V₀ ≠ 0)
+(hθ : θ 0 ≠ 0)
 :
 q = a*P/((1-b*P)*(1-b*P+c*P))
 :=
 begin
-rw nnreal.tsum_eq_zero_add at hA, 
+have hx1' : ∥(x : ℝ)∥ < 1,
+{ rw [real.norm_eq_abs, abs_lt],
+  split, 
+  nlinarith,
+  exact hx1,}, 
+have hx2' : 0 ≤ x,
+{ apply le_of_lt,
+  exact hx2,
+},
+conv at h1
+{ find (x^_) {rw pow_succ,}},
+--Simplfy hA
+rw tsum_eq_zero_add at hA,
 simp only [h1] at hA {single_pass := tt},
-rw tsum_mul_left at hA,
-rw tsum_mul_left at hA,
-rw ← mul_assoc at hA,
-rw mul_comm C (θ 0) at hA,
-rw ← mul_one (θ 0) at hA,
-rw mul_assoc at hA,
-rw mul_assoc at hA,
-rw ← mul_add (θ 0) at hA,
-rw one_mul at hA,
-simp_rw [pow_add, pow_one, tsum_mul_right] at hA,
-rw tsum_geometric_nnreal hx2 at hA,
-rw inv_eq_one_div at hA,
-rw mul_comm (1/(1-x)) x at hA,
-rw ← mul_div_assoc x 1(1 - x) at hA,
-rw mul_one at hA,
-rw zero_mul at hVads,
-rw zero_add at hVads,
-rw tsum_mul_left at hVads,
-rw tsum_mul_left at hVads,
-rw ← mul_assoc at hVads,
-rw mul_comm C (θ 0) at hVads,
-rw mul_assoc at hVads,
-rw hA at hq,
-rw hVads at hq,
-rw mul_div_mul_left at hq,
-rw nnreal.tsum_coe_mul_geometric_of_norm_lt_1 at hq,
-rw ← mul_div_assoc at hq,
-have h1: 1-x ≠ 0,
-have h2: 0<1-x,
-exact tsub_pos_of_lt hx2,
-apply ne_of_gt,
-exact h2,
-rw ← mul_div_assoc C x(1 - x) at hq,
-rw nnreal.add_div' at hq,
-rw one_mul at hq,
-rw div_div_div_div_eq at hq,
-rw sq at hq,
-rw mul_assoc (1-x) (1-x) (1-x+C*x) at hq,
-rw mul_comm (C*x) (1-x) at hq,
-rw mul_div_mul_left at hq,
-rw mul_comm C x at hq,
-rw hC at hq,
-rw mul_div_assoc' at hq,
-rw mul_comm x y at hq,
-rw mul_div_cancel at hq,
-rw hy at hq, 
-rw hx at hq,
-rw ← hb at hq,
-rw ← hc at hq,
-rw mul_comm c P at hq,
-field_simp[hv] at hq,
-rw mul_assoc P c V₀ at hq,
-rw ← ha at hq,
-rw mul_comm P a at hq,
-rw mul_comm b P at hq,
-rw mul_comm P b at hq,
-rw mul_comm P c at hq,
-exact hq,
-exact hx1,
-exact h1,
-exact h1,
+rw [tsum_mul_right, tsum_mul_right, tsum_mul_left , tsum_geometric_of_lt_1 hx2' hx1,mul_comm] at hA,
+ring_nf at hA,
+rw [mul_assoc, inv_eq_one_div, mul_comm (1/(1-x)) _, ← mul_div_assoc, mul_one, mul_comm] at hA,
+--simplify hVads
+rw tsum_eq_zero_add at hVads,
+simp only [h1] at hVads {single_pass := tt},
+push_cast at hVads,
+conv at hVads 
+{ find (_*(_*_*_)){rw mul_comm x, rw mul_assoc, rw mul_assoc, rw ← mul_assoc,rw right_distrib, rw one_mul,},},
+rw [tsum_mul_right, tsum_add, tsum_geometric_of_lt_1 hx2' hx1, tsum_coe_mul_geometric_of_norm_lt_1 hx1', zero_mul,
+zero_add, ← mul_assoc (x / (1 - x) ^ 2 + (1 - x)⁻¹), right_distrib] at hVads,
+simp at hVads,
+rw inv_eq_one_div at hVads,
+iterate 2 {rw mul_comm _ x at hVads},
+iterate 2 {rw ← mul_div_assoc x at hVads},
+rw [← pow_two, mul_one] at hVads,
+have h2 : x^2/(1-x)^2+x/(1-x) = x/(1-x)^2,
+{ rw add_comm,
+  apply add_eq_of_eq_sub,
+  rw div_sub_div_same,
+  symmetry,
+  apply div_eq_of_eq_mul,
+  nlinarith,
+  symmetry,
+  rw [mul_comm, ← mul_div_assoc, mul_comm, pow_two, ← mul_assoc, mul_div_assoc, div_self],
+  linarith,
+  linarith,},
+rw [h2, mul_comm _ (C*θ 0), ← mul_assoc, ← mul_assoc, mul_comm (V₀*C) _, mul_assoc] at hVads,
+--simplify hq
+rw [hA, hVads] at hq,
+field_simp at hq,
+rw [mul_comm ((1-x)^2), mul_assoc, mul_assoc] at hq,
+rw [hC, hy, hx, ← hc, ← hb] at hq,
+rw [hq, ha],
+rw mul_div_mul_left,
+rw mul_assoc,
+field_simp,
+rw [mul_comm (c*P) (b*P), mul_div_mul_left, div_add_one, mul_comm _ ((1 - b * P) ^ 2), pow_two, mul_assoc (1-b*P) (1-b*P) _,
+ mul_div_cancel', mul_div_assoc, mul_div_mul_left, add_comm, ← mul_div_assoc],
+rw [hb, ← hx, ne_iff_lt_or_gt],
+right,
+rw gt_iff_lt,
+exact hx2,
+iterate 2 {rw [hb, ← hx, ne_iff_lt_or_gt],
+right,
+rw gt_iff_lt,
+rw [lt_sub, sub_zero],
+exact hx1,},
+rw [hb, ← hx, ne_iff_lt_or_gt],
+right,
+rw gt_iff_lt,
 exact hx2,
 exact hθ,
-sorry,
+convert summable_pow_mul_geometric_of_norm_lt_1 1 hx1',
+conv{
+  find (↑_^1){rw pow_one,}
+},
+apply summable_geometric_of_lt_1 hx2' hx1,
+exact hsum,
+exact hsum2,
 end
