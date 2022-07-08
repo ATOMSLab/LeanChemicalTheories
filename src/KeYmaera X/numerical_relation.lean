@@ -1,6 +1,10 @@
-import math.anti_deriv
+import data.real.basic
+import analysis.calculus.deriv
+/-This formalizes a couple of ideas that are derived in KeYmera X. Nothing new is defined here
+this just shows applications of Lean theorems for use of verifying KeYmera X -/
 
-theorem left_lt_eq
+
+example
 {A B C D : ℝ}
 (h1 : A + B = C + D)
 (h2 : 0 < A)
@@ -11,7 +15,7 @@ begin
 nlinarith,
 end
 
-theorem left_le_eq
+example
 {A B C D : ℝ}
 (h1 : A + B = C + D)
 (h2 : 0 ≤ A)
