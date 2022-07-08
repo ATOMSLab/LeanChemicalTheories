@@ -4,6 +4,22 @@ import analysis.complex.basic
 
 open_locale big_operators
 
+theorem tsum_coe_mul_geometric_add_zero
+{x : ℝ} (hx1: x<1) (hx2 : 0 < x)
+:
+∑' k : ℕ, (k + 1 : ℝ)*(x^(k+1)) = x/(1-x)^2
+:=
+begin
+  have hxnorm : ∥x∥ < 1, by refine abs_lt.mpr ⟨_, _⟩ ; linarith,  
+  conv{find (_*_){rw [pow_succ, mul_comm x _, ← mul_assoc, right_distrib, one_mul],}},
+  rw [tsum_mul_right, tsum_add, tsum_coe_mul_geometric_of_norm_lt_1, tsum_geometric_of_lt_1, inv_eq_one_div, right_distrib,
+  show x/(1-x)^2*x = x^2/(1-x)^2, by {field_simp, rw ← pow_two}, mul_comm (1/_) x, ← mul_div_assoc x 1 _, mul_one, show  x^2/(1-x)^2+x/(1-x) = x/(1-x)^2, 
+  by {rw [show x^2/(1-x)^2+x/(1-x) = x/(1-x)*(x/(1-x)+1), by {rw left_distrib, simp, rw [← pow_two, div_pow]}, pow_two,
+  div_mul_eq_div_div, div_add_one], field_simp, nlinarith}],
+  iterate 3 {linarith},
+  simpa using summable_pow_mul_geometric_of_norm_lt_1 1 hxnorm,
+  simpa using summable_geometric_of_norm_lt_1 hxnorm,
+end
 
 namespace nnreal
 
