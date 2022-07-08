@@ -21,6 +21,17 @@ begin
   simpa using summable_geometric_of_norm_lt_1 hxnorm,
 end
 
+theorem tsum_geometric_of_lt_1_pow_succ
+{x : ℝ}(hx1: x<1)(hx2 : 0 < x)
+:
+∑' k, x^(k+1) = x/(1-x)
+:=
+begin
+conv{find (x^(_+1)){rw [pow_succ, mul_comm x _],}},
+rw [tsum_mul_right, tsum_geometric_of_lt_1, inv_eq_one_div, mul_comm, ← mul_div_assoc, mul_one],
+iterate 2 {linarith},
+end
+
 namespace nnreal
 
 theorem tsum_eq_zero_add {f : ℕ → nnreal} (hf : summable f) :
