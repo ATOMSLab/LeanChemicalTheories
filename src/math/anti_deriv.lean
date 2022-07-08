@@ -158,7 +158,7 @@ begin
   norm_cast at *, 
 end
 
-lemma antideriv_first_order_poly
+theorem antideriv_poly
 {k j: ℝ}
 (f : ℝ → ℝ)
 (hf : ∀ x, has_deriv_at f (j*x + k) x) :
@@ -167,6 +167,7 @@ begin
   conv{
   find (k*_) {rw ← pow_one x,}
   },
+  rw fun_split,
   have h1: ∀ (x y : ℝ), f x - (j*(x^2)/2 + k*x^1)= f y - (j*(y^2)/2 + k*y^1),
   { 
     apply is_const_of_deriv_eq_zero,
