@@ -12,6 +12,7 @@ def seq : ℕ → ℝ
 |(0 : ℕ)            := θ₀
 |(nat.succ n) := x^(n+1)*θ₀*C
 
+--the main math of BET
 theorem BET₁ (C : ℝ) (hx1: x < 1) (hx2 : 0 < x) (hθ : θ₀ ≠ 0):
   (∑' k : ℕ, ((k + 1 : ℝ)*(seq x θ₀ C (k+1:ℕ))))/(θ₀ + ∑' k, (seq x θ₀ C (k+1:ℕ))) = C*x/((1 - x)*(1 - x + x*C)) :=
 begin
@@ -69,4 +70,3 @@ intros,
   have hx3 : x ≠ 0 := by linarith,
   field_simp,
 end
-
