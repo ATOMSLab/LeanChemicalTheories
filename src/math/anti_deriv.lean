@@ -4,6 +4,7 @@ import analysis.calculus.mean_value
 import data.complex.exponential
 import analysis.special_functions.exp_deriv
 
+universe u_1
 
 lemma fun_split
 (f g : ℝ → ℝ)
@@ -208,59 +209,63 @@ begin
   apply eq_add_of_sub_eq',
   simpa using h1,
 end
+
 lemma has_deriv_at_linear_no_pow
 :
 ∀ x : ℝ, has_deriv_at (λ y : ℝ, y) 1 x
 :=
 begin
-have h1 : (λ y : ℝ, y) = (λ y : ℝ, y^1),
-{ finish,},
-rw h1,
-intro,
-have h2 : 1 = ↑(1:ℕ)*x^(1-1) := by finish,
-rw h2,
-apply has_deriv_at_pow 1,
+  have h1 : (λ y : ℝ, y) = (λ y : ℝ, y^1) := by finish,
+  rw h1,
+  intro,
+  have h2 : 1 = ↑(1:ℕ)*x^(1-1) := by finish,
+  rw h2,
+  apply has_deriv_at_pow 1,
 end
 
-theorem anti_deriv_self
+theorem constant_of_has_deriv_right_zero' {E : Type u_1} [normed_group E] [normed_space ℝ E]
+  {f : ℝ → E} {a b : ℝ} (hderiv : ∀ (x : ℝ), x ∈ set.Icc a b → has_deriv_at f 0 x) (h : a ≤ b) :
+  f b = f a :=
+begin
+  apply constant_of_has_deriv_right_zero,
+  apply has_deriv_at.continuous_on hderiv,
+  intros,
+  apply has_deriv_at.has_deriv_within_at,
+  apply hderiv x (set.mem_Icc_of_Ico H), 
+  finish,
+end
+
+
+theorem antideriv_self
 {k: ℝ}
 (f : ℝ → ℝ)
 (hf : ∀ x, has_deriv_at f (k*(f x)) x) :
 (f = λ x, (f 0)*real.exp(k*x)) :=
 begin
-have h1: ∀ (x y : ℝ), f x - (f 0)*real.exp(k*x)= f y - (f 0)*real.exp(k*y),
-  { 
-    apply is_const_of_deriv_eq_zero,
-    {
-      rw differentiable,
-      intro x,
-      specialize hf x,
-      apply has_deriv_at.differentiable_at,
-      apply has_deriv_at.sub,
-      {
-        convert hf,
-      },
-      apply has_deriv_at.const_mul,
-      apply has_deriv_at.exp,
-      apply has_deriv_at.const_mul,
-      apply has_deriv_at_linear_no_pow,
-    },
-    intro x,
-    
-    rw deriv_sub,
-    rw sub_eq_zero,
-    simp,
-    rw ← real.deriv_exp,
-    rw has_deriv_at.deriv,
-    specialize hf x,
-    
-
-    exact hf,
-    apply has_deriv_at.differentiable_at,
-    apply hf,
-    finish,
-  },
+  have : ∀ x, has_deriv_at (λ x, real.exp (- k * x) * f x) 0 x,
+  { intros x,
+    convert (has_deriv_at_mul_const k).neg.exp.mul (hf x),
+    { ext x,
+      ring_nf },
+    { ring_nf } },
+  ext x,
+  have hx : x ≤ 0 ∨ 0 ≤ x := by exact le_total x 0,
+  cases hx with hx hx',
+  swap,
+  have : real.exp (-k * x) * f x = f 0,
+  { convert @constant_of_has_deriv_right_zero _ _ _ _ 0 x _ (λ y hy, (this y).has_deriv_within_at) x _,
+    { simp },
+    { intros x hx,
+      exact (this x).continuous_at.continuous_within_at },
+    { rw set.right_mem_Icc,
+      exact hx' } },
+  convert congr_arg ((*) (real.exp (k * x))) this using 1,
+  { rw [← mul_assoc, ← real.exp_add],
+    ring_nf,
+    simp },
+  { ring }
 end
+
 open set
 theorem antideriv_within_at_const
 (f : ℝ → ℝ) (k x : ℝ) (s : set ℝ) 
