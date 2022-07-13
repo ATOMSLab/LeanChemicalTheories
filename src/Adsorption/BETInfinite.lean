@@ -23,8 +23,8 @@ begin
   tsum_geometric_of_lt_1_pow_succ hx1 hx2, pow_two],
   have h1 : (1-x) ≠ 0 := by linarith,
   field_simp,
-  rw [mul_comm, mul_assoc (1-x) _ _, mul_div_mul_left, mul_comm, mul_comm x θ₀, mul_comm C _, mul_assoc θ₀ x C, ← mul_add θ₀ _ _, ← mul_assoc (1-x) _ _,
-  mul_comm _ θ₀, mul_assoc θ₀ _ _, mul_div_mul_left, mul_comm C x],
+  rw [mul_comm, mul_assoc (1-x) _ _, mul_div_mul_left, mul_comm, mul_comm x θ₀, mul_comm C _, mul_assoc θ₀ x C, 
+  ← mul_add θ₀ _ _, ← mul_assoc (1-x) _ _,  mul_comm _ θ₀, mul_assoc θ₀ _ _, mul_div_mul_left, mul_comm C x],
   iterate 2 {finish},
 end
 
