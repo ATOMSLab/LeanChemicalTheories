@@ -2,7 +2,8 @@ import data.real.basic
 
 theorem kineticDerivLangmuir
 [comm_group ℝ]
-(theta k_eq P_A r_ad r_d k_ad k_d A_ad S_0 S : ℝ) -- declare all variables to be real numbers
+-- declare all variables to be real numbers
+(theta k_eq P_A r_ad r_d k_ad k_d A_ad S_0 S : ℝ) 
 -- Premises
 (h1 : r_ad = k_ad*P_A*S) -- Adsorption rate expression
 (h2 : r_d = k_d*A_ad) -- Desorption rate expression
