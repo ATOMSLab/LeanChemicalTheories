@@ -7,7 +7,7 @@ import math.rpow
 
 open real 
 
-lemma deriv_inv_rpow
+theorem deriv_inv_rpow
 {C z: ℝ} (hz : 0 < z)
 :
 ∀ r:ℝ, 1 ≤ r →  deriv (λ x:ℝ, C/x^r) z = -r*C/z^(r+1):=
@@ -41,6 +41,25 @@ begin
   linarith,
 end
 
+theorem differentiable_at_inv_rpow
+{C z: ℝ} (hz : 0 < z)
+:
+∀ r:ℝ, 1 ≤ r →  differentiable_at ℝ (λ x:ℝ, C/x^r) z :=
+begin
+  intros n hr,
+  have h :  (λ x:ℝ, C/x^n) = λ x:ℝ, ((λ x:ℝ, C) x)/((λ x:ℝ, x^n) x) := by simp,
+  apply has_deriv_at.differentiable_at,
+  rw h,
+  apply has_deriv_at.div,
+  apply has_deriv_at_const,
+  apply has_deriv_at_rpow_const hr.inr,
+  simp,
+  rw ← ne.def,
+  apply ne_of_gt,
+  apply zero_lt_rpow hz,
+  linarith,
+end
+
 lemma deriv_abs_of_nonneg_rpow
 {z : ℝ} (hpos : ∀ x : ℝ, 0 ≤ x)
 :
@@ -54,12 +73,26 @@ end
 
 
 lemma deriv_inv_abs_rpow
-{C z: ℝ} (hz : 0 < z) (hC : 0 < C) (hpos : ∀ x : ℝ, 0 ≤ x)
+{C z: ℝ} (hz : 0 < z) (hC : 0 < C) (hpos : ∀ x : ℝ, 0 < x)
 :
 ∀ r:ℝ, 1 ≤ r →  deriv (λ x : ℝ , |C|/|x^r|) z = -r*C/z^(r+1):=
 begin
   intros r hr,
   simp only [abs_of_pos hC],
-  conv {  find (|_^r|) {rw [abs_rpow_of_nonneg (hpos x), abs_of_nonneg (hpos x)],}},
+  have hnonneg : ∀ x : ℝ, 0 ≤ x := by {intro x, refine le_of_lt (hpos x)},
+  conv {  find (|_^r|) {rw [abs_rpow_of_nonneg (hnonneg x), abs_of_nonneg (hnonneg x)],}},
   apply deriv_inv_rpow hz _ hr,
+end
+
+theorem differentiable_at_inv_abs_rpow
+{C z: ℝ} (hz : 0 < z) (hC : 0 < C) (hpos : ∀ x : ℝ, 0 < x)
+:
+∀ r:ℝ, 1 ≤ r →  differentiable_at ℝ (λ x:ℝ, |C|/|x^r|) z :=
+begin
+  intros r hr,
+  simp only [abs_of_pos hC],
+  have hnonneg : ∀ x : ℝ, 0 ≤ x := by {intro x, refine le_of_lt (hpos x)},
+  conv {  find (|_^r|) {rw [abs_rpow_of_nonneg (hnonneg x), abs_of_nonneg (hnonneg x)],}},
+  apply differentiable_at_inv_rpow hz r hr,
+  
 end
