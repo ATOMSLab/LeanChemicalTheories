@@ -1,26 +1,24 @@
 import data.real.basic
 
-theorem kineticDerivLangmuir
-[comm_group ℝ]
--- declare all variables to be real numbers
-(theta k_eq P_A r_ad r_d k_ad k_d A_ad S_0 S : ℝ) 
--- Premises
-(h1 : r_ad = k_ad*P_A*S) -- Adsorption rate expression
-(h2 : r_d = k_d*A_ad) -- Desorption rate expression
-(h3 : r_ad = r_d) -- Equilibrium assumption
-(h4 : k_eq = k_ad/k_d) -- Definition of adsorption constant
-(h5 : S_0 = S + A_ad) -- Site balance
-(h6 : theta = A_ad/S_0) -- Definition of fractional coverage
-(h7 : S + A_ad ≠ 0)
-(h8 : k_d + k_ad * P_A ≠ 0)
-(h9 : k_d ≠ 0)
+theorem Langmuir_single_site
+(Pₐ k_ad k_d A S₀ S : ℝ)
+(hreaction : let r_ad := k_ad*Pₐ*S, r_d := k_d*A in r_ad = r_d) --definition of equillibrium with local definitions
+
+--three constraints that field_simp auto uses
+(hS : S ≠ 0)
+(hk_d : k_d ≠ 0)
+(hPₐ : Pₐ ≠ 0)
 : 
-theta = k_eq*P_A/(1+k_eq*P_A) := -- Langmuir's adsorption law
-begin -- Proof starts here
-  rw [h1, h2] at h3,
-  rw [h6, h5, h4],
-  field_simp,
-  iterate 2 {rw mul_add},
-  rw [h3, ← right_distrib _ _ A_ad, ← left_distrib, mul_comm],  
+let θ := A/(S+A), --local definition of fractional adsorption
+    K := k_ad/k_d in --local definition of equillibrium constant
+θ = K*Pₐ/(1+K*Pₐ) :=
+begin
+  simp at hreaction,
+  simp,
+  have h : k_ad/k_d*Pₐ = A/S,
+  { field_simp [hreaction],
+    rw mul_comm,},
+  rw h,
+  field_simp,  
 end
 
