@@ -1,5 +1,7 @@
 import analysis.normed_space.basic
 import analysis.calculus.local_extr
+import group_theory.semidirect_product
+
 
 --Local imports
 import math.deriv
@@ -10,15 +12,18 @@ has a minimum, and r, the radius between the two particles.
 We first show that LJ has a local minimum at minRadius. We then
 show that LJ is translationally invaraint on a general
 vector space, E-/
+universes u 
 
 
 noncomputable theory
-universe u
+
 variables (ε minRadius: ℝ)
 
 def LJ (ε minRadius r: ℝ) : ℝ := 
   let σ := (1 / 2 ^ (1 / 6:ℝ):ℝ)*minRadius in
   4*ε*(∥σ/r∥^(12:ℝ)-∥σ/r∥^(6:ℝ))
+
+
 
 open real
 
@@ -171,9 +176,8 @@ end
 theorem LJ_deriv_2_pos
 (hrpos : ∀ r : ℝ, 0 < r)
 :
-∀ r, 0 ≤  (deriv^[2] (LJ ε minRadius) r)  :=
+ 0 ≤  (deriv^[2] (LJ ε minRadius) minRadius)  :=
 begin
-  intro,
   simp,
   rw LJ_deriv ε minRadius hrpos,
   field_simp,
