@@ -13,7 +13,6 @@ theorem Langmuir_single_site
 (hreaction : let r_ad := k_ad*Pₐ*S, r_d := k_d*A in r_ad = r_d) 
 (hS : S ≠ 0)
 (hk_d : k_d ≠ 0)
-(hPₐ : Pₐ ≠ 0)
 : 
 let θ := A/(S+A), --local definition of fractional adsorption
     K := k_ad/k_d in --local definition of equillibrium constant
