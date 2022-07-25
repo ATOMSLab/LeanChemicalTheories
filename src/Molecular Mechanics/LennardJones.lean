@@ -23,8 +23,6 @@ def LJ (ε minRadius r: ℝ) : ℝ :=
   let σ := (1 / 2 ^ (1 / 6:ℝ):ℝ)*minRadius in
   4*ε*(∥σ/r∥^(12:ℝ)-∥σ/r∥^(6:ℝ))
 
-
-
 open real
 
 lemma zero_lt_six

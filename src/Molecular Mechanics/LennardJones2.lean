@@ -1,17 +1,16 @@
 import analysis.normed_space.basic
 import geometry.manifold.tangent_bundle
 import linear_algebra.dual
+import analysis.normed_space.dual
+import geometry.manifold.instances.real
+
+
 
 
 --Local imports
 import math.deriv
 
-/-We define the Lennard Jones potential to take in an ε, the
-minimum energy constant, a minRadius, the radius where the function
-has a minimum, and r, the radius between the two particles which is a vector.
-We first show that LJ has a local minimum at minRadius. We then
-show that LJ is translationally invaraint on a general
-vector space, E-/
+
 universes u_1 u_2 u_3 u_4
 variables {𝕜 : Type u_1} [nondiscrete_normed_field 𝕜] {E : Type u_2} [normed_group E] 
 [normed_space 𝕜 E] {H : Type u_3}  [topological_space H] (I : model_with_corners 𝕜 E H) 
@@ -32,17 +31,10 @@ def cotangent_space := module.dual 𝕜 (tangent_space I x)
 
 def cotangent_bundle := bundle.total_space (cotangent_space I : M → Type*)
 
-#check cotangent_space I x
-#check cotangent_bundle I
+def configuration_space 
 structure phase_space := 
 (position : M)
 (momentum : cotangent_space I x)
-
-
-
-
-
-
 
 section end 
 variable (n:ℕ)

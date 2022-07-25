@@ -262,8 +262,16 @@ begin
   convert congr_arg ((*) (real.exp (k * x))) this using 1,
   { rw [← mul_assoc, ← real.exp_add],
     ring_nf,
-    simp },
-  { ring }
+    simp, },
+  { ring, },
+  have : real.exp (-k * x) * f x = f 0,
+  { convert @constant_of_has_deriv_right_zero _ _ _ _ x 0 _ (λ y hy, (this y).has_deriv_within_at) x _,
+    { simp },
+    { intros x hx,
+      exact (this x).continuous_at.continuous_within_at },
+    { rw set.right_mem_Icc,
+      exact hx' } },
+
 end
 
 open set
