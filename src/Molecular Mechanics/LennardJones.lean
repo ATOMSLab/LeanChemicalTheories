@@ -171,21 +171,21 @@ begin
   norm_num,
 end
 
-theorem LJ_deriv_2_pos
-(hrpos : ∀ r : ℝ, 0 < r)
-:
- 0 ≤  (deriv^[2] (LJ ε minRadius) minRadius)  :=
-begin
-  simp,
-  rw LJ_deriv ε minRadius hrpos,
-  field_simp,
-  simp [neg_div],
-  rw deriv_sub,
-  field_simp,
-  rw [deriv_inv_rpow (hrpos r),deriv_inv_rpow (hrpos r)],
-  norm_num,
+-- theorem LJ_deriv_2_pos
+-- (hrpos : ∀ r : ℝ, 0 < r)
+-- :
+--  0 ≤  (deriv^[2] (LJ ε minRadius) minRadius)  :=
+-- begin
+--   simp,
+--   rw LJ_deriv ε minRadius hrpos,
+--   field_simp,
+--   simp [neg_div],
+--   rw deriv_sub,
+--   field_simp,
+--   rw [deriv_inv_rpow (hrpos minRadius),deriv_inv_rpow (hrpos minRadius)],
+--   norm_num,
 
-end
+-- end
 
 theorem LJ_deriv_at_minEnergy
 (hrpos : ∀ r : ℝ, 0 < r)
