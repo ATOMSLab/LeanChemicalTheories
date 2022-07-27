@@ -1,10 +1,11 @@
 /-This is the attempt to formalize a section of special realtivity, by following the formalization in Coq. 
-The paper I am following is from: https://dash.harvard.edu/handle/1/38811518-/
+The paper I am following is from: https://dash.harvard.edu/handle/1/38811518 -/
 
-import data.real.sqrt
+import data.real.basic
+import analysis.inner_product_space.pi_L2
 
 noncomputable theory
-
+variables {i : ℕ}
 def body := Type
 def v4 := ((ℝ × ℝ × ℝ) × ℝ)
 def v4x (v : v4) : ℝ := v.fst.fst
@@ -39,7 +40,7 @@ def eveq (b1 b2 : body) (v1 v2 : v4) := ∀ b, W b1 b v1 ↔ W b2 b v2
 structure specrel :=
 (AxPh : ∀ (m : body), ∃ (c : ℝ), ∀ (X Y : v4), (IOb m) → ((∃ p, Ph p ∧ W m p X ∧ W m p Y) ↔ v4norm ((Yˢ) -ᵥ (Xˢ)) = c*v4norm ((Yᵗ) -ᵥ (Xᵗ))))
 (AxEv : ∀ (m k : body), IOb m ∧ IOb k ↔ forall X, exists Y, eveq m k X Y)
-(AxSf : ∀ m, IOb m →  (forall v, W m m  v ↔ (v x) = 0 ∧ (v y) = 0 ∧ (v z) = 0))
+(AxSf : ∀ m, IOb m →  (forall v, W m m v ↔ (v x) = 0 ∧ (v y) = 0 ∧ (v z) = 0))
 (AxSm1 : ∀ m k, IOb m ∧ IOb k → forall X Y X' Y', (Xᵗ) = (Yᵗ) ∧ (X'ᵗ) = (Y'ᵗ) ∧ eveq m k X X' ∧ eveq m k Y Y' → v4norm ((Xˢ) -ᵥ (Yˢ)) = v4norm ((X'ˢ) -ᵥ (Y'ˢ)))
 (AxSm2 : ∀ m, IOb m → ∃ p, Ph p ∧ W m p ((0, 0, 0), 0) ∧ W m p ((1, 0, 0), 1))
 
@@ -48,18 +49,14 @@ structure specrel :=
 theorem ax_ph' (SR : specrel): ∀ m, forall X Y, IOb m → ((∃ p, Ph p ∧ W m p X ∧ W m p Y) ↔ v4norm ((Yˢ) -ᵥ (Xˢ)) = v4norm ((Yᵗ) -ᵥ (Xᵗ))):=
 begin
   let AxPh := specrel.AxPh SR,
-  let AxSm2 := specrel.AxSm2 SR,
   intros m X Y h,
-  split,
-  intro h1,
+  specialize AxPh m,
+  cases AxPh with c AxPh,
+  specialize AxPh X Y h,
+  convert AxPh,
+  cases AxPh with AxPh1 AxPh2,
+  let AxSm2 := specrel.AxSm2 SR,
   specialize AxSm2 m h,
-  cases AxSm2 with p AxSm2,
-  cases AxSm2 with hPh AxSm2,
   
-  have hc : c = 1,
-  { cases AxPh with AxPh1 AxPh2,
-    specialize AxPh1 h1,
-    },
-
   
 end

@@ -1,5 +1,5 @@
 import math.antideriv
-
+import analysis.inner_product_space.pi_L2
 
 variables
 {α : ℝ} --α is a real number, for us it will take on the value of the constant acceleration
@@ -109,30 +109,17 @@ rw accel_const,
 ring_nf,
 end
 
-variables
-{𝔸 : fin 3 → ℝ}
-(𝕩 𝕧 𝕒 : ℝ → (fin 3 → ℝ))--Position, velocity, and acceleration are functions which take in a 
---real number (time) and outputs a real number (position, velocity, or acceleration)
-theorem vector_velocity_eq_const_accel_mul_time
-(hf' : ∀(t : ℝ), has_deriv_at 𝕩 (𝕧 t) t) /- We say that for all t, where t is a real number,
-x, our position function, has a derivative and that derivative is the function v, which
-is our velocity function. At each t, v t is the evaluation of the velocity function
-at t which is the slope of the tangent line, basically saying x(t) = dv(t)/dt-/
-(hf'' : ∀(t : ℝ), has_deriv_at 𝕧 (𝕒 t) t)/- We say that for all t, where t is a real number,
-v, our velocity function, has a derivative and that derivative is the function a, which
-is our acceleration function. At each t, a t is the evaluation of the acceleration function
-at t which is the slope of the tangent line, basically saying v(t) = da(t)/dt-/
-(accel_const : 𝕒 = λ (t : ℝ), 𝔸) /-we say that a, which is our acceleration function, is equal
-to the lamda function which takes in a t and outputs α. This function is a constant function,
-because no matter what value of t is put in, it always outputs the same value, α. da/dt = 0,
-a(t) = α-/
-:
-𝕧 =  λ t, t•𝔸 + 𝕧 0 /- we say that our velocity function is a linear function with slope
-α and intercept v₀, which is our initial velocity. We say there exists a v₀, which is our
-integration constant.-/
-:=
+def deriv_matrix 
+example
+: deriv (λ t:ℝ, ![t,t^2,t] )= λ t, ![1,2*t,1]:=
 begin
-  apply antideriv_const,
-  rw accel_const at hf'',
-  exact hf'',
+  simp,
 end
+variables {E : Type*} [normed_group E] [normed_space ℝ E]
+/-Using def to define position, velocity, and acceleration-/
+noncomputable theory
+def position (t : ℝ) : E := 
+
+#check position
+def velocity : ℝ → E := deriv position
+def acceleration : ℝ → E := deriv velocity
