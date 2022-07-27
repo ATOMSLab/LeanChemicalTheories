@@ -25,7 +25,7 @@ theorem particle_1D_box
 (h1D : n = 1)
 
 :
-
+1=1
 :=
 begin
 
