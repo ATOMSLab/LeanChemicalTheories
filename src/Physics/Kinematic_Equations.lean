@@ -1,5 +1,7 @@
 import math.antideriv
-import analysis.inner_product_space.pi_L2
+import analysis.normed_space.basic
+
+
 
 variables
 {α : ℝ} --α is a real number, for us it will take on the value of the constant acceleration
@@ -118,8 +120,71 @@ end
 variables {E : Type*} [normed_group E] [normed_space ℝ E]
 /-Using def to define position, velocity, and acceleration-/
 noncomputable theory
-def position (t : ℝ) : E := 
+variables (𝕩 : ℝ → E) (h𝕩 : continuous 𝕩)
+def position (f : ℝ → E) (n : with_top ℕ): Prop := cont_diff ℝ n f
+def velocity  : ℝ → E := deriv 𝕩
+def acceleration : ℝ → E := deriv (velocity 𝕩)
 
-#check position
-def velocity : ℝ → E := deriv position
-def acceleration : ℝ → E := deriv velocity
+
+theorem acceleration_eq_deriv2_position
+:acceleration 𝕩 = (deriv^[2] 𝕩):=
+begin
+  simp [acceleration, velocity],
+end
+
+
+local notation `𝕧` := velocity 𝕩
+local notation `𝕒` := acceleration 𝕩
+lemma two_le_imp_one_le :∀ (α : Type*), 2 ≤ α 
+theorem has_deriv_at_velocity
+{n : with_top ℕ} (hn : 2 ≤ n)
+(hf : position 𝕩 n)
+:
+∀ t, has_deriv_at 𝕩 (𝕧 t) t:=
+begin
+  intro t,
+  simp [velocity],
+  apply differentiable.differentiable_at,
+  simp [position] at hf,
+  apply cont_diff.differentiable hf hn,
+end
+
+theorem cont_diff_velocity 
+
+:
+cont_diff:=
+theorem velocity_differentiable
+{n : with_top ℕ} (hn : 1 ≤ n)
+(hf : position 𝕩 n)
+:
+differentiable ℝ (velocity 𝕩) :=
+begin
+  simp [position] at hf,
+  simp [velocity],
+  
+end
+
+theorem has_deriv_at_acceleration
+{n : with_top ℕ} (hn : 1 ≤ n)
+(hf : position 𝕩 n)
+:
+∀ t, has_deriv_at 𝕧 (𝕒 t) t:=
+begin
+  intro t,
+  simp [acceleration],
+  apply differentiable.differentiable_at,
+  simp [position] at hf,
+  apply cont_diff.differentiable hf hn,
+end
+
+#check antideriv_const'
+variable 𝔸 : E
+theorem const_accel
+(accel_const : 𝕒 = λ (t : ℝ), 𝔸)
+:
+𝕧 =  λ t:ℝ, t•𝔸 + 𝕧 0:=
+begin
+  apply antideriv_const',
+  rw accel_const at hf'',
+  exact hf'',
+end

@@ -274,6 +274,57 @@ begin
 
 end
 
+section vector_function
+universe u_2
+variables {E : Type u_2} [normed_group E] [normed_space ℝ E]
+
+theorem antideriv_const'
+(f : ℝ → E) (k : E)
+(hf : ∀ x, has_deriv_at f k x):
+(f = λ (x : ℝ), x•k + f 0) :=
+begin
+   have h1: ∀(x y : ℝ), f x - (x•k) = f y - (y•k),
+   { 
+    apply is_const_of_deriv_eq_zero,
+    {
+      rw differentiable,
+      intro x,
+      specialize hf x,
+      apply has_deriv_at.differentiable_at,
+      apply has_deriv_at.sub,
+      {
+        convert hf,
+      },
+      apply has_deriv_at.smul_const,
+      apply has_deriv_at_linear_no_pow,
+    },
+    intro x,
+    rw deriv_sub,
+    rw sub_eq_zero,
+    simp,
+    rw has_deriv_at.deriv,
+    specialize hf x,
+    rw deriv_smul_const,
+    simp,
+    apply hf,
+    apply has_deriv_at.differentiable_at,
+    apply has_deriv_at_linear_no_pow,
+    specialize hf x,
+    apply has_deriv_at.differentiable_at,
+    apply hf,
+    apply has_deriv_at.differentiable_at,
+    apply has_deriv_at.smul_const,
+    apply has_deriv_at_linear_no_pow,
+  },
+  ext z,
+  specialize h1 z 0,
+  apply eq_add_of_sub_eq',
+  simp at h1,
+  exact h1,
+end
+#check antideriv_const'
+section end
+
 open set
 theorem antideriv_within_at_const
 (f : ℝ → ℝ) (k x : ℝ) (s : set ℝ) 
