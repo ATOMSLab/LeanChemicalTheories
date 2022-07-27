@@ -75,6 +75,7 @@ rw has_deriv_at.deriv,
 apply h,
 end
 
+/-
 theorem eq_integral_to_deriv_eq_integral_of_deriv
 {μ : measure_theory.measure ℝ³} {V1 V2 : (ℝ³)}{t0 ε: ℝ} [linear_order ℝ³] (ε_pos : 0 < ε) {bound : ℝ³ → ℝ}
 (ρ ρ': ℝ → ℝ³ → ℝ )(M : ℝ → ℝ) (hV : V1 ≤ V2) 
@@ -108,7 +109,7 @@ begin
   rw has_deriv_at.deriv,
   apply h3,
 end
-
+-/
 
 theorem some_name_2
 {μ : measure_theory.measure ℝ³} {V1 V2 : (ℝ³)}{ε: ℝ} {bound : ℝ³ → ℝ}{ρ ρ': ℝ → ℝ³ → ℝ }{M : ℝ → ℝ}
