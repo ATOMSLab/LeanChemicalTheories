@@ -10,5 +10,4 @@ variables {E : Type*} [normed_add_comm_group E] [normed_space ℝ E] [finite_dim
 
 def configuration_space := M
 
-#check configuration_space 
 
