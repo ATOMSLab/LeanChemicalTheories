@@ -323,13 +323,6 @@ begin
   exact h1,
 end
 #check antideriv_const'
-section end
+end vector_function
 
--- open set
--- theorem antideriv_within_at_const
--- (f : ℝ → ℝ) (k x : ℝ) (s : set ℝ) 
--- (hf : ∀ (x:ℝ), has_deriv_within_at f k s x)  :
--- f x =  (k*(x-a)) + (f a) :=
--- begin
 
--- end
