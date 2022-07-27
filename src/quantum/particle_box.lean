@@ -6,7 +6,7 @@ wave function is an element of the function space-/
 import analysis.inner_product_space.basic
 import analysis.inner_product_space.l2_space
 
-/-
+/- not finished
 open_locale complex_conjugate
 
 universes u_1 u_2
