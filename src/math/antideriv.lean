@@ -322,7 +322,6 @@ begin
   simp at h1,
   exact h1,
 end
-#check antideriv_const'
 end vector_function
 
 
