@@ -1,13 +1,12 @@
 import data.real.basic
 
--- Variables
+
 lemma Avogadro (P1 P2 V1 V2 T1 T2 n1 n2 R : ℝ )
 
--- Assumptions
-(a1: P1*V1=n1*R*T1)  -- Gas 1 is ideal
-(a2: P2*V2=n2*R*T2)  -- Gas 2 is ideal
-(a3: P1=P2)  -- Pressure is constant
-(a4: T1=T2)  -- Tempertature is constant
+(a1: P1*V1=n1*R*T1)
+(a2: P2*V2=n2*R*T2)
+(a3: P1=P2)
+(a4: T1=T2) 
 
 
 --
@@ -16,8 +15,7 @@ lemma Avogadro (P1 P2 V1 V2 T1 T2 n1 n2 R : ℝ )
 (hn1: n1 ≠ 0)
  :
 
---Conjecture
-(V1/n1=V2/n2) -- Avogadro's Law
+(V1/n1=V2/n2)
 :=
 
 begin

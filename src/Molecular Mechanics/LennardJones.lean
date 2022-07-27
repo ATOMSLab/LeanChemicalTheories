@@ -3,15 +3,9 @@ import analysis.calculus.local_extr
 import group_theory.semidirect_product
 
 
---Local imports
 import math.deriv
 
-/-We define the Lennard Jones potential to take in an ε, the
-minimum energy constant, a minRadius, the radius where the function
-has a minimum, and r, the radius between the two particles.
-We first show that LJ has a local minimum at minRadius. We then
-show that LJ is translationally invaraint on a general
-vector space, E-/
+
 universes u 
 
 
@@ -140,7 +134,6 @@ begin
   rw zero_le_mul_left,
   refine le_of_lt (hrpos r),
   exact zero_lt_two_pow_one_div_six,
-  
 end
 
 theorem LJ_deriv
@@ -171,21 +164,7 @@ begin
   norm_num,
 end
 
--- theorem LJ_deriv_2_pos
--- (hrpos : ∀ r : ℝ, 0 < r)
--- :
---  0 ≤  (deriv^[2] (LJ ε minRadius) minRadius)  :=
--- begin
---   simp,
---   rw LJ_deriv ε minRadius hrpos,
---   field_simp,
---   simp [neg_div],
---   rw deriv_sub,
---   field_simp,
---   rw [deriv_inv_rpow (hrpos minRadius),deriv_inv_rpow (hrpos minRadius)],
---   norm_num,
 
--- end
 
 theorem LJ_deriv_at_minEnergy
 (hrpos : ∀ r : ℝ, 0 < r)
@@ -202,18 +181,4 @@ begin
   norm_num,
 end
 
--- theorem LJ_local_extr_at_minEnergy
--- (hrpos : ∀ r : ℝ, 0 < r)
--- :
--- is_local_extr (LJ ε minRadius) minRadius :=
--- begin
 
--- end
-
--- theorem LJ_minEnerg
--- (hrpos : ∀ r : ℝ, 0 ≤ r)
--- : 
--- is_local_min (LJ ε minRadius) minRadius :=
--- begin
---   sorry,
--- end

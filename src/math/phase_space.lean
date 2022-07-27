@@ -1,4 +1,3 @@
-/-We define Phase space as the cotangent bundle of configuration space-/
 
 import geometry.manifold.tangent_bundle
 

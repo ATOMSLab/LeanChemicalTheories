@@ -7,12 +7,12 @@ open_locale big_operators
 
 variables (x θ₀ C: ℝ)
 
--- The main BET sequence
+
 def seq : ℕ → ℝ
 |(0 : ℕ)            := θ₀
 |(nat.succ n) := x^(n+1)*θ₀*C
 
---the main math of BET
+
 theorem BET₁ (C : ℝ) (hx1: x < 1) (hx2 : 0 < x) (hθ : θ₀ ≠ 0):
   (∑' k : ℕ, ((k + 1 : ℝ)*(seq x θ₀ C (k+1:ℕ))))/(θ₀ + ∑' k, (seq x θ₀ C (k+1:ℕ))) = C*x/((1 - x)*(1 - x + x*C)) :=
 begin
@@ -28,11 +28,8 @@ begin
   iterate 2 {finish},
 end
 
-/-BET given in a form that is similar to something that would be derived by symbolic regression. 
-We want this for use with our Bayesian symbolic regression group  -/
 theorem BET_regression_form
 { P V₀ y: ℝ}
--- Constraints
 (hx1: x<1)
 (hx2 : 0 < x)
 (hθ : θ₀ ≠ 0)

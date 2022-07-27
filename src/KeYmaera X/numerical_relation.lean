@@ -1,9 +1,5 @@
 import math.antideriv
 
-/-This formalizes a couple of ideas that are derived in KeYmera X. Nothing new is defined here
-this just shows applications of Lean theorems for use of verifying KeYmera X -/
-
-
 example
 {A B C D : ℝ}
 (h1 : A + B = C + D)

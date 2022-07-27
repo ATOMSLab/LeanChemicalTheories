@@ -36,7 +36,7 @@ lemma Boyle's_Law
 {k : ℝ≥0}
 {P V: ℕ → ℝ≥0}
 (hV : ∀ n, (V n) ≠ 0)
-(h1 : ∀ n, P n = k/(V n)) --n is the state of our system
+(h1 : ∀ n, P n = k/(V n)) 
 :
 (P 1)*(V 1) = (P 2)*(V 2)
 :=
@@ -63,7 +63,7 @@ lemma Avagadro's_Law
 (V 1)*(N 2) = (V 2)*(N 1)
 :=
 begin
-exact Charle's_Law h1, -- I think this is funny
+exact Charle's_Law h1, 
 end
 
 lemma Gay_Lussac_law

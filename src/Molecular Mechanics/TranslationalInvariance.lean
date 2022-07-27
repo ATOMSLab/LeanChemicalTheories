@@ -2,16 +2,16 @@ import data.real.basic
 import analysis.complex.basic
 
 
-open real  --real.sqrt, will return 0 for negative inputs
+open real  
  
 lemma LJTranslationInvariance1D (r x y t rt E a b Et : ℝ )
 
-( a1: r = sqrt ((x-y)^2) ) -- pairwise distance
-( a2: E = a/r^12 - b/r^6 ) -- LJ potential
-( a3: rt = sqrt (((x+t) - (y+t))^2)  ) --- pairwise distance after translation t
-( a4: Et = a/rt^12 - b/rt^6 ) -- LJ potential after translation t
+( a1: r = sqrt ((x-y)^2) ) 
+( a2: E = a/r^12 - b/r^6 ) 
+( a3: rt = sqrt (((x+t) - (y+t))^2)  )
+( a4: Et = a/rt^12 - b/rt^6 )
 :
---Conjecture
+
 E = Et
 :=
 
@@ -26,12 +26,11 @@ end
 
 lemma LJTranslationInvariance3D (a b r rt E t Et x1 y1 z1 x2 y2 z2 : ℝ)
 
-( a1: r = sqrt ((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2) ) -- pairwise distance
-( a2: E = a/r^12 - b/r^6 ) -- LJ potential
-( a3: rt = sqrt (((x1+t) - (x2+t))^2 + ((y1+t) - (y2+t))^2 + ((z1+t) - (z2+t))^2) ) --- pairwise distance after translation t
-( a4: Et = a/rt^12 - b/rt^6 ) -- LJ potential after translation t
+( a1: r = sqrt ((x1-x2)^2 + (y1-y2)^2 + (z1-z2)^2) ) 
+( a2: E = a/r^12 - b/r^6 ) 
+( a3: rt = sqrt (((x1+t) - (x2+t))^2 + ((y1+t) - (y2+t))^2 + ((z1+t) - (z2+t))^2) ) 
+( a4: Et = a/rt^12 - b/rt^6 ) 
 :
---Conjecture
 E = Et
 :=
 
@@ -43,14 +42,12 @@ begin
  exact a2,
 end
 
---separately proves invariance and uses the lemma to prove LJinvariance
 
 lemma TranslationInvariance (d dt t x y : ℝ )
 
-( a1: d = sqrt ((x-y)^2) ) -- pairwise distance
-( a2: dt = sqrt (((x+t) - (y+t))^2)  ) --- pairwise distance after translation t
+( a1: d = sqrt ((x-y)^2) )
+( a2: dt = sqrt (((x+t) - (y+t))^2)  )
 :
---Conjecture
 d = dt
 :=
 
@@ -61,12 +58,12 @@ begin
 end
 
 lemma LJInvariance (a b r rt x y t E Et : ℝ )
-( a1: r = sqrt ((x-y)^2) ) -- pairwise distance
-( a2: rt = sqrt (((x+t) - (y+t))^2)  ) --- pairwise distance after translation
-( a3: E = a/r^12 - b/r^6 ) -- LJ potential
-( a4: Et = a/rt^12 - b/rt^6 ) -- LJ potential after translation t
+( a1: r = sqrt ((x-y)^2) ) 
+( a2: rt = sqrt (((x+t) - (y+t))^2)  ) 
+( a3: E = a/r^12 - b/r^6 ) 
+( a4: Et = a/rt^12 - b/rt^6 )
 :
---Conjecture
+
 E = Et
 :=
 

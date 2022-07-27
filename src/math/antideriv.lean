@@ -236,43 +236,7 @@ begin
 end
 
 
--- theorem antideriv_self
--- {k: ℝ}
--- (f : ℝ → ℝ)
--- (hf : ∀ x, has_deriv_at f (k*(f x)) x) :
--- (f = λ x, (f 0)*real.exp(k*x)) :=
--- begin
---   have : ∀ x, has_deriv_at (λ x, real.exp (- k * x) * f x) 0 x,
---   { intros x,
---     convert (has_deriv_at_mul_const k).neg.exp.mul (hf x),
---     { ext x,
---       ring_nf },
---     { ring_nf } },
---   ext x,
---   have hx : x ≤ 0 ∨ 0 ≤ x := by exact le_total x 0,
---   cases hx with hx hx',
---   swap,
---   have : real.exp (-k * x) * f x = f 0,
---   { convert @constant_of_has_deriv_right_zero _ _ _ _ 0 x _ (λ y hy, (this y).has_deriv_within_at) x _,
---     { simp },
---     { intros x hx,
---       exact (this x).continuous_at.continuous_within_at },
---     { rw set.right_mem_Icc,
---       exact hx' } },
---   convert congr_arg ((*) (real.exp (k * x))) this using 1,
---   { rw [← mul_assoc, ← real.exp_add],
---     ring_nf,
---     simp, },
---   { ring, },
---   have : real.exp (-k * x) * f x = f 0,
---   { convert @constant_of_has_deriv_right_zero _ _ _ _ x 0 _ (λ y hy, (this y).has_deriv_within_at) x _,
---     { simp },
---     { intros x hx,
---       exact (this x).continuous_at.continuous_within_at },
---     { rw set.right_mem_Icc,
---       exact hx' } },
 
--- end
 
 section vector_function
 universe u_2
