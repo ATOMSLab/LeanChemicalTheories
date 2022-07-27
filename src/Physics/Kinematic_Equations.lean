@@ -110,7 +110,7 @@ rw accel_const,
 ring_nf,
 end
 
-variables {E : Type*} [normed_group E] [normed_space ℝ E]
+variables {E : Type*} [normed_add_comm_group E] [normed_space ℝ E]
 /-Using def to define position, velocity, and acceleration-/
 noncomputable theory
 variables (𝕩 : ℝ → E) (h𝕩 : continuous 𝕩)

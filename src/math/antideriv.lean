@@ -223,7 +223,7 @@ begin
   apply has_deriv_at_pow 1,
 end
 
-theorem constant_of_has_deriv_right_zero' {E : Type u_1} [normed_group E] [normed_space ℝ E]
+theorem constant_of_has_deriv_right_zero' {E : Type u_1} [normed_add_comm_group E] [normed_space ℝ E]
   {f : ℝ → E} {a b : ℝ} (hderiv : ∀ (x : ℝ), x ∈ set.Icc a b → has_deriv_at f 0 x) (h : a ≤ b) :
   f b = f a :=
 begin
@@ -276,7 +276,7 @@ end
 
 section vector_function
 universe u_2
-variables {E : Type u_2} [normed_group E] [normed_space ℝ E]
+variables {E : Type u_2} [normed_add_comm_group E] [normed_space ℝ E]
 
 theorem antideriv_const'
 (f : ℝ → E) (k : E)

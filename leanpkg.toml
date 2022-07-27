@@ -1,8 +1,8 @@
 [package]
 name = "ssharlin_project"
 version = "0.1"
-lean_version = "leanprover-community/lean:3.44.1"
+lean_version = "leanprover-community/lean:3.45.0"
 path = "src"
 
 [dependencies]
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "71b1be63560d43c689b2c1338ed1366619ce2940"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "c59720b460605812986068342d81f50d3740fd8e"}
