@@ -202,18 +202,18 @@ begin
   norm_num,
 end
 
-theorem LJ_local_extr_at_minEnergy
-(hrpos : ∀ r : ℝ, 0 < r)
-:
-is_local_extr (LJ ε minRadius) minRadius :=
-begin
+-- theorem LJ_local_extr_at_minEnergy
+-- (hrpos : ∀ r : ℝ, 0 < r)
+-- :
+-- is_local_extr (LJ ε minRadius) minRadius :=
+-- begin
 
-end
+-- end
 
-theorem LJ_minEnerg
-(hrpos : ∀ r : ℝ, 0 ≤ r)
-: 
-is_local_min (LJ ε minRadius) minRadius :=
-begin
-  sorry,
-end
+-- theorem LJ_minEnerg
+-- (hrpos : ∀ r : ℝ, 0 ≤ r)
+-- : 
+-- is_local_min (LJ ε minRadius) minRadius :=
+-- begin
+--   sorry,
+-- end
