@@ -15,7 +15,7 @@ begin
 end
 
 
-lemma LJInvariance (x y t : ℝ^n) (r rt a b E Et: ℝ)
+lemma LJInvariance_2 (x y t : ℝ^n) (r rt a b E Et: ℝ)
 ( a1: r = dist x y)  -- pairwise distance
 ( a2: rt = dist (x+t) (y+t)  ) --- pairwise distance after translation
 ( a3: E = a/r^12 - b/r^6 ) -- LJ potential
