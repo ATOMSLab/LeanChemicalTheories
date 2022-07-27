@@ -24,7 +24,7 @@ end
 
 open nnreal
 local notation `ℝ≥0` := {r : ℝ // 0 ≤ r}
-theorem Boyle's_Law 
+theorem Boyle's_Law_2
 {k : ℝ≥0}
 (h1 : ∃(P V : ℝ≥0), P*V = k)
 :
