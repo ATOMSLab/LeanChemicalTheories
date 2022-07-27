@@ -162,7 +162,7 @@ begin
   norm_cast at *, 
 end
 
-theorem antideriv_poly
+theorem antideriv_first_order_poly
 {k j: ℝ}
 (f : ℝ → ℝ)
 (hf : ∀ x, has_deriv_at f (j*x + k) x) :

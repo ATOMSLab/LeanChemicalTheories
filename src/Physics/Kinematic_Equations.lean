@@ -40,9 +40,6 @@ lemma pos_eq_const_accel_mul_time_sqr_add_velocity_mul_time
 x = (λ t:ℝ, (α*t^2)/2 + (v 0)*t + (x 0)) 
 :=
 begin
-conv{
-  find ((v 0)*_) {rw ← pow_one t,}
-},
 have h1 :v =  λ t:ℝ, α*t + v 0, 
 {
   apply velocity_eq_const_accel_mul_time,
@@ -50,8 +47,10 @@ have h1 :v =  λ t:ℝ, α*t + v 0,
   apply hf'',
   apply accel_const,
 },
+apply antideriv_first_order_poly,
+rw h1 at hf',
+simp at hf',
 exact hf',
-exact h1,
 end
 
 lemma pos_eq_velocity_add_initial_mul_time
@@ -111,12 +110,6 @@ rw accel_const,
 ring_nf,
 end
 
-def deriv_matrix 
-example
-: deriv (λ t:ℝ, ![t,t^2,t] )= λ t, ![1,2*t,1]:=
-begin
-  simp,
-end
 variables {E : Type*} [normed_group E] [normed_space ℝ E]
 /-Using def to define position, velocity, and acceleration-/
 noncomputable theory
@@ -135,7 +128,15 @@ end
 
 local notation `𝕧` := velocity 𝕩
 local notation `𝕒` := acceleration 𝕩
-lemma two_le_imp_one_le :∀ (α : Type*), 2 ≤ α 
+universe u
+lemma two_le_imp_one_le {α : Type u} {a : α} [preorder α] [has_one α] [has_add α]
+(h : (1:α) ≤ (2:α)): 
+(2:α) ≤ a → (1:α) ≤ a :=
+begin
+  intro h1,
+  apply le_trans h h1,  
+end
+
 theorem has_deriv_at_velocity
 {n : with_top ℕ} (hn : 2 ≤ n)
 (hf : position 𝕩 n)
@@ -146,45 +147,45 @@ begin
   simp [velocity],
   apply differentiable.differentiable_at,
   simp [position] at hf,
-  apply cont_diff.differentiable hf hn,
+  apply cont_diff.differentiable hf (two_le_imp_one_le one_le_two hn),
 end
 
-theorem cont_diff_velocity 
+-- theorem cont_diff_velocity 
 
-:
-cont_diff:=
-theorem velocity_differentiable
-{n : with_top ℕ} (hn : 1 ≤ n)
-(hf : position 𝕩 n)
-:
-differentiable ℝ (velocity 𝕩) :=
-begin
-  simp [position] at hf,
-  simp [velocity],
+-- :
+-- cont_diff:=
+-- theorem velocity_differentiable
+-- {n : with_top ℕ} (hn : 2 ≤ n)
+-- (hf : position 𝕩 n)
+-- :
+-- differentiable ℝ (velocity 𝕩) :=
+-- begin
+--   simp [position] at hf,
+--   simp [velocity],
   
-end
+-- end
 
-theorem has_deriv_at_acceleration
-{n : with_top ℕ} (hn : 1 ≤ n)
-(hf : position 𝕩 n)
-:
-∀ t, has_deriv_at 𝕧 (𝕒 t) t:=
-begin
-  intro t,
-  simp [acceleration],
-  apply differentiable.differentiable_at,
-  simp [position] at hf,
-  apply cont_diff.differentiable hf hn,
-end
+-- theorem has_deriv_at_acceleration
+-- {n : with_top ℕ} (hn : 1 ≤ n)
+-- (hf : position 𝕩 n)
+-- :
+-- ∀ t, has_deriv_at 𝕧 (𝕒 t) t:=
+-- begin
+--   intro t,
+--   simp [acceleration],
+--   apply differentiable.differentiable_at,
+--   simp [position] at hf,
+--   apply cont_diff.differentiable hf hn,
+-- end
 
-#check antideriv_const'
-variable 𝔸 : E
-theorem const_accel
-(accel_const : 𝕒 = λ (t : ℝ), 𝔸)
-:
-𝕧 =  λ t:ℝ, t•𝔸 + 𝕧 0:=
-begin
-  apply antideriv_const',
-  rw accel_const at hf'',
-  exact hf'',
-end
+-- #check antideriv_const'
+-- variable 𝔸 : E
+-- theorem const_accel
+-- (accel_const : 𝕒 = λ (t : ℝ), 𝔸)
+-- :
+-- 𝕧 =  λ t:ℝ, t•𝔸 + 𝕧 0:=
+-- begin
+--   apply antideriv_const',
+--   rw accel_const at hf'',
+--   exact hf'',
+-- end

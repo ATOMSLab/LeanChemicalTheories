@@ -46,17 +46,17 @@ structure specrel :=
 
 
 
-theorem ax_ph' (SR : specrel): ∀ m, forall X Y, IOb m → ((∃ p, Ph p ∧ W m p X ∧ W m p Y) ↔ v4norm ((Yˢ) -ᵥ (Xˢ)) = v4norm ((Yᵗ) -ᵥ (Xᵗ))):=
-begin
-  let AxPh := specrel.AxPh SR,
-  intros m X Y h,
-  specialize AxPh m,
-  cases AxPh with c AxPh,
-  specialize AxPh X Y h,
-  convert AxPh,
-  cases AxPh with AxPh1 AxPh2,
-  let AxSm2 := specrel.AxSm2 SR,
-  specialize AxSm2 m h,
+-- theorem ax_ph' (SR : specrel): ∀ m, forall X Y, IOb m → ((∃ p, Ph p ∧ W m p X ∧ W m p Y) ↔ v4norm ((Yˢ) -ᵥ (Xˢ)) = v4norm ((Yᵗ) -ᵥ (Xᵗ))):=
+-- begin
+--   let AxPh := specrel.AxPh SR,
+--   intros m X Y h,
+--   specialize AxPh m,
+--   cases AxPh with c AxPh,
+--   specialize AxPh X Y h,
+--   convert AxPh,
+--   cases AxPh with AxPh1 AxPh2,
+--   let AxSm2 := specrel.AxSm2 SR,
+--   specialize AxSm2 m h,
   
   
-end
+-- end
