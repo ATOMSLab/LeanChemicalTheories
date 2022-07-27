@@ -16,8 +16,6 @@ def v4_t (v : v4) := (((0:ℝ),(0:ℝ),(0:ℝ)),v.snd)
 def v4_s (v : v4) := (v.fst, (0:ℝ))
 def v4norm (v : v4) := real.sqrt ((v4x v)^2 + (v4y v)^2 + (v4z v)^2 + (v4t v)^2)
 
-#check v4_t 
-#check v4_s
 
 local notation v`x` := v4x v
 local notation v`y` := v4y v
