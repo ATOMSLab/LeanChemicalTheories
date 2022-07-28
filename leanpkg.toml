@@ -1,5 +1,5 @@
 [package]
-name = "ssharlin_project"
+name = "LeanChemicalTheories"
 version = "0.1"
 lean_version = "leanprover-community/lean:3.45.0"
 path = "src"
