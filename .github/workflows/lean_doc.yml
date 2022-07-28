@@ -5,9 +5,6 @@ jobs:
   build_docs:
     runs-on: ubuntu-latest
     name: Build docs
-    environment: 
-      name: documentation
-      url: https://atomslab.github.io/LeanChemicalTheoriesDocs
     steps:
 
     - name: 📁 Checkout project
@@ -80,8 +77,8 @@ jobs:
       run: |
         cd doc-gen
         python3 \
-          -c "import print_docs; del print_docs.extra_doc_files[:]; print_docs.copy_yaml_bib_files = lambda p: None; print_docs.library_link_roots['LeanChemicalTheories'] = 'https://github.com/ATOMSLab/LeanChemicalTheories/blob/$GITHUB_SHA/src/'; print_docs.main()" \
-          -r .. -w 'https://atomslab.github.io/LeanChemicalTheoriesDocs/' -t built-docs
+          -c "import print_docs; del print_docs.extra_doc_files[:]; print_docs.copy_yaml_bib_files = lambda p: None; print_docs.library_link_roots['LeanChemicalTheories'] = 'https://github.com/${GITHUB_REPOSITORY}/blob/$GITHUB_SHA/src/'; print_docs.main()" \
+          -r .. -w "https://${GITHUB_REPOSITORY%/*}.github.io/${GITHUB_REPOSITORY#*/}/" -t built-docs
 
     - name: 🔑 Install SSH Client
       uses: webfactory/ssh-agent@v0.4.1
@@ -91,8 +88,6 @@ jobs:
     - name: 🚀 Deploy
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
-        SSH: true
         SINGLE_COMMIT: true
-        REPOSITORY_NAME: ATOMSLab/LeanChemicalTheories
         BRANCH: gh-pages # The branch the action should deploy to.
         FOLDER: doc-gen/built-docs # The folder the action should deploy.
