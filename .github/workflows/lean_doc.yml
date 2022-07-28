@@ -7,7 +7,7 @@ jobs:
     name: Build docs
     environment: 
       name: documentation
-      url: https://atomslab.github.io/LeanChemicalTheories
+      url: https://LeanChemicalTheories.github.io
     steps:
 
     - name: 📁 Checkout project
@@ -72,8 +72,8 @@ jobs:
       run: |
         cd doc-gen
         python3 \
-          -c "import print_docs; del print_docs.extra_doc_files[:]; print_docs.copy_yaml_bib_files = lambda p: None; print_docs.library_link_roots['LeanChemicalTheories'] = 'https://atomslab.github.io/LeanChemicalTheories/blob/$GITHUB_SHA/src/'; print_docs.main()" \
-          -r .. -w 'https://atomslab.github.io/LeanChemicalTheories' -t built-docs
+          -c "import print_docs; del print_docs.extra_doc_files[:]; print_docs.copy_yaml_bib_files = lambda p: None; print_docs.library_link_roots['LeanChemicalTheories'] = 'https://LeanChemicalTheories.github.io/blob/$GITHUB_SHA/src/'; print_docs.main()" \
+          -r .. -w 'https://LeanChemicalTheories.github.io' -t built-docs
     - name: 🔑 Install SSH Client
       uses: webfactory/ssh-agent@v0.4.1
       with:
