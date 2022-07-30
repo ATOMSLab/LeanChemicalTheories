@@ -2,107 +2,28 @@ import math.antideriv
 import analysis.inner_product_space.basic
 import analysis.calculus.iterated_deriv
 
-variables
-{α : ℝ} 
-(x v a : ℝ → ℝ) 
+/-!
+# The equations of motion
+We define motion to be over an inner product space, which is a vector space endowed with an operator caleld the inner product. 
+We generalize motion to be over a field that is either real or complex, and show that three of the four kinematic equations for 
+constant acceleration hold in complex time. The fourth kinematic equation, as of now, can only be derived in real time. 
 
-theorem velocity_eq_const_accel_mul_time
-(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
-(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
-(accel_const : a = λ (t : ℝ), α) 
-:
-v =  λ t, α*t + v 0 
-:=
-begin
-  apply antideriv_const,
-  rw accel_const at hf'',
-  exact hf'',
-end
+We also define an extension of the motion class to require that our functions be continously differentiable n times. In the
+future, we plan to define another class extension which only requires the equations of motion to be differentiable on a set. These
+classes are defined seperatley from the motion class to give flexibility to motion's applicability. We also don't require the equations
+to be infinitley differentiable, but this can be achieved by using ⊤ for n.
 
-lemma pos_eq_const_accel_mul_time_sqr_add_velocity_mul_time
-(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
-(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
-(accel_const : a = λ (t : ℝ), α)
-:
-x = (λ t:ℝ, (α*t^2)/2 + (v 0)*t + (x 0)) 
-:=
-begin
-have h1 :v =  λ t:ℝ, α*t + v 0, 
-{
-  apply velocity_eq_const_accel_mul_time,
-  apply hf',
-  apply hf'',
-  apply accel_const,
-},
-apply antideriv_first_order_poly,
-rw h1 at hf',
-simp at hf',
-exact hf',
-end
+Finally, at the end we derive the four equations of motion for the case of linear translation along a line. Currently, these derivations
+are independent of the motion class, but in the future, they will be unified with motion and shown to be examples of their vector
+coutner-part.
 
-lemma pos_eq_velocity_add_initial_mul_time
-(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
-(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
-(accel_const : a = λ (t : ℝ), α)
-:
-∀ t, x t =  ((v t) + (v 0))*t/2 + (x 0)
-:=
-begin
-have h1 : v =  λ t:ℝ, α*t + v 0, 
-{
-  apply velocity_eq_const_accel_mul_time,
-  apply hf',
-  apply hf'',
-  apply accel_const,
-},
-intro t,
-rw h1, 
-simp,
-ring_nf, 
-have h2 :  x = λ (t : ℝ), α * t ^ 2 / 2 + (v 0) * t + x 0,
-{
-  apply antideriv_first_order_poly, 
-  rw h1 at hf',
-  exact hf', 
-}, 
-rw h2, 
-ring_nf,
-end
-
-lemma velocity_pow_two_eq_velocity_initial_pow_two_add_accel_mul_pos 
-(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
-(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
-(accel_const : a = λ (t : ℝ), α)
-:
-∀ t,(v t)^2 = (v 0)^2 + 2*(a t)*((x t) - (x 0))
-:=
-begin
-have h1 :v =  λ t:ℝ, α*t + v 0, 
-{
-  apply velocity_eq_const_accel_mul_time,
-  apply hf',
-  apply hf'',
-  apply accel_const,
-},
-intro t,
-rw h1,
-have h2 :x = λ (t : ℝ), α * t ^ 2 / 2 + (v 0) * t + x 0 ,
-{
-  apply antideriv_first_order_poly,
-  rw h1 at hf',
-  exact hf',
-},
-rw h2,
-rw accel_const,
-ring_nf,
-end
-
+## To-Do
+ - Show that the fourth kinematic equations hold in complex time with the nescessary assumptions
+ - Show that the linear translation equations follow from the vector form-/
 
 noncomputable theory
 
-/-Given a vector space over a field with a norm, we define motion as the parametric function which takes in a field 
-(normally time) and outputs an element of vector space. We only require the field to be nontrivial and normed, but for 
-the derivation of the four kinematic equations, we require the field to be the real or complex numbers. -/
+
 class motion (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜]
   extends inner_product_space 𝕜 E:=
 {position velocity acceleration : 𝕜 → E}
@@ -308,3 +229,101 @@ begin
   repeat {rw real_inner_smul_right,},
   ring_nf,
 end
+
+/-! ### Kinematic equations for translation on a real line-/
+variables
+{α : ℝ} 
+(x v a : ℝ → ℝ) 
+
+theorem velocity_eq_const_accel_mul_time
+(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
+(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
+(accel_const : a = λ (t : ℝ), α) 
+:
+v =  λ t, α*t + v 0 
+:=
+begin
+  apply antideriv_const,
+  rw accel_const at hf'',
+  exact hf'',
+end
+
+lemma pos_eq_const_accel_mul_time_sqr_add_velocity_mul_time
+(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
+(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
+(accel_const : a = λ (t : ℝ), α)
+:
+x = (λ t:ℝ, (α*t^2)/2 + (v 0)*t + (x 0)) 
+:=
+begin
+have h1 :v =  λ t:ℝ, α*t + v 0, 
+{
+  apply velocity_eq_const_accel_mul_time,
+  apply hf',
+  apply hf'',
+  apply accel_const,
+},
+apply antideriv_first_order_poly,
+rw h1 at hf',
+simp at hf',
+exact hf',
+end
+
+lemma pos_eq_velocity_add_initial_mul_time
+(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
+(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
+(accel_const : a = λ (t : ℝ), α)
+:
+∀ t, x t =  ((v t) + (v 0))*t/2 + (x 0)
+:=
+begin
+have h1 : v =  λ t:ℝ, α*t + v 0, 
+{
+  apply velocity_eq_const_accel_mul_time,
+  apply hf',
+  apply hf'',
+  apply accel_const,
+},
+intro t,
+rw h1, 
+simp,
+ring_nf, 
+have h2 :  x = λ (t : ℝ), α * t ^ 2 / 2 + (v 0) * t + x 0,
+{
+  apply antideriv_first_order_poly, 
+  rw h1 at hf',
+  exact hf', 
+}, 
+rw h2, 
+ring_nf,
+end
+
+lemma velocity_pow_two_eq_velocity_initial_pow_two_add_accel_mul_pos 
+(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
+(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
+(accel_const : a = λ (t : ℝ), α)
+:
+∀ t,(v t)^2 = (v 0)^2 + 2*(a t)*((x t) - (x 0))
+:=
+begin
+have h1 :v =  λ t:ℝ, α*t + v 0, 
+{
+  apply velocity_eq_const_accel_mul_time,
+  apply hf',
+  apply hf'',
+  apply accel_const,
+},
+intro t,
+rw h1,
+have h2 :x = λ (t : ℝ), α * t ^ 2 / 2 + (v 0) * t + x 0 ,
+{
+  apply antideriv_first_order_poly,
+  rw h1 at hf',
+  exact hf',
+},
+rw h2,
+rw accel_const,
+ring_nf,
+end
+
+
