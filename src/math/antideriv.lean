@@ -1,8 +1,6 @@
 import data.real.basic
 import analysis.calculus.deriv
 import analysis.calculus.mean_value
-import data.complex.exponential
-import analysis.special_functions.exp_deriv
 
 universe u_1
 
@@ -210,18 +208,6 @@ begin
   simpa using h1,
 end
 
-lemma has_deriv_at_linear_no_pow
-:
-∀ x : ℝ, has_deriv_at (λ y : ℝ, y) 1 x
-:=
-begin
-  have h1 : (λ y : ℝ, y) = (λ y : ℝ, y^1) := by finish,
-  rw h1,
-  intro,
-  have h2 : 1 = ↑(1:ℕ)*x^(1-1) := by finish,
-  rw h2,
-  apply has_deriv_at_pow 1,
-end
 
 theorem constant_of_has_deriv_right_zero' {E : Type u_1} [normed_add_comm_group E] [normed_space ℝ E]
   {f : ℝ → E} {a b : ℝ} (hderiv : ∀ (x : ℝ), x ∈ set.Icc a b → has_deriv_at f 0 x) (h : a ≤ b) :
@@ -239,15 +225,29 @@ end
 
 
 section vector_function
-universe u_2
-variables {E : Type u_2} [normed_add_comm_group E] [normed_space ℝ E]
+universes u_2 u_3
+variables {E : Type u_2}  {𝕜 : Type u_3} [is_R_or_C 𝕜] [normed_add_comm_group E] 
+[normed_space 𝕜 E]
+
+lemma has_deriv_at_linear_no_pow
+:
+∀ x : 𝕜, has_deriv_at (λ y : 𝕜, y) 1 x
+:=
+begin
+  have h1 : (λ y : 𝕜, y) = (λ y : 𝕜, y^1) := by finish,
+  rw h1,
+  intro,
+  have h2 : 1 = ↑(1:ℕ)*x^(1-1) := by finish,
+  rw h2,
+  apply has_deriv_at_pow 1,
+end
 
 theorem antideriv_const'
-(f : ℝ → E) (k : E)
+(f : 𝕜 → E) {k : E}
 (hf : ∀ x, has_deriv_at f k x):
-(f = λ (x : ℝ), x•k + f 0) :=
+(f = λ (x : 𝕜), x•k + f 0) :=
 begin
-   have h1: ∀(x y : ℝ), f x - (x•k) = f y - (y•k),
+   have h1: ∀(x y : 𝕜), f x - (x•k) = f y - (y•k),
    { 
     apply is_const_of_deriv_eq_zero,
     {
@@ -285,6 +285,55 @@ begin
   apply eq_add_of_sub_eq',
   simp at h1,
   exact h1,
+end
+
+theorem antideriv_first_order_poly'
+{k j: E}
+(f : 𝕜 → E)
+(hf : ∀ x:𝕜, has_deriv_at f (x•j+k) x) :
+(f = λ x,(x^2/2)•j + x•k + (f 0)) :=
+begin
+  conv{
+  find (_•k) {rw ← pow_one x,}
+  },
+  have h1: ∀ (x y : 𝕜), f x - ((x^2/2)•j + x^1•k)= f y - ((y^2/2)•j + y^1•k),
+  { 
+    apply is_const_of_deriv_eq_zero,
+    {
+      rw differentiable,
+      intro x,
+      specialize hf x,
+      apply has_deriv_at.differentiable_at,
+      apply has_deriv_at.sub,
+      {
+        convert hf,
+      },
+      apply has_deriv_at.add,
+      apply has_deriv_at.smul_const,
+      apply has_deriv_at.div_const,
+      apply has_deriv_at_pow,
+      apply has_deriv_at.smul_const,
+      apply has_deriv_at_pow,
+    },
+    intro x,
+    rw deriv_sub,
+    rw sub_eq_zero,
+    simp,
+    iterate 2 {rw deriv_smul_const},
+    simp,
+    ring_nf,
+    rw has_deriv_at.deriv,
+    exact hf x,
+    iterate 2 {finish},
+    apply has_deriv_at.differentiable_at,
+    exact hf x,
+    finish,
+  },
+  ext z,
+  specialize h1 z 0,
+  apply eq_add_of_sub_eq',
+  simpa using h1,
+
 end
 end vector_function
 
