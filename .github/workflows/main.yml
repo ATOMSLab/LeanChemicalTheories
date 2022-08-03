@@ -27,7 +27,8 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        repository: leanprover-community/doc-gen
+        repository: ATOMSLab/doc-gen
+        ref: change-header
         path: doc-gen
 
     - name: 🐍 Install Python dependencies
