@@ -5,6 +5,9 @@ jobs:
   build_docs:
     runs-on: ubuntu-latest
     name: Build docs
+    environment: 
+      name: documentation
+      url: https://github.com/ATOMSLab/LeanChemicalTheories 
     steps:
 
     - name: 📁 Checkout project
