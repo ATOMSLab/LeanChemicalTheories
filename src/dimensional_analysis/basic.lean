@@ -8,8 +8,8 @@ inductive dimension
 
 namespace dimension
 
-protected def add : dimension → dimension → dimension
-|(Q a b c d e f g) (Q a b c d e f g) := (Q a b c d e f g)
+-- protected def add : dimension → dimension → dimension
+-- |(Q a b c d e f g) (Q a b c d e f g) := (Q a b c d e f g)
 
 protected def mul : dimension → dimension → dimension 
 |(Q a b c d e f g) (Q h i j k l m n) := (Q (a+h) (b+i) (c+j) (d+k) (e+l) (f+m) (g+n))
