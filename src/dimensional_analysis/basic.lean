@@ -1,6 +1,21 @@
-
 import tactic
-import data.real.basic
+/-! ### Dimensional Analysis
+  We define a new Type, called dimension, inductively, with a single constuctor function that is used to create
+  any dimension. This function, Q, corresponds to the function L^aM^bT^cI^dθ^eN^fJ^g which is the product of the
+  seven base dimension. L corresponds to length, M to mass, T to time, I to electric current, θ to absolute temperature,
+  N to amount of substance, and J to luminous intensity. The function then takes in seven rational numbers, corresponding
+  to the powers a-g. 
+  
+  We then define the algebraic properties of dimension through the constructor function. In addition and subtraction,
+  we use one (the dimensionless number) as a junk value for Lean to return in we attempt to force the addition of the elements
+  that aren't the same. However, we only allow the simp tactic to simplify addition between two elements that are the same.
+  We defined addition and subtraction to be of the form a + a = a and a - a = a, because, in dimensional analysis, if we have an 
+  equation of the form dim1 + dim2 = dim3 and show that dim1 = dim2 = dim3, we want the goal to close, or else we would be left with
+  a goal of 2 = 1. Finally we prove that the type dimension forms an abelian group.
+
+  We then define the seven base dimensions by their respective constructor function and, in other files,
+  show the dimensional congruity of scientific equations-/
+
 
 inductive dimension 
 | Q : rat → rat → rat → rat → rat → rat → rat → dimension 
