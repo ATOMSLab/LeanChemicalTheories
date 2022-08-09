@@ -3,13 +3,12 @@ import tactic
 import data.real.basic
 
 inductive dimension 
-| Q : rat → rat → rat → rat → rat → rat → rat → dimension -- L → M → N → I → θ → T → J → dimension
+| Q : rat → rat → rat → rat → rat → rat → rat → dimension 
+-- L → M → N → I → θ → T → J → dimension
 
 
 namespace dimension
 
--- protected def add : dimension → dimension → dimension
--- |(Q a b c d e f g) (Q a b c d e f g) := (Q a b c d e f g)
 
 protected def mul : dimension → dimension → dimension 
 |(Q a b c d e f g) (Q h i j k l m n) := (Q (a+h) (b+i) (c+j) (d+k) (e+l) (f+m) (g+n))
@@ -37,6 +36,15 @@ instance : has_div dimension := ⟨dimension.div⟩
 instance : has_one dimension := ⟨Q 0 0 0 0 0 0 0⟩
 instance : has_inv dimension := ⟨dimension.inv⟩
 
+protected def add : dimension → dimension → dimension
+|(Q a b c d e f g) (Q h i j k l m n) := ite (a=h∧b=i∧c=j∧d=k∧e=l∧f=m∧g=n) (Q a b c d e f g) 1
+
+protected def sub : dimension → dimension → dimension
+|(Q a b c d e f g) (Q h i j k l m n) := ite (a=h∧b=i∧c=j∧d=k∧e=l∧f=m∧g=n) (Q a b c d e f g) 1
+
+instance : has_add dimension := ⟨dimension.add⟩
+instance : has_sub dimension := ⟨dimension.sub⟩
+
 def length               : dimension := Q 1 0 0 0 0 0 0
 def mass                 : dimension := Q 0 1 0 0 0 0 0 
 def time                 : dimension := Q 0 0 1 0 0 0 0 
@@ -44,6 +52,8 @@ def electric_current     : dimension := Q 0 0 0 1 0 0 0
 def absolute_temperature : dimension := Q 0 0 0 0 1 0 0
 def amount_of_substance  : dimension := Q 0 0 0 0 0 1 0
 def luminous_intensity   : dimension := Q 0 0 0 0 0 0 1
+
+
 local notation `L` := length
 local notation `M` := mass
 local notation `N` := amount_of_substance
@@ -52,6 +62,9 @@ local notation `θ` := absolute_temperature
 local notation `T` := time
 local notation `J` := luminous_intensity
 
+@[simp] lemma add_def (a b : dimension) : a.add b = a+b := by refl
+
+@[simp] lemma sub_def (a b : dimension) : a.sub b = a-b := by refl
 
 @[simp] lemma mul_def (a b : dimension) : a.mul b = a*b := by refl
 
@@ -64,6 +77,18 @@ local notation `J` := luminous_intensity
 @[simp] lemma div_def (a b : dimension) : a.div b = a/b := by refl
 
 @[simp] lemma inv_def (a : dimension) : a.inv = a⁻¹ := by refl
+
+@[simp] theorem add_def' {a b c d e f g : ℚ} :(Q a b c d e f g) + (Q a b c d e f g) = (Q a b c d e f g) :=
+begin
+  rw ← add_def,
+  simp [dimension.add],
+end
+
+@[simp] theorem sub_def' {a b c d e f g : ℚ} :(Q a b c d e f g) - (Q a b c d e f g) = (Q a b c d e f g) :=
+begin
+  rw ← sub_def,
+  simp [dimension.sub],
+end
 
 @[simp] theorem mul_def' {a b c d e f g h i j k l m n : ℚ} : (Q a b c d e f g) * (Q h i j k l m n) 
 = (Q (a+h) (b+i) (c+j) (d+k) (e+l) (f+m) (g+n)) :=
@@ -120,7 +145,7 @@ begin
   exact rat.add_comm _ _,
 end
 
-protected theorem div_mul_comm {a b c : dimension} : a/b*c = c/b*a :=
+protected theorem div_mul_comm (a b c : dimension) : a/b*c = c/b*a :=
 begin
   induction a,
   induction b,
@@ -204,6 +229,8 @@ local notation `MV` := molar_volume
 def specific_volume := L^3/M
 local notation `SV` := specific_volume
 
+def area := L^2
+local notation `A` := area 
 
 theorem molar_volume_div_molecular_weight_eq_density : MW/MV = ρ :=
 begin
@@ -215,5 +242,10 @@ begin
   field_simp [specific_volume, density],
 end
 
+theorem volume_div_area_eq_length :V/A = L :=
+begin
+  field_simp [volume, area, length],
+  norm_num,
+end
 
 end dimension
