@@ -1,15 +1,29 @@
-
 import tactic
-import data.real.basic
+/-! ### Dimensional Analysis
+  We define a new Type, called dimension, inductively, with a single constuctor function that is used to create
+  any dimension. This function, Q, corresponds to the function L^aM^bT^cI^dθ^eN^fJ^g which is the product of the
+  seven base dimension. L corresponds to length, M to mass, T to time, I to electric current, θ to absolute temperature,
+  N to amount of substance, and J to luminous intensity. The function then takes in seven rational numbers, corresponding
+  to the powers a-g. 
+  
+  We then define the algebraic properties of dimension through the constructor function. In addition and subtraction,
+  we use one (the dimensionless number) as a junk value for Lean to return in we attempt to force the addition of the elements
+  that aren't the same. However, we only allow the simp tactic to simplify addition between two elements that are the same.
+  We defined addition and subtraction to be of the form a + a = a and a - a = a, because, in dimensional analysis, if we have an 
+  equation of the form dim1 + dim2 = dim3 and show that dim1 = dim2 = dim3, we want the goal to close, or else we would be left with
+  a goal of 2 = 1. Finally we prove that the type dimension forms an abelian group.
+
+  We then define the seven base dimensions by their respective constructor function and, in other files,
+  show the dimensional congruity of scientific equations-/
+
 
 inductive dimension 
-| Q : rat → rat → rat → rat → rat → rat → rat → dimension -- L → M → N → I → θ → T → J → dimension
+| Q : rat → rat → rat → rat → rat → rat → rat → dimension 
+-- L → M → N → I → θ → T → J → dimension
 
 
 namespace dimension
 
--- protected def add : dimension → dimension → dimension
--- |(Q a b c d e f g) (Q a b c d e f g) := (Q a b c d e f g)
 
 protected def mul : dimension → dimension → dimension 
 |(Q a b c d e f g) (Q h i j k l m n) := (Q (a+h) (b+i) (c+j) (d+k) (e+l) (f+m) (g+n))
@@ -37,6 +51,15 @@ instance : has_div dimension := ⟨dimension.div⟩
 instance : has_one dimension := ⟨Q 0 0 0 0 0 0 0⟩
 instance : has_inv dimension := ⟨dimension.inv⟩
 
+protected def add : dimension → dimension → dimension
+|(Q a b c d e f g) (Q h i j k l m n) := ite (a=h∧b=i∧c=j∧d=k∧e=l∧f=m∧g=n) (Q a b c d e f g) 1
+
+protected def sub : dimension → dimension → dimension
+|(Q a b c d e f g) (Q h i j k l m n) := ite (a=h∧b=i∧c=j∧d=k∧e=l∧f=m∧g=n) (Q a b c d e f g) 1
+
+instance : has_add dimension := ⟨dimension.add⟩
+instance : has_sub dimension := ⟨dimension.sub⟩
+
 def length               : dimension := Q 1 0 0 0 0 0 0
 def mass                 : dimension := Q 0 1 0 0 0 0 0 
 def time                 : dimension := Q 0 0 1 0 0 0 0 
@@ -44,6 +67,8 @@ def electric_current     : dimension := Q 0 0 0 1 0 0 0
 def absolute_temperature : dimension := Q 0 0 0 0 1 0 0
 def amount_of_substance  : dimension := Q 0 0 0 0 0 1 0
 def luminous_intensity   : dimension := Q 0 0 0 0 0 0 1
+
+
 local notation `L` := length
 local notation `M` := mass
 local notation `N` := amount_of_substance
@@ -52,6 +77,9 @@ local notation `θ` := absolute_temperature
 local notation `T` := time
 local notation `J` := luminous_intensity
 
+@[simp] lemma add_def (a b : dimension) : a.add b = a+b := by refl
+
+@[simp] lemma sub_def (a b : dimension) : a.sub b = a-b := by refl
 
 @[simp] lemma mul_def (a b : dimension) : a.mul b = a*b := by refl
 
@@ -64,6 +92,18 @@ local notation `J` := luminous_intensity
 @[simp] lemma div_def (a b : dimension) : a.div b = a/b := by refl
 
 @[simp] lemma inv_def (a : dimension) : a.inv = a⁻¹ := by refl
+
+@[simp] theorem add_def' {a b c d e f g : ℚ} :(Q a b c d e f g) + (Q a b c d e f g) = (Q a b c d e f g) :=
+begin
+  rw ← add_def,
+  simp [dimension.add],
+end
+
+@[simp] theorem sub_def' {a b c d e f g : ℚ} :(Q a b c d e f g) - (Q a b c d e f g) = (Q a b c d e f g) :=
+begin
+  rw ← sub_def,
+  simp [dimension.sub],
+end
 
 @[simp] theorem mul_def' {a b c d e f g h i j k l m n : ℚ} : (Q a b c d e f g) * (Q h i j k l m n) 
 = (Q (a+h) (b+i) (c+j) (d+k) (e+l) (f+m) (g+n)) :=
@@ -120,7 +160,7 @@ begin
   exact rat.add_comm _ _,
 end
 
-protected theorem div_mul_comm {a b c : dimension} : a/b*c = c/b*a :=
+protected theorem div_mul_comm (a b c : dimension) : a/b*c = c/b*a :=
 begin
   induction a,
   induction b,
@@ -204,6 +244,8 @@ local notation `MV` := molar_volume
 def specific_volume := L^3/M
 local notation `SV` := specific_volume
 
+def area := L^2
+local notation `A` := area 
 
 theorem molar_volume_div_molecular_weight_eq_density : MW/MV = ρ :=
 begin
@@ -215,5 +257,10 @@ begin
   field_simp [specific_volume, density],
 end
 
+theorem volume_div_area_eq_length :V/A = L :=
+begin
+  field_simp [volume, area, length],
+  norm_num,
+end
 
 end dimension
