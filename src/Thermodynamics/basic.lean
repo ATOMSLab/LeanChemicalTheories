@@ -33,6 +33,7 @@ class thermo_system (𝕜 : Type u) [comm_group 𝕜] :=
 
 export thermo_system (pressure volume temperature substance_amount energy)
 
+def boyles_law {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (pressure n) * (volume n)= k
 
 def isobaric {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : Prop := ∀ n m : ℕ, @pressure 𝕜 _ _ n = pressure m
 def isochoric {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : Prop := ∀ n m : ℕ, @volume 𝕜 _ _ n = volume m
@@ -48,12 +49,11 @@ class ideal_gas (𝕜 : Type u) [comm_group 𝕜]
 (R : 𝕜)
 (ideal_gas_law : ∀ n : ℕ, (pressure n)*(volume n) = (substance_amount n)*R*(temperature n))
 
-def boyles_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (pressure n) * (volume n)= k
 
 /-! ### Properties about the ideal gas law-/
-variables {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜}
+variables {𝕜 : Type u} [comm_group 𝕜] {M : ideal_gas 𝕜}
 theorem ideal_gas_law_relation 
-: ∀ n m : ℕ, (@pressure 𝕜 _ M.to_thermo_system n)*(volume n)/((substance_amount n)*(temperature n)) = 
+: ∀ n m : ℕ, (@pressure 𝕜 _inst_1 M.to_thermo_system n)*(volume n)/((substance_amount n)*(temperature n)) = 
 (pressure m)*(volume m)/((substance_amount m)*(temperature m)):=
 begin
   intros,
@@ -63,7 +63,7 @@ begin
   field_simp,
 end
 
-theorem boyles_law_relation 
+theorem boyles_law_relation {M : thermo_system 𝕜}
 : boyles_law M →  ∀ n m, (@pressure 𝕜 _ _ n)*volume n = pressure m * volume m:=
 begin
   intros h n m,
@@ -72,7 +72,7 @@ begin
   field_simp [h n, h m],
 end
 
-theorem boyles_law_relation'
+theorem boyles_law_relation' {M : thermo_system 𝕜}
 : (∀ n m, (@pressure 𝕜 _ _ n)*volume n = pressure m * volume m) → boyles_law M :=
 begin
   intros h,
@@ -84,7 +84,7 @@ end
 
 theorem boyles_from_ideal_gas {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜} (iso1 : isothermal M.to_thermo_system)
 (iso2 : closed_system M.to_thermo_system)
-: boyles_law M:=
+: boyles_law M.to_thermo_system:=
 begin
   simp [boyles_law, isothermal, closed_system] at *,
   let h := @ideal_gas_law_relation 𝕜 _ M,
