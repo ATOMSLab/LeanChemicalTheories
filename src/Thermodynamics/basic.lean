@@ -42,18 +42,19 @@ def closed_system {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : P
 def isolated_system {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : Prop := adiabatic M ∧ closed_system M
 
 
-def boyles_law {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (pressure n) * (volume n)= k
 /-! ### System models-/
 class ideal_gas (𝕜 : Type u) [comm_group 𝕜]
   extends thermo_system 𝕜 :=
 (R : 𝕜)
 (ideal_gas_law : ∀ n : ℕ, (pressure n)*(volume n) = (substance_amount n)*R*(temperature n))
 
+def boyles_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (pressure n) * (volume n)= k
 
 /-! ### Properties about the ideal gas law-/
 variables {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜}
 theorem ideal_gas_law_relation 
-: ∀ n m : ℕ, (@pressure 𝕜 _ M.to_thermo_system n)*(volume n)/((substance_amount n)*(temperature n)) = (pressure m)*(volume m)/((substance_amount m)*(temperature m)):=
+: ∀ n m : ℕ, (@pressure 𝕜 _ M.to_thermo_system n)*(volume n)/((substance_amount n)*(temperature n)) = 
+(pressure m)*(volume m)/((substance_amount m)*(temperature m)):=
 begin
   intros,
   let h1 := ideal_gas.ideal_gas_law n,
@@ -62,20 +63,8 @@ begin
   field_simp,
 end
 
-theorem boyles_law_const_function {M : thermo_system 𝕜}
-:boyles_law M ↔ ∃ (k : 𝕜), ∀ n : ℕ, (pressure n) * (volume n) = (λ n, k) n :=
-begin
-  split,
-  intro h,
-  simp [boyles_law] at h,
-  field_simp [h],
-  intro h,
-  simp [boyles_law],
-  field_simp [h],
-end
-
-theorem boyles_law_relation {M : thermo_system 𝕜}
-: boyles_law M →  ∀ n m, (@pressure 𝕜 _ M n)*volume n = pressure m * volume m:=
+theorem boyles_law_relation 
+: boyles_law M →  ∀ n m, (@pressure 𝕜 _ _ n)*volume n = pressure m * volume m:=
 begin
   intros h n m,
   simp [boyles_law] at h,
@@ -83,8 +72,8 @@ begin
   field_simp [h n, h m],
 end
 
-theorem boyles_law_relation' {M : thermo_system 𝕜}
-: (∀ n m, (@pressure 𝕜 _ M n)*volume n = pressure m * volume m) → boyles_law M :=
+theorem boyles_law_relation'
+: (∀ n m, (@pressure 𝕜 _ _ n)*volume n = pressure m * volume m) → boyles_law M :=
 begin
   intros h,
   simp [boyles_law],
@@ -95,7 +84,7 @@ end
 
 theorem boyles_from_ideal_gas {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜} (iso1 : isothermal M.to_thermo_system)
 (iso2 : closed_system M.to_thermo_system)
-: boyles_law M.to_thermo_system:=
+: boyles_law M:=
 begin
   simp [boyles_law, isothermal, closed_system] at *,
   let h := @ideal_gas_law_relation 𝕜 _ M,
