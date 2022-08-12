@@ -23,7 +23,6 @@ coutner-part.
 
 noncomputable theory
 
-
 class motion (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜]
   extends inner_product_space 𝕜 E:=
 {position velocity acceleration : 𝕜 → E}
@@ -188,26 +187,26 @@ begin
    rw [add_assoc, ← add_smul, show t/2+t/2 = t, by finish, ← smul_assoc, show (t/2)•t = t^2/2, by {rw smul_eq_mul, ring_nf,}],
 end
 
--- theorem const_accel'''
--- (accel_const : 𝕒 = λ (t : 𝕜), 𝔸)
--- {n : with_top ℕ}
--- :
--- ∀ t : 𝕜, @inner ℝ E (has_inner.is_R_or_C_to_real 𝕜 E) (𝕧 t) (𝕧 t) = @inner ℝ E (has_inner.is_R_or_C_to_real 𝕜 E) (𝕧 (0:𝕜)) (𝕧 (0:𝕜)) + 2 * @inner ℝ E (has_inner.is_R_or_C_to_real 𝕜 E) ((𝕩 t) - (𝕩 (0:𝕜))) 𝔸
--- :=
--- begin
---   intro,
---   have : semiring 𝕜 := by apply ring.to_semiring,
---   rw [@real_inner_self_eq_norm_sq E (inner_product_space.is_R_or_C_to_real 𝕜 E), show  𝕧 =  λ t:𝕜, t•𝔸 + 𝕧 0, by {apply const_accel accel_const, exact n},
---       norm_add_pow_two, norm_smul, mul_pow, inner_smul_left, show (𝕩 t) - (𝕩 (0:𝕜)) = ((t^2/2)•𝔸) + t•(𝕧 0), by {rw const_accel' accel_const, simp, exact n,},
---       @inner_add_left _ _ _ (inner_product_space.is_R_or_C_to_real 𝕜 E) ((t ^ 2 / 2) • 𝔸) _ 𝔸, real_inner_eq_re_inner 𝕜 ((t ^ 2 / 2) • 𝔸) 𝔸,
---       real_inner_eq_re_inner 𝕜 _ 𝔸, inner_smul_left, inner_smul_left],
---   simp,
---   rw [← real_inner_eq_re_inner 𝕜 𝔸 _, ← real_inner_eq_re_inner 𝕜 𝔸 _, @real_inner_self_eq_norm_sq _ (inner_product_space.is_R_or_C_to_real 𝕜 E) (velocity (0:𝕜)),
---       add_comm,@real_inner_self_eq_norm_sq _ (inner_product_space.is_R_or_C_to_real 𝕜 E) 𝔸, mul_add, mul_add],
---   field_simp,
---   rw [inner_re_symm, ← real_inner_eq_re_inner 𝕜 𝔸 _, mul_add],
+theorem const_accel'''
+(accel_const : 𝕒 = λ (t : 𝕜), 𝔸)
+{n : with_top ℕ}
+:
+∀ t : 𝕜, inner (𝕧 t) (𝕧 t) = inner(𝕧 (0:𝕜)) (𝕧 (0:𝕜)) + (2:𝕜) * inner ((𝕩 t) - (𝕩 (0:𝕜))) 𝔸
+:=
+begin
+  intro,
+  have : semiring 𝕜 := by apply ring.to_semiring,
+  rw [@real_inner_self_eq_norm_sq E (inner_product_space.is_R_or_C_to_real 𝕜 E), show  𝕧 =  λ t:𝕜, t•𝔸 + 𝕧 0, by {apply const_accel accel_const, exact n},
+      norm_add_pow_two, norm_smul, mul_pow, inner_smul_left, show (𝕩 t) - (𝕩 (0:𝕜)) = ((t^2/2)•𝔸) + t•(𝕧 0), by {rw const_accel' accel_const, simp, exact n,},
+      @inner_add_left _ _ _ (inner_product_space.is_R_or_C_to_real 𝕜 E) ((t ^ 2 / 2) • 𝔸) _ 𝔸, real_inner_eq_re_inner 𝕜 ((t ^ 2 / 2) • 𝔸) 𝔸,
+      real_inner_eq_re_inner 𝕜 _ 𝔸, inner_smul_left, inner_smul_left],
+  simp,
+  rw [← real_inner_eq_re_inner 𝕜 𝔸 _, ← real_inner_eq_re_inner 𝕜 𝔸 _, @real_inner_self_eq_norm_sq _ (inner_product_space.is_R_or_C_to_real 𝕜 E) (velocity (0:𝕜)),
+      add_comm,@real_inner_self_eq_norm_sq _ (inner_product_space.is_R_or_C_to_real 𝕜 E) 𝔸, mul_add, mul_add],
+  field_simp,
+  rw [inner_re_symm, ← real_inner_eq_re_inner 𝕜 𝔸 _, mul_add],
   
--- end
+end
 
 theorem real_const_accel'''
 [N : motion_cont_diff_everywhere ℝ E]
