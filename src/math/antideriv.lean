@@ -222,23 +222,49 @@ begin
 end
 
 
-
-
 section vector_function
 universes u_2 u_3
 variables {E : Type u_2}  {𝕜 : Type u_3} [is_R_or_C 𝕜] [normed_add_comm_group E] 
 [normed_space 𝕜 E]
 
+theorem antideriv 
+{f F G: 𝕜 → E} (hf : ∀ t, has_deriv_at F (f t) t)
+(hg : ∀ t, has_deriv_at G (f t) t)
+(hg' : G 0 = 0)
+: F = λ t, G t + F(0) :=
+begin
+have h1: ∀(x y : 𝕜), F x - G x = F y - G y,
+   { 
+    apply is_const_of_deriv_eq_zero,
+    {
+      rw differentiable,
+      intro x,
+      apply has_deriv_at.differentiable_at,
+      apply has_deriv_at.sub (hf x),
+      apply (hg x),},
+    intro x,
+    rw [deriv_sub, sub_eq_zero],
+    rw has_deriv_at.deriv,
+    simp,
+    rw has_deriv_at.deriv,
+    apply hf,
+    apply hg,
+    apply has_deriv_at.differentiable_at (hf x),
+    apply has_deriv_at.differentiable_at (hg x),
+  },
+  funext z,
+  specialize h1 z 0,
+  rw hg' at h1,
+  simp at h1,
+  apply eq_add_of_sub_eq' h1,  
+end
 lemma has_deriv_at_linear_no_pow
 :
 ∀ x : 𝕜, has_deriv_at (λ y : 𝕜, y) 1 x
 :=
 begin
-  have h1 : (λ y : 𝕜, y) = (λ y : 𝕜, y^1) := by finish,
-  rw h1,
   intro,
-  have h2 : 1 = ↑(1:ℕ)*x^(1-1) := by finish,
-  rw h2,
+  rw [show (λ y : 𝕜, y) = (λ y : 𝕜, y^1), by finish, show 1 = ↑(1:ℕ)*x^(1-1), by finish],
   apply has_deriv_at_pow 1,
 end
 
@@ -247,44 +273,16 @@ theorem antideriv_const'
 (hf : ∀ x, has_deriv_at f k x):
 (f = λ (x : 𝕜), x•k + f 0) :=
 begin
-   have h1: ∀(x y : 𝕜), f x - (x•k) = f y - (y•k),
-   { 
-    apply is_const_of_deriv_eq_zero,
-    {
-      rw differentiable,
-      intro x,
-      specialize hf x,
-      apply has_deriv_at.differentiable_at,
-      apply has_deriv_at.sub,
-      {
-        convert hf,
-      },
-      apply has_deriv_at.smul_const,
-      apply has_deriv_at_linear_no_pow,
-    },
-    intro x,
-    rw deriv_sub,
-    rw sub_eq_zero,
-    simp,
-    rw has_deriv_at.deriv,
-    specialize hf x,
-    rw deriv_smul_const,
-    simp,
-    apply hf,
-    apply has_deriv_at.differentiable_at,
-    apply has_deriv_at_linear_no_pow,
-    specialize hf x,
-    apply has_deriv_at.differentiable_at,
-    apply hf,
-    apply has_deriv_at.differentiable_at,
-    apply has_deriv_at.smul_const,
-    apply has_deriv_at_linear_no_pow,
+  apply antideriv hf,
+  simp,
+  intro,
+  rw show k = (1:𝕜)•k, by simp,
+  conv{
+    find (_•(1:𝕜)•k) {simp,},
   },
-  ext z,
-  specialize h1 z 0,
-  apply eq_add_of_sub_eq',
-  simp at h1,
-  exact h1,
+  rw show (λ t, t•k) = λ t, ((λ t : 𝕜, t) t) • k, by {funext, simp},
+  apply has_deriv_at.smul_const (has_deriv_at_linear_no_pow t) k,
+  simp,
 end
 
 theorem antideriv_first_order_poly'
