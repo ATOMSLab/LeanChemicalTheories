@@ -5,9 +5,24 @@ import group_theory.semidirect_product
 
 import math.deriv
 
-
 universes u 
 
+/-!
+# Lennard-Jones potential function
+We define the properties of Lennard-Jonnes potential function that describes intermolecular
+pair potentials in molecular simulations. The commonly used expression is: <br>
+$$
+E = 4ε  [(\frac{σ}{r})^{12} - (\frac{σ}{r})^6]
+$$
+where:
+- `E` is the intermolecular potential between the two atoms or molecules
+- `ε` is the well depth and a measure of how strongly the two particles attract each other
+- `σ` is the distance at which the intermolecular potential between the two particles is zero
+- `r` is the distance of separation between both particles
+
+Here we use our own proof of [derivative] (./deriv.html) to show that Lennard-Jones potential has its minimum 
+at a distance of `r = r_min = 2^1/6 σ, where the potential energy has the value `-ε`
+-/
 
 noncomputable theory
 
