@@ -21,7 +21,7 @@ where:
 - `r` is the distance of separation between both particles
 
 Here we use our own proof of [derivative] (./deriv.html) to show that Lennard-Jones potential has its minimum 
-at a distance of `r = r_min = 2^1/6 σ, where the potential energy has the value `-ε`
+at a distance of `r = r_min = 2^1/6 σ`, where the potential energy has the value `-ε`
 -/
 
 noncomputable theory
