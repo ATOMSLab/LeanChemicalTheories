@@ -1,4 +1,4 @@
-import data.real.basic
+import analysis.special_functions.exp_deriv
 import analysis.calculus.deriv
 import analysis.calculus.mean_value
 
@@ -335,4 +335,95 @@ begin
 end
 end vector_function
 
+/-! ### Analytical ODE solutions-/
+open set
 
+lemma image_norm_le_of_norm_deriv_left_le_deriv_boundary' 
+{E : Type u_1} [normed_add_comm_group E] [normed_space ℝ E]
+{f : ℝ → E} {a b : ℝ} {f' : ℝ → E}
+(hf : continuous_on f (Icc a b))
+(hf' : ∀ x ∈ Ioc a b, has_deriv_within_at f (f' x) (Iic x) x)
+{B B' : ℝ → ℝ} (ha : ∥f a∥ ≤ B a) (hB : continuous_on B (Icc a b))
+(hB' : ∀ x ∈ Ioc a b, has_deriv_within_at B (B' x) (Iic x) x)
+(bound : ∀ x ∈ Ioc a b, ∥f' x∥ ≤ B' x) :
+∀ ⦃x⦄, x ∈ Icc a b → ∥f x∥ ≤ B x :=
+image_le_of_liminf_slope_right_le_deriv_boundary (continuous_norm.comp_continuous_on hf) ha hB hB' $
+  (λ x hx r hr, (hf' x hx).liminf_right_slope_norm_le (lt_of_le_of_lt (bound x hx) hr))
+
+theorem image_norm_le_of_norm_deriv_left_le_deriv_boundary 
+{E : Type u_1} [normed_add_comm_group E] [normed_space ℝ E]
+{f : ℝ → E} {a b : ℝ}{f' : ℝ → E}
+(hf : continuous_on f (Icc a b))
+(hf' : ∀ x ∈ Ioc a b, has_deriv_within_at f (f' x) (Iic x) x)
+{B B' : ℝ → ℝ} (ha : ∥f a∥ ≤ B a) (hB : ∀ x, has_deriv_at B (B' x) x)
+(bound : ∀ x ∈ Ioc a b, ∥f' x∥ ≤ B' x) :
+∀ ⦃x⦄, x ∈ Icc a b → ∥f x∥ ≤ B x :=
+image_norm_le_of_norm_deriv_right_le_deriv_boundary' hf hf' ha
+  (λ x hx, (hB x).continuous_at.continuous_within_at)
+  (λ x hx, (hB x).has_deriv_within_at) bound
+
+theorem norm_image_sub_le_of_norm_deriv_left_le_segment 
+{E : Type u_1} [normed_add_comm_group E] [normed_space ℝ E]
+{f : ℝ → E} {a b : ℝ} {f' : ℝ → E} {C : ℝ}
+(hf : continuous_on f (set.Icc a b))
+(hf' : ∀ x ∈ set.Ioc a b, has_deriv_within_at f (f' x) (set.Iic x) x)
+(bound : ∀x ∈ set.Ioc a b, ∥f' x∥ ≤ C) :
+∀ x ∈ set.Icc a b, ∥f b - f x∥ ≤ C * (b - x) :=
+begin
+  let g := λ x, f x - f a,
+  have hg : continuous_on g (set.Icc a b), from hf.sub continuous_on_const,
+  have hg' : ∀ x ∈ set.Ioc a b, has_deriv_within_at g (f' x) (set.Iic x) x,
+  { assume x hx,
+    simpa using (hf' x hx).sub (has_deriv_within_at_const _ _ _) },
+  let B := λ x, C * (x - a),
+  have hB : ∀ x, has_deriv_at B C x,
+  { assume x,
+    simpa using (has_deriv_at_const x C).mul ((has_deriv_at_id x).sub (has_deriv_at_const x a)) },
+  convert image_norm_le_of_norm_deriv_right_le_deriv_boundary hg hg' _ hB bound,
+  simp only [g, B], rw [sub_self, norm_zero, sub_self, mul_zero]
+end
+theorem constant_of_has_deriv_left_zero
+{E : Type u_1} [normed_add_comm_group E] [normed_space ℝ E] 
+{f : ℝ → E} {a b : ℝ} (hcont : continuous_on f (set.Icc a b))
+(hderiv : ∀ x ∈ set.Ioc a b, has_deriv_within_at f 0 (set.Iic x) x) :
+∀ x ∈ set.Icc a b, f x = f b :=
+by simpa only [zero_mul, norm_le_zero_iff, sub_eq_zero] using
+  λ x hx, norm_image_sub_le_of_norm_deriv_left_le_segment
+    hcont hderiv (λ y hy, by rw norm_le_zero_iff) x hx
+theorem antideriv_self
+{k: ℝ}
+(f : ℝ → ℝ)
+(hf : ∀ x, has_deriv_at f (k*(f x)) x) :
+(f = λ x, (f 0)*real.exp(k*x)) :=
+begin
+  have : ∀ x, has_deriv_at (λ x, real.exp (- k * x) * f x) 0 x,
+  { intros x,
+    convert (has_deriv_at_mul_const k).neg.exp.mul (hf x),
+    { ext x,
+      ring_nf },
+    { ring_nf } },
+  ext x,
+  have hx : x ≤ 0 ∨ 0 ≤ x := by exact le_total x 0,
+  cases hx with hx hx',
+  swap,
+  have : real.exp (-k * x) * f x = f 0,
+  { convert @constant_of_has_deriv_right_zero _ _ _ _ 0 x _ (λ y hy, (this y).has_deriv_within_at) x _,
+    { simp },
+    { intros x hx,
+      exact (this x).continuous_at.continuous_within_at },
+    { rw set.right_mem_Icc,
+      exact hx' } },
+  convert congr_arg ((*) (real.exp (k * x))) this using 1,
+  { rw [← mul_assoc, ← real.exp_add],
+    ring_nf,
+    simp, },
+  { ring, },
+  have : real.exp (-k * x) * f x = f 0,
+  { convert @constant_of_has_deriv_right_zero' _ _ _ _ x 0 _ (λ y hy, (this y).has_deriv_within_at) x _,
+    { simp },
+    { intros x hx,
+      exact (this x).continuous_at.continuous_within_at },
+    { rw set.right_mem_Icc,
+      exact hx' } },
+
+end
