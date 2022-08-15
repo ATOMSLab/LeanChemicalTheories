@@ -8,7 +8,7 @@ local notation `ℝ^n ` := fin (n) → ℝ
 This section defines the translation invariance of Lennard-Jonnes potential function that describes the intermolecular
 pair potentials in molecular simulations. The commonly used expression is: <br>
 $$
-E = 4ε [(\frac{σ}{r})^12 - (\frac{σ}{r})^6]
+E = 4ε  [(\frac{σ}{r})^{12} - (\frac{σ}{r})^6]
 $$
 where:
 - `E` is the intermolecular potential between the two atoms or molecules
