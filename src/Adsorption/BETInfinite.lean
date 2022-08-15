@@ -12,8 +12,6 @@ of the [Langmuir model](./langmuir_kinetics.html) that restricts adsorption on a
 instead, molecules can stack on top of each other in layers.
 
 
-
-
 ### Assumptions
 
 

@@ -2,8 +2,10 @@ import data.real.basic
 
 /-!
 # Langmuir adsorption model
-This section defines the Langmuir adsorption model from kinetics for a single adsorbate on a single site: <br>
-`θ = K*Pₐ/(1+K*Pₐ)` 
+This section defines Langmuir adsorption model from kinetics for a single adsorbate on a single site: <br>
+$$
+θ = \frac{KPₐ}{1 + KPₐ} 
+$$
 where:
 - `θ` is the fractional occupancy of the adsorption sites
 - `K` is the adsorption constant describing the adsorption/desorption rates in equilibrium
@@ -21,8 +23,10 @@ the rate of desorption `r_d = k_d * A` are equal at equilibrium conditions where
 - `S ≠ 0`
 - `k_d ≠ 0`
 
+
 ### To-Do
 - Proof statistical mechanical derivation of the model
+- Generalize proof from properties of system
 -/
 
 theorem Langmuir_single_site
