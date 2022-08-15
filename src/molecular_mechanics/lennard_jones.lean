@@ -20,7 +20,7 @@ where:
 - `σ` is the distance at which the intermolecular potential between the two particles is zero
 - `r` is the distance of separation between both particles
 
-Here we use our own proof of [derivative] (./math/deriv.html) to show that Lennard-Jones potential has its minimum 
+Here we use our own proof of [derivative] (../../math/deriv.html) to show that Lennard-Jones potential has its minimum 
 at a distance of `r = r_min = 2^1/6 σ`, where the potential energy has the value `-ε`
 -/
 
