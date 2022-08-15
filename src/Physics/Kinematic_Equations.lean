@@ -23,7 +23,6 @@ coutner-part.
 
 noncomputable theory
 
-
 class motion (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜]
   extends inner_product_space 𝕜 E:=
 {position velocity acceleration : 𝕜 → E}

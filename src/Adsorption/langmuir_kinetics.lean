@@ -4,7 +4,7 @@ import data.real.basic
 # Langmuir adsorption model
 This section defines Langmuir adsorption model from kinetics for a single adsorbate on a single site: <br>
 $$
-θ = \frac{KPₐ}{1 + KPₐ} 
+θ = \frac{K Pₐ}{1  +  K Pₐ} 
 $$
 where:
 - `θ` is the fractional occupancy of the adsorption sites

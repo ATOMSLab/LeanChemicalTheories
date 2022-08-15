@@ -1,13 +1,17 @@
 import algebra.group.defs
 import analysis.inner_product_space.basic
-/-!# The Thermodynamic System and Models
+/-!
+
+# The Thermodynamic System and Models
 We define a thermodynamic system to be over a general field, which we require to be an albelian group 
 for multiplication. This class has five properties to describe the system, pressure, volume, temperature, 
 amount of substance, and energy. Each property is defined as a function from the natural numbers to our 
 field. This function represents the equillibrium states of the system. 
+
 We also define six properties of a thermodynamic system: isobaric, isochoric, isothermal, adiabatic,
 closed system, and isolated system. These take in a thermodynamic system and have the type Prop, so
 they can be thought of as assertation about the system.
+
 We finally define an ideal gas, which extends the thermodynamic system by providing a model for the systems
 properties. So far, the ideal gas only defines the unviersal gas constant and the ideal gas law. Then we show
 how the boyles law follows form the ideal gas law and the assumption of isothermal and a closed system

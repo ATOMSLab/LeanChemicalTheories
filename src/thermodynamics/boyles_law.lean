@@ -25,7 +25,7 @@ The model assumes:
 - equal temperature (`T1 = T2`)
 - equal number of moles (`n1 = n2`)
 
-The generalized proof from properties of system is shown [here](./basic.html).
+#### A generalized proof for Boyle's law from the properties of system is shown [here](./basic.html).
 -/
 
 -- Variables
