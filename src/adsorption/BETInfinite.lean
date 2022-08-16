@@ -12,6 +12,8 @@ of the [Langmuir model](./langmuir_kinetics.html) that restricts adsorption on a
 instead, molecules can stack on top of each other in layers.
 
 
+
+
 ### Assumptions
 
 
@@ -24,15 +26,15 @@ instead, molecules can stack on top of each other in layers.
 
 
 
-
+section BET
 variables (x θ₀ C: ℝ)
 
-def seq : ℕ → ℝ
+def seq (x θ₀ C: ℝ) : ℕ → ℝ
 |(0 : ℕ)            := θ₀
 |(nat.succ n) := x^(n+1)*θ₀*C
 
 
-theorem BET₁ (C : ℝ) (hx1: x < 1) (hx2 : 0 < x) (hθ : θ₀ ≠ 0):
+theorem sequence_math (C : ℝ) (hx1: x < 1) (hx2 : 0 < x) (hθ : θ₀ ≠ 0):
   (∑' k : ℕ, ((k + 1 : ℝ)*(seq x θ₀ C (k+1:ℕ))))/(θ₀ + ∑' k, (seq x θ₀ C (k+1:ℕ))) = C*x/((1 - x)*(1 - x + x*C)) :=
 begin
   simp [seq],
@@ -47,7 +49,7 @@ begin
   iterate 2 {finish},
 end
 
-theorem BET_regression_form
+theorem regression_form
 { P V₀ y: ℝ}
 (hx1: x < 1)
 (hx2 : 0 < x)
