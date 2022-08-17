@@ -11,7 +11,13 @@ This section defines the Brunauer–Emmett–Teller (BET) adsorption theory wher
 of the [Langmuir model](./langmuir_kinetics.html) that restricts adsorption on a single site to be one molecule;
 instead, molecules can stack on top of each other in layers.
 
+The adsorption layers of BET are defined as infinite sequence with zeroth layer as constant and is expressed as:
 
+where:
+
+- `x` is
+- `θ₀` is
+- `C` is
 
 
 ### Assumptions
@@ -84,7 +90,9 @@ intros,
   rw [tsum_eq_zero_add hsum, tsum_eq_zero_add hsum2],
   simp only [nat.cast_zero, zero_mul, zero_add, nat.cast_one, pow_zero, one_mul, mul_assoc, nat.cast_add, mul_div_assoc],
   rw [show seq x θ₀ C 0 = θ₀, by {simp [seq]}], 
-  rw [BET₁ x θ₀ (y/x) hx1 hx2 hθ, ← mul_div_assoc,mul_comm x (y/x)],
+  rw [BET x θ₀ (y/x) hx1 hx2 hθ, ← mul_div_assoc,mul_comm x (y/x)],
   have hx3 : x ≠ 0 := by linarith,
   field_simp,
 end
+
+
