@@ -34,7 +34,7 @@ def seq (x θ₀ C: ℝ) : ℕ → ℝ
 |(nat.succ n) := x^(n+1)*θ₀*C
 
 
-theorem sequence_math (C : ℝ) (hx1: x < 1) (hx2 : 0 < x) (hθ : θ₀ ≠ 0):
+lemma sequence_math (x θ₀ C : ℝ) (hx1: x < 1) (hx2 : 0 < x) (hθ : θ₀ ≠ 0):
   (∑' k : ℕ, ((k + 1 : ℝ)*(seq x θ₀ C (k+1:ℕ))))/(θ₀ + ∑' k, (seq x θ₀ C (k+1:ℕ))) = C*x/((1 - x)*(1 - x + x*C)) :=
 begin
   simp [seq],
@@ -50,7 +50,7 @@ begin
 end
 
 theorem regression_form
-{ P V₀ y: ℝ}
+{P V₀ y: ℝ}
 (hx1: x < 1)
 (hx2 : 0 < x)
 (hθ : θ₀ ≠ 0)
@@ -84,7 +84,45 @@ intros,
   rw [tsum_eq_zero_add hsum, tsum_eq_zero_add hsum2],
   simp only [nat.cast_zero, zero_mul, zero_add, nat.cast_one, pow_zero, one_mul, mul_assoc, nat.cast_add, mul_div_assoc],
   rw [show seq x θ₀ C 0 = θ₀, by {simp [seq]}], 
-  rw [BET₁ x θ₀ (y/x) hx1 hx2 hθ, ← mul_div_assoc,mul_comm x (y/x)],
+  rw [sequence_math x θ₀ (y/x) hx1 hx2 hθ, ← mul_div_assoc,mul_comm x (y/x)],
   have hx3 : x ≠ 0 := by linarith,
   field_simp,
 end
+
+theorem brunauer_form
+{V₀ y: ℝ}
+(hx1: x < 1)
+(hx2 : 0 < x)
+(hθ : θ₀ ≠ 0)
+(hV₀ : V₀ ≠ 0)
+:
+  let C := y/x,
+      Vads :=  V₀ * ∑' (k : ℕ), ↑k * (seq x θ₀ C k),
+      A :=  ∑' (k : ℕ), (seq x θ₀ C k),
+      Vₘ := A*V₀ in
+  Vads/Vₘ = C*x/((1-x)*(1-x+C*x))
+:=
+begin
+intros,
+  have hsum2 : summable (seq x θ₀ C),
+  { refine (summable_nat_add_iff 1).mp _,
+    simp only [seq, pow_succ', mul_assoc],
+    exact (summable_geometric_of_lt_1 hx2.le hx1).mul_right _ },
+  have hxnorm : ∥x∥ < 1, by refine abs_lt.mpr ⟨_, _⟩ ; linarith,
+  have hsum : summable (λ k : ℕ, ↑k * (seq x θ₀ C k)),
+  { refine (summable_nat_add_iff 1).mp _,
+    simp only [seq, ← mul_assoc],
+    refine summable.mul_right _ (summable.mul_right _ _),
+    set u := λ k :ℕ, (k : ℝ) * x ^ k,
+    change summable (λ (n : ℕ), u (n+1)),
+    refine (summable_nat_add_iff 1).mpr _,
+    simpa using summable_pow_mul_geometric_of_norm_lt_1 1 hxnorm },
+  simp only [C, Vₘ, Vads, A],
+  rw [tsum_eq_zero_add hsum, tsum_eq_zero_add hsum2],
+  simp only [nat.cast_zero, zero_mul, zero_add, nat.cast_one, pow_zero, one_mul, mul_assoc, nat.cast_add, mul_div_assoc],
+  rw [show seq x θ₀ C 0 = θ₀, by {simp [seq]}], 
+  rw [← mul_div_assoc, mul_comm V₀ _, mul_div_mul_right _ _ hV₀, sequence_math x θ₀ (y/x) hx1 hx2 hθ],
+  field_simp [C, mul_comm x y],
+end
+
+end BET
