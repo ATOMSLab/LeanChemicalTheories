@@ -2,7 +2,7 @@ import dimensional_analysis.basic
 
 /-! # Proof of dimensionless numbers
 We demonstrate Grashof and Prandtl numbers are dimensionless by expressing the variables in their
-fundamental units defined in our `dimensionsal_analysis.basic` system.
+fundamental units defined in our [basic] (./basic.html) `dimensionsal_analysis` system.
 
 Here:
 - `g` is gravitational acceleration 
