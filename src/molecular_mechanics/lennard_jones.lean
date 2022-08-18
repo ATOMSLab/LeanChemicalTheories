@@ -211,7 +211,7 @@ begin
   rw @repulsive_2 minRadius hrpos,
   apply differentiable_at_inv_abs_rpow (hrpos x) (@minRadius_rpow_div_const_pos minRadius 4 12 (hrpos minRadius) zero_lt_four zero_lt_twelve) hrpos,
   norm_num,
-  rw @attractice_2 minRadius hrpos,
+  rw @attractive_2 minRadius hrpos,
   apply differentiable_at_inv_abs_rpow (hrpos x) (@minRadius_rpow_div_const_pos minRadius 2 6 (hrpos minRadius) zero_lt_two zero_lt_six) hrpos,
   norm_num,
 end
@@ -249,7 +249,7 @@ begin
   norm_num,
 end
 
-theorem LJ_deriv_2_pos
+theorem deriv2_nonneg
 (hrpos : ∀ r : ℝ, 0 < r)
 :
  0 ≤  (deriv^[2] (LJ ε minRadius) minRadius)  :=
@@ -262,7 +262,7 @@ begin
   apply real.rpow_nonneg_of_nonneg (le_of_lt (hrpos minRadius)),
 end
 
-def convex_zone (minRadius : ℝ) := set.Ioo (0:ℝ) ((11/6)^(1/6:ℝ)*minRadius)
+def convex_zone (minRadius : ℝ) := set.Ioo (0:ℝ) ((13/7)^(1/6:ℝ)*minRadius)
 
 lemma differentiable_at_LJ 
 (hrpos : ∀ r : ℝ, 0 < r)
@@ -331,26 +331,37 @@ end
 lemma deriv2_of_convex_zone_nonneg 
 (hrpos : ∀ r : ℝ, 0 < r)
 :
-:=
+∀ x ∈ (convex_zone minRadius), 0 ≤ (deriv^[2] (LJ ε minRadius) x):=
 begin
-
+  intros x h,
+  let h1 := deriv2_of_LJ ε minRadius hrpos,
+  rw h1,
+  simp only [convex_zone] at h,
+  cases h with hl hu,
+  field_simp [hrpos ε],
+  rw [show x^(14:ℝ) = x^(6:ℝ)*x^(8:ℝ), by {rw ← real.rpow_add (hrpos x), norm_num}, show minRadius^(12:ℝ) = minRadius^(6:ℝ)*minRadius^(6:ℝ), by {rw ← real.rpow_add (hrpos minRadius), norm_num},
+  mul_div_assoc, mul_div_assoc, mul_div_mul_comm, ← mul_assoc, mul_le_mul_right (hrpos (minRadius^(6:ℝ)/x^(8:ℝ))), ← mul_div_assoc, le_div_iff (hrpos (x^(6:ℝ))),
+  ← le_div_iff' (hrpos (84:ℝ)), mul_comm (156:ℝ) _, mul_div_assoc],
+  norm_num,
+  apply le_of_lt,
+  rw [mul_comm, show (13/7)*minRadius^(6:ℝ) = ((13/7)^(1/6:ℝ)*minRadius)^(6:ℝ), by {rw [mul_rpow, ← rpow_mul], norm_num, norm_num, apply le_of_lt, apply zero_lt_rpow,
+  norm_num, norm_num, linarith [hrpos minRadius],}],
+  apply rpow_lt_rpow _ hu _,
+  linarith [hrpos x],
+  norm_num,
 end
+
 theorem convex_on
 (hrpos : ∀ r : ℝ, 0 < r)
 :
 convex_on ℝ (convex_zone minRadius) (LJ ε minRadius) :=
 begin
-  apply convex_on_of_deriv2_nonneg (convex_Ioo _ _) (continuous_on_convex_zone _ _ hrpos) (differentiable_on_convex_zone _ _ hrpos) (differentiable_of_deriv_on_convex_zone _ _ _),
+  apply convex_on_of_deriv2_nonneg (convex_Ioo _ _) (continuous_on_convex_zone _ _ hrpos) (differentiable_on_convex_zone _ _ hrpos) (differentiable_of_deriv_on_convex_zone _ _ hrpos),
   intros x h,
-
-end
-theorem local_min_at_minRadius
-(hrpos : ∀ r : ℝ, 0 < r)
-:
-is_local_min (LJ ε minRadius) minRadius :=
-begin
-  simp [is_local_min, is_min_filter, LJ],
-  
+  apply deriv2_of_convex_zone_nonneg _ _ hrpos,
+  simp [convex_zone],
+  simp at h,
+  exact h,
 end
 
 end LJ
