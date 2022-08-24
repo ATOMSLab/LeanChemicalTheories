@@ -2,6 +2,7 @@ import analysis.complex.basic
 import data.real.basic
 import algebra.ring.basic
 import math.infinite_series
+import topology.metric_space.basic
 
 open_locale big_operators
 
@@ -26,103 +27,221 @@ instead, molecules can stack on top of each other in layers.
 
 
 
-section BET
-variables (x θ₀ C: ℝ)
+noncomputable theory
 
-def seq (x θ₀ C: ℝ) : ℕ → ℝ
+constants (C_1 C_L θ₀: ℝ) (P₀ : nnreal) (hCL : 0 < C_L) (hC1 : 0 < C_1) (hθ₀ : 0 < θ₀) (hP₀ : 0 < P₀)
+
+def BET_first_layer_adsoprtion_rate (P : nnreal) := (C_1)*P
+local notation `y` := BET_first_layer_adsoprtion_rate
+
+def BET_n_layer_adsorption_rate (P : nnreal):= (C_L)*P
+local notation `x` := BET_n_layer_adsorption_rate
+
+def BET_constant := C_1/C_L
+local notation `C` := BET_constant
+
+
+def seq (P: nnreal) : ℕ → ℝ
 |(0 : ℕ)            := θ₀
-|(nat.succ n) := x^(n+1)*θ₀*C
+|(nat.succ n) := (x P)^(n+1)*θ₀*C
 
+section BET
 
-lemma sequence_math (x θ₀ C : ℝ) (hx1: x < 1) (hx2 : 0 < x) (hθ : θ₀ ≠ 0):
-  (∑' k : ℕ, ((k + 1 : ℝ)*(seq x θ₀ C (k+1:ℕ))))/(θ₀ + ∑' k, (seq x θ₀ C (k+1:ℕ))) = C*x/((1 - x)*(1 - x + x*C)) :=
+lemma sequence_math  (P : nnreal) (hx1: (x P) < 1) (hx2 : 0 < (x P)):
+  (∑' k : ℕ, ((k + 1 : ℝ)*(seq P (k+1:ℕ))))/(θ₀ + ∑' k, (seq P (k+1:ℕ))) = C*(x P)/((1 - (x P))*(1 - (x P) + (x P)*C)):=
 begin
   simp [seq],
-  have hxnorm : ∥x∥ < 1, by refine abs_lt.mpr ⟨_, _⟩ ; linarith,
+  have hxnorm : ∥x P∥ < 1, by refine abs_lt.mpr ⟨_, _⟩ ; linarith,
   simp [← mul_assoc],
   rw [tsum_mul_right, tsum_mul_right, tsum_mul_right, tsum_mul_right, tsum_coe_mul_geometric_succ hx1 hx2, 
   tsum_geometric_of_lt_1_pow_succ hx1 hx2, pow_two],
-  have h1 : (1-x) ≠ 0 := by linarith,
+  have h1 : (1-(x P)) ≠ 0 := by linarith,
   field_simp,
-  rw [mul_comm, mul_assoc (1-x) _ _, mul_div_mul_left, mul_comm, mul_comm x θ₀, mul_comm C _, mul_assoc θ₀ x C, 
-  ← mul_add θ₀ _ _, ← mul_assoc (1-x) _ _,  mul_comm _ θ₀, mul_assoc θ₀ _ _, mul_div_mul_left, mul_comm C x],
-  iterate 2 {finish},
+  rw [mul_comm, mul_assoc (1-(x P)) _ _, mul_div_mul_left, mul_comm, mul_comm (x P) θ₀, mul_comm C _, mul_assoc θ₀ (x P) C, 
+  ← mul_add θ₀ _ _, ← mul_assoc (1-(x P)) _ _,  mul_comm _ θ₀, mul_assoc θ₀ _ _, mul_div_mul_left, mul_comm C (x P)],
+  iterate 2 {linarith [hθ₀, h1],},
 end
 
 theorem regression_form
-{P V₀ y: ℝ}
-(hx1: x < 1)
-(hx2 : 0 < x)
-(hθ : θ₀ ≠ 0)
-(hP : P ≠ 0)
+{P : nnreal}
+{V₀: ℝ}
+(hx1: (x P) < 1)
+(hx2 : 0 < (x P))
+(hθ : 0 < θ₀ )
+(hP : 0 < P)
 :
-  let a := V₀*y/P,
-      b := x/P,
-      c := y/P,
-      C := y/x,
-      Vads :=  V₀ * ∑' (k : ℕ), ↑k * (seq x θ₀ C k),
-      A :=  ∑' (k : ℕ), (seq x θ₀ C k),
+  let a := V₀*C_1,
+      b := C_L,
+      c := C_1,
+      Vads :=  V₀ * ∑' (k : ℕ), ↑k * (seq P k),
+      A :=  ∑' (k : ℕ), (seq P k),
       q := Vads/A in
   q = a*P/((1-b*P)*(1-b*P+c*P))
 :=
 begin
 intros,
-  have hsum2 : summable (seq x θ₀ C),
+  have hsum2 : summable (seq P),
   { refine (summable_nat_add_iff 1).mp _,
     simp only [seq, pow_succ', mul_assoc],
     exact (summable_geometric_of_lt_1 hx2.le hx1).mul_right _ },
-  have hxnorm : ∥x∥ < 1, by refine abs_lt.mpr ⟨_, _⟩ ; linarith,
-  have hsum : summable (λ k : ℕ, ↑k * (seq x θ₀ C k)),
+  have hxnorm : ∥x P∥ < 1, by refine abs_lt.mpr ⟨_, _⟩ ; linarith,
+  have hsum : summable (λ k : ℕ, ↑k * (seq P k)),
   { refine (summable_nat_add_iff 1).mp _,
     simp only [seq, ← mul_assoc],
     refine summable.mul_right _ (summable.mul_right _ _),
-    set u := λ k :ℕ, (k : ℝ) * x ^ k,
+    set u := λ k :ℕ, (k : ℝ) * (x P) ^ k,
     change summable (λ (n : ℕ), u (n+1)),
     refine (summable_nat_add_iff 1).mpr _,
     simpa using summable_pow_mul_geometric_of_norm_lt_1 1 hxnorm },
   simp only [a, b, c, q, Vads, A],
   rw [tsum_eq_zero_add hsum, tsum_eq_zero_add hsum2],
   simp only [nat.cast_zero, zero_mul, zero_add, nat.cast_one, pow_zero, one_mul, mul_assoc, nat.cast_add, mul_div_assoc],
-  rw [show seq x θ₀ C 0 = θ₀, by {simp [seq]}], 
-  rw [sequence_math x θ₀ (y/x) hx1 hx2 hθ, ← mul_div_assoc,mul_comm x (y/x)],
-  have hx3 : x ≠ 0 := by linarith,
+  rw [show seq P 0 = θ₀, by {simp [seq]}], 
+  rw [sequence_math P hx1 hx2, BET_constant, BET_n_layer_adsorption_rate],
+  have h1 : C_L ≠ 0 := by {linarith [hCL],},
   field_simp,
+  rw [mul_comm (1-C_L*P) C_L, mul_assoc C_L P _, ← mul_add C_L _ _, ← mul_assoc V₀ C_1 _, mul_comm C_L _, ← mul_assoc (V₀*C_1) _ _,
+  mul_comm C_L _, ← mul_assoc _ _ C_L, mul_div_mul_right _ _ h1, mul_comm (↑P) C_1, mul_assoc],
 end
 
-theorem brunauer_form
-{V₀ y: ℝ}
-(hx1: x < 1)
-(hx2 : 0 < x)
-(hθ : θ₀ ≠ 0)
-(hV₀ : V₀ ≠ 0)
+def brunauer_26 := λ P : nnreal, C*(x P)/((1-(x P))*(1-(x P)+C*(x P))) 
+
+theorem brunauer_26_from_seq
+{P : nnreal}
+{V₀: ℝ}
+(hx1: (x P) < 1)
+(hx2 : 0 < (x P))
+(hP : 0 < P)
 :
-  let C := y/x,
-      Vads :=  V₀ * ∑' (k : ℕ), ↑k * (seq x θ₀ C k),
-      A :=  ∑' (k : ℕ), (seq x θ₀ C k),
-      Vₘ := A*V₀ in
-  Vads/Vₘ = C*x/((1-x)*(1-x+C*x))
+  let Vads :=  V₀ * ∑' (k : ℕ), ↑k * (seq P k),
+      A :=  ∑' (k : ℕ), (seq P k) in
+  Vads/A = V₀*(brunauer_26 P)
 :=
 begin
-intros,
-  have hsum2 : summable (seq x θ₀ C),
+  intros,
+  simp [brunauer_26],
+  have hsum2 : summable (seq P),
   { refine (summable_nat_add_iff 1).mp _,
     simp only [seq, pow_succ', mul_assoc],
     exact (summable_geometric_of_lt_1 hx2.le hx1).mul_right _ },
-  have hxnorm : ∥x∥ < 1, by refine abs_lt.mpr ⟨_, _⟩ ; linarith,
-  have hsum : summable (λ k : ℕ, ↑k * (seq x θ₀ C k)),
+  have hxnorm : ∥x P∥ < 1, by refine abs_lt.mpr ⟨_, _⟩ ; linarith,
+  have hsum : summable (λ k : ℕ, ↑k * (seq P k)),
   { refine (summable_nat_add_iff 1).mp _,
     simp only [seq, ← mul_assoc],
     refine summable.mul_right _ (summable.mul_right _ _),
-    set u := λ k :ℕ, (k : ℝ) * x ^ k,
+    set u := λ k :ℕ, (k : ℝ) * (x P) ^ k,
     change summable (λ (n : ℕ), u (n+1)),
     refine (summable_nat_add_iff 1).mpr _,
     simpa using summable_pow_mul_geometric_of_norm_lt_1 1 hxnorm },
-  simp only [C, Vₘ, Vads, A],
+  simp only [Vads, A],
   rw [tsum_eq_zero_add hsum, tsum_eq_zero_add hsum2],
   simp only [nat.cast_zero, zero_mul, zero_add, nat.cast_one, pow_zero, one_mul, mul_assoc, nat.cast_add, mul_div_assoc],
-  rw [show seq x θ₀ C 0 = θ₀, by {simp [seq]}], 
-  rw [← mul_div_assoc, mul_comm V₀ _, mul_div_mul_right _ _ hV₀, sequence_math x θ₀ (y/x) hx1 hx2 hθ],
-  field_simp [C, mul_comm x y],
+  rw [show seq P 0 = θ₀, by {simp [seq]}], 
+  rw [sequence_math P hx1 hx2],
+  field_simp [mul_comm (x P) C],
 end
+
+lemma tendsto_at_top_at_inv_CL
+: filter.tendsto brunauer_26 (nhds_within (1/C_L.to_nnreal) (set.Ioo 0 (1/C_L.to_nnreal))) filter.at_top:=
+begin
+  have h1 : filter.tendsto (λ («x» : nnreal), 1 - C_L * ↑«x») (nhds (C_L.to_nnreal)⁻¹) (nhds (0)) := by {rw show (0 : ℝ) = 1 - 1, by norm_num, 
+      apply filter.tendsto.sub, apply tendsto_const_nhds,  rw show (1 : ℝ) = C_L*C_L⁻¹, by { symmetry, rw mul_inv_cancel (ne_of_gt hCL),},
+      apply filter.tendsto.const_mul, rw show C_L⁻¹ = C_L.to_nnreal⁻¹, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, norm_cast, finish,},
+  have h : 0 < C := by { simp [BET_constant], exact div_pos hC1 hCL,},
+  simp only [brunauer_26, BET_n_layer_adsorption_rate, div_eq_inv_mul],
+  apply filter.tendsto.at_top_mul h,
+  apply filter.tendsto.inv_tendsto_zero,
+  simp [nhds_within],
+  apply filter.tendsto.inf,
+  rw show 0 = 0*C, by simp,
+  apply filter.tendsto.mul,
+  exact h1,
+  rw show nhds C = nhds (0 + C), by simp,
+  apply filter.tendsto.add h1,
+  rw show nhds C = nhds (C*1), by simp,
+  apply filter.tendsto.const_mul,
+  rw show 1 = C_L*C_L⁻¹, by {symmetry, rw mul_inv_eq_one₀, linarith[hCL]},
+  apply filter.tendsto.const_mul,
+  rw show C_L⁻¹ = C_L.to_nnreal⁻¹, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, 
+  norm_cast,
+  finish,
+  simp,
+  intros a ha1 ha2,
+  have HC : C_L.to_nnreal < C_1.to_nnreal ∨ C_1.to_nnreal ≤ C_L.to_nnreal := by { apply lt_or_ge,},
+  cases HC with HC1 HC2,
+  { rw [zero_lt_mul_left, sub_add, ← neg_sub, neg_sub', lt_sub, sub_zero, neg_sub, BET_constant, ← mul_assoc, div_mul, div_self (ne_of_gt hCL), div_one, ← sub_mul, 
+    mul_comm, ← div_lt_iff],
+    rw show C_L = C_L.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, 
+    rw show C_1 = C_1.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hC1),}, 
+    rw ← nnreal.coe_lt_coe at ha1,
+    apply lt_trans _ ha1,
+    simp,
+    rw [neg_div, neg_lt_zero],
+    rw ← nnreal.coe_lt_coe at HC1,
+    simpa using HC1,    
+    rw ← nnreal.coe_lt_coe at HC1,
+    rw show C_L = C_L.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, 
+    rw show C_1 = C_1.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hC1),}, 
+    simpa using HC1,
+    rw [lt_sub, mul_comm, ← lt_div_iff hCL],
+    rw ← nnreal.coe_lt_coe at ha2,
+    rw show C_L = C_L.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, 
+    simpa using ha2,},
+  { rw le_iff_lt_or_eq at HC2,
+    cases HC2 with HC2 HC3,
+    rw [zero_lt_mul_left, sub_add, lt_sub, sub_zero, BET_constant, ← mul_assoc, div_mul, div_self (ne_of_gt hCL), div_one, ← sub_mul, 
+    mul_comm, ← lt_div_iff],
+    have H : C_L.to_nnreal⁻¹ <  1/(C_L.to_nnreal-C_1.to_nnreal) := by { rw one_div, apply nnreal.inv_lt_inv, simpa using HC2, rw ← nnreal.coe_lt_coe, rw nnreal.coe_sub (le_of_lt HC2), simpa using hC1,},
+    rw ← nnreal.coe_lt_coe at ha2,
+    rw ← nnreal.coe_lt_coe at H,
+    push_cast at H,
+     rw nnreal.coe_sub (le_of_lt HC2) at H,
+    rw show C_L = C_L.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, 
+    rw show C_1 = C_1.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hC1),}, 
+    apply lt_trans ha2 H,
+    rw show C_L = C_L.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, 
+    rw show C_1 = C_1.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hC1),},
+    rw ← nnreal.coe_lt_coe at HC2,
+    simpa using HC2,
+    rw [lt_sub, mul_comm, ← lt_div_iff hCL],
+    rw show C_L = C_L.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, 
+    simpa using ha2,
+    rw [BET_constant, show C_L = C_L.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, show C_1 = C_1.to_nnreal, by { rw real.coe_to_nnreal _ (le_of_lt hC1),}, HC3, div_self, one_mul, sub_add_cancel, mul_one,
+    lt_sub, sub_zero, mul_comm, ← lt_div_iff, one_div],
+    rw ← nnreal.coe_lt_coe at ha2,
+    simpa using ha2,
+    simpa using hCL,
+    simpa using hCL,},
+  simp [nhds_within],
+  apply filter.tendsto_inf_left,
+  rw show nhds C = nhds (C*1), by simp,
+  apply filter.tendsto.const_mul,
+  rw show 1 = C_L*C_L⁻¹, by {symmetry, rw mul_inv_eq_one₀, linarith [hCL]},
+  apply filter.tendsto.const_mul,
+  rw show C_L⁻¹ = C_L.to_nnreal⁻¹, by { rw real.coe_to_nnreal _ (le_of_lt hCL),}, 
+  norm_cast,
+  finish,
+end
+
+def co_tendsto {α β} (f : α → β) (l₁ : filter α) (l₂ : filter β) :=
+  l₂.comap f ≤ l₁
+
+theorem brunauer_27
+(h1 : co_tendsto brunauer_26 (nhds_within (P₀) (set.Ioo 0 (P₀))) filter.at_top)
+: 1/C_L.to_nnreal = P₀:=
+begin
+  have h2 : filter.tendsto brunauer_26 (nhds_within (1/C_L.to_nnreal) (set.Ioo 0 (1/C_L.to_nnreal))) filter.at_top := by exact tendsto_at_top_at_inv_CL,
+  have h3 : (nhds_within (1/C_L.to_nnreal) (set.Ioo 0 (1/C_L.to_nnreal))) ≤ (nhds_within (P₀) (set.Ioo 0 (P₀))) := (filter.map_le_iff_le_comap.1 h2).trans h1,
+  simp only [nhds_within] at h3,
+  rw ← nhds_le_nhds_iff,
+  convert h3,
+  simp,
+  apply Ioo_mem_nhds,
+  
+end
+
+example {α β} (f : α → β) (l₁ l₁' : filter α) (l₂ : filter β)
+  (h1 : filter.tendsto f l₁ l₂) (h2 : co_tendsto f l₁' l₂) : l₁ ≤ l₁' :=
+(filter.map_le_iff_le_comap.1 h1).trans h2
 
 end BET
