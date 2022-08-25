@@ -1,8 +1,5 @@
-import analysis.complex.basic
 import data.real.basic
-import algebra.ring.basic
 import math.infinite_series
-import topology.metric_space.basic
 
 open_locale big_operators
 
@@ -223,25 +220,35 @@ begin
   finish,
 end
 
-def co_tendsto {α β} (f : α → β) (l₁ : filter α) (l₂ : filter β) :=
-  l₂.comap f ≤ l₁
-
 theorem brunauer_27
-(h1 : co_tendsto brunauer_26 (nhds_within (P₀) (set.Ioo 0 (P₀))) filter.at_top)
-: 1/C_L.to_nnreal = P₀:=
+(h1 : P₀ = 1/C_L.to_nnreal)
+: filter.tendsto brunauer_26 (nhds_within (P₀) (set.Ioo 0 (P₀))) filter.at_top:=
 begin
-  have h2 : filter.tendsto brunauer_26 (nhds_within (1/C_L.to_nnreal) (set.Ioo 0 (1/C_L.to_nnreal))) filter.at_top := by exact tendsto_at_top_at_inv_CL,
-  have h3 : (nhds_within (1/C_L.to_nnreal) (set.Ioo 0 (1/C_L.to_nnreal))) ≤ (nhds_within (P₀) (set.Ioo 0 (P₀))) := (filter.map_le_iff_le_comap.1 h2).trans h1,
-  simp only [nhds_within] at h3,
-  rw ← nhds_le_nhds_iff,
-  convert h3,
-  simp,
-  apply Ioo_mem_nhds,
-  
+  simpa [h1] using  tendsto_at_top_at_inv_CL,
 end
 
-example {α β} (f : α → β) (l₁ l₁' : filter α) (l₂ : filter β)
-  (h1 : filter.tendsto f l₁ l₂) (h2 : co_tendsto f l₁' l₂) : l₁ ≤ l₁' :=
-(filter.map_le_iff_le_comap.1 h1).trans h2
+def brunauer_28 := λ P : nnreal, C*P/((P₀-P)*(1+(C-1)*(P/P₀)))
 
+theorem brunauer_28_from_seq
+{P : nnreal}
+{V₀: ℝ}
+(h27 : P₀ = 1/C_L.to_nnreal)
+(hx1: (x P) < 1)
+(hx2 : 0 < (x P))
+(hP : 0 < P)
+: let Vads :=  V₀ * ∑' (k : ℕ), ↑k * (seq P k),
+      A :=  ∑' (k : ℕ), (seq P k) in
+  Vads/A = V₀*(brunauer_28 P) :=
+begin
+  have h1 : let Vads :=  V₀ * ∑' (k : ℕ), ↑k * (seq P k),
+      A :=  ∑' (k : ℕ), (seq P k) in
+  Vads/A = V₀*(brunauer_26 P) := by exact brunauer_26_from_seq hx1 hx2 hP,
+  simp at *,
+  rw [h1, brunauer_26, brunauer_28, BET_constant],
+  field_simp,
+  rw [BET_n_layer_adsorption_rate, h27],
+  rw [← mul_assoc, mul_comm C_L _, ← mul_assoc, mul_comm _ C_L, mul_div_mul_left _ _ (ne_of_gt hCL), show ↑(C_L.to_nnreal)⁻¹ = C_L⁻¹, by {push_cast, rw real.coe_to_nnreal, linarith [hCL]},
+  ← mul_assoc C_L _ _, mul_sub, mul_inv_cancel (ne_of_gt hCL), ← mul_assoc V₀ _ _, mul_comm C_L (↑P), mul_div_assoc C_1 _ _, mul_div_cancel _ (ne_of_gt hCL), sub_mul _ _ (↑P), inv_eq_one_div,
+  ← div_mul, div_one, sub_mul _ _ C_L, one_mul, mul_comm (C_1 / C_L * ↑P) C_L, ← mul_assoc C_L _ _, mul_div, mul_comm C_L C_1, mul_div_cancel _ (ne_of_gt hCL), add_sub, add_sub_right_comm],
+end
 end BET
