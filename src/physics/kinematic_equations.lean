@@ -187,7 +187,7 @@ begin
    rw [add_assoc, ← add_smul, show t/2+t/2 = t, by finish, ← smul_assoc, show (t/2)•t = t^2/2, by {rw smul_eq_mul, ring_nf,}],
 end
 
-theorem const_accel'''
+/- theorem const_accel'''
 (accel_const : 𝕒 = λ (t : 𝕜), 𝔸)
 {n : with_top ℕ}
 :
@@ -206,7 +206,7 @@ begin
   field_simp,
   rw [inner_re_symm, ← real_inner_eq_re_inner 𝕜 𝔸 _, mul_add],
   
-end
+end -/
 
 theorem real_const_accel'''
 [N : motion_cont_diff_everywhere ℝ E]
