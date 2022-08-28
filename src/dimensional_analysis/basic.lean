@@ -43,6 +43,10 @@ protected def div : dimension → dimension → dimension
 protected def inv : dimension → dimension 
 |(Q a b c d e f g) := (Q (-a) (-b) (-c) (-d) (-e) (-f) (-g))
 
+protected def DimDeriv : dimension → dimension → dimension := dimension.div
+
+protected def DimIntegral : dimension → dimension → dimension := dimension.mul
+
 instance : has_mul dimension := ⟨dimension.mul⟩
 instance : has_pow dimension ℚ := ⟨dimension.qpow⟩
 instance : has_pow dimension ℕ := ⟨dimension.pow⟩
