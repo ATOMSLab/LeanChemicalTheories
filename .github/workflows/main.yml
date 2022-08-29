@@ -31,7 +31,7 @@ jobs:
       with:
         fetch-depth: 0
         repository: ATOMSLab/doc-gen
-        ref: change-header
+        ref: UpdateHomepageText
         path: doc-gen
 
     - name: 🐍 Install Python dependencies
