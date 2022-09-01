@@ -28,8 +28,8 @@ noncomputable theory
 
 constants (C_1 C_L θ₀: ℝ) (P₀ : nnreal) (hCL : 0 < C_L) (hC1 : 0 < C_1) (hθ₀ : 0 < θ₀) (hP₀ : 0 < P₀)
 
-def BET_first_layer_adsoprtion_rate (P : nnreal) := (C_1)*P
-local notation `y` := BET_first_layer_adsoprtion_rate
+def BET_first_layer_adsorption_rate (P : nnreal) := (C_1)*P
+local notation `y` := BET_first_layer_adsorption_rate
 
 def BET_n_layer_adsorption_rate (P : nnreal):= (C_L)*P
 local notation `x` := BET_n_layer_adsorption_rate
