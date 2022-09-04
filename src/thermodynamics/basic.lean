@@ -82,6 +82,48 @@ begin
   exact h n 1,
 end
 
+def charles_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (volume n)/(temperature n)= k
+
+theorem charles_law_relation 
+: charles_law M →  ∀ n m, (@volume 𝕜 _ _ n) / temperature n = volume m / temperature m:=
+begin
+  intros h n m,
+  simp [charles_law] at h,
+  cases h with k h,
+  field_simp [h n, h m],
+end
+
+theorem charles_law_relation'
+: (∀ n m, (@volume 𝕜 _ _ n) / temperature n = volume m / temperature m) → charles_law M :=
+begin
+  intros h,
+  simp [charles_law],
+  use (volume 1 / temperature 1),
+  intro,
+  exact h n 1,
+end
+
+def avogadros_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (volume n)/(substance_amount n)= k
+
+theorem avogadros_law_relation 
+: avogadros_law M →  ∀ n m, (@volume 𝕜 _ _ n) / substance_amount n = volume m / substance_amount m:=
+begin
+  intros h n m,
+  simp [avogadros_law] at h,
+  cases h with k h,
+  field_simp [h n, h m],
+end
+
+theorem avogadros_law_relation'
+: (∀ n m, (@volume 𝕜 _ _ n) / substance_amount n = volume m / substance_amount m) → avogadros_law M :=
+begin
+  intros h,
+  simp [avogadros_law],
+  use (volume 1 / substance_amount 1),
+  intro,
+  exact h n 1,
+end
+
 theorem boyles_from_ideal_gas {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜} (iso1 : isothermal M.to_thermo_system)
 (iso2 : closed_system M.to_thermo_system)
 : boyles_law M:=
@@ -91,6 +133,36 @@ begin
   apply boyles_law_relation',
   intros,
   specialize h n m,
+  simp [iso1 n m] at h,
+  simp [iso2 n m] at h,
+  exact h,  
+end
+
+theorem charles_from_ideal_gas {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜} (iso1 : isobaric M.to_thermo_system)
+(iso2 : closed_system M.to_thermo_system)
+: charles_law M:=
+begin
+  simp [charles_law, isobaric, closed_system] at *,
+  let h := @ideal_gas_law_relation 𝕜 _ M,
+  apply charles_law_relation',
+  intros,
+  specialize h n m,
+  iterate 2 {rw mul_div_mul_comm at h,},
+  simp [iso1 n m, iso2 n m] at h,
+  exact h,  
+end
+
+theorem avogadros_from_ideal_gas {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜} (iso1 : isothermal M.to_thermo_system)
+(iso2 : isobaric M.to_thermo_system) 
+: avogadros_law M:=
+begin
+  simp [avogadros_law, isothermal, isobaric] at *,
+  let h := @ideal_gas_law_relation 𝕜 _ M,
+  apply avogadros_law_relation',
+  intros,
+  specialize h n m,
+  rw [mul_comm (pressure n) _,mul_comm (pressure m) _]  at h,
+  iterate 2 {rw mul_div_mul_comm at h,},
   simp [iso1 n m, iso2 n m] at h,
   exact h,  
 end
