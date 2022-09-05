@@ -49,6 +49,8 @@ class ideal_gas (𝕜 : Type u) [comm_group 𝕜]
 (ideal_gas_law : ∀ n : ℕ, (pressure n)*(volume n) = (substance_amount n)*R*(temperature n))
 
 def boyles_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (pressure n) * (volume n)= k
+def charles_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (volume n)/(temperature n)= k
+def avogadros_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (volume n)/(substance_amount n)= k
 
 /-! ### Properties about the ideal gas law-/
 variables {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜}
@@ -82,8 +84,6 @@ begin
   exact h n 1,
 end
 
-def charles_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (volume n)/(temperature n)= k
-
 theorem charles_law_relation 
 : charles_law M →  ∀ n m, (@volume 𝕜 _ _ n) / temperature n = volume m / temperature m:=
 begin
@@ -102,8 +102,6 @@ begin
   intro,
   exact h n 1,
 end
-
-def avogadros_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (volume n)/(substance_amount n)= k
 
 theorem avogadros_law_relation 
 : avogadros_law M →  ∀ n m, (@volume 𝕜 _ _ n) / substance_amount n = volume m / substance_amount m:=
