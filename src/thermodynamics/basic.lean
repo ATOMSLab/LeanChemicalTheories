@@ -23,50 +23,32 @@ how the boyles law follows form the ideal gas law and the assumption of isotherm
 
 universe u
 
-class thermo_system (𝕜 : Type u) [comm_group 𝕜] :=
+class thermo_system :=
 
-(pressure : ℕ → 𝕜)
-(volume : ℕ → 𝕜)
-(temperature : ℕ → 𝕜)
-(substance_amount : ℕ → 𝕜)
-(energy : ℕ → 𝕜)
+(pressure : ℕ → ℝ)
+(volume : ℕ → ℝ)
+(temperature : ℕ → ℝ)
+(substance_amount : ℕ → ℝ)
+(energy : ℕ → ℝ)
 
 export thermo_system (pressure volume temperature substance_amount energy)
 
 
-def isobaric {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : Prop := ∀ n m : ℕ, @pressure 𝕜 _ _ n = pressure m
-def isochoric {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : Prop := ∀ n m : ℕ, @volume 𝕜 _ _ n = volume m
-def isothermal {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : Prop := ∀ n m : ℕ, @temperature 𝕜 _ _ n = temperature m
-def adiabatic {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : Prop :=  ∀ n m : ℕ, @energy 𝕜 _ _ n = energy m
-def closed_system {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : Prop := ∀ n m : ℕ, @substance_amount 𝕜 _ _ n = substance_amount m
-def isolated_system {𝕜 : Type u} [comm_group 𝕜] (M : thermo_system 𝕜) : Prop := adiabatic M ∧ closed_system M
+def isobaric (M : thermo_system) : Prop := ∀ n m : ℕ, pressure n = pressure m
+def isochoric (M : thermo_system) : Prop := ∀ n m : ℕ, volume n = volume m
+def isothermal (M : thermo_system) : Prop := ∀ n m : ℕ, temperature n = temperature m
+def adiabatic (M : thermo_system) : Prop :=  ∀ n m : ℕ, energy  n = energy m
+def closed_system (M : thermo_system) : Prop := ∀ n m : ℕ, substance_amount  n = substance_amount m
+def isolated_system (M : thermo_system) : Prop := adiabatic M ∧ closed_system M
 
-
-/-! ### System models-/
-class ideal_gas (𝕜 : Type u) [comm_group 𝕜]
-  extends thermo_system 𝕜 :=
-(R : 𝕜)
-(ideal_gas_law : ∀ n : ℕ, (pressure n)*(volume n) = (substance_amount n)*R*(temperature n))
-
-def boyles_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (pressure n) * (volume n)= k
-def charles_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (volume n)/(temperature n)= k
-def avogadros_law {𝕜 : Type u} [comm_group 𝕜] (M : ideal_gas 𝕜) :=  ∃ (k : 𝕜), ∀ n : ℕ, (volume n)/(substance_amount n)= k
-
-/-! ### Properties about the ideal gas law-/
-variables {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜}
-theorem ideal_gas_law_relation 
-: ∀ n m : ℕ, (@pressure 𝕜 _ M.to_thermo_system n)*(volume n)/((substance_amount n)*(temperature n)) = 
-(pressure m)*(volume m)/((substance_amount m)*(temperature m)):=
-begin
-  intros,
-  let h1 := ideal_gas.ideal_gas_law n,
-  let h2 := ideal_gas.ideal_gas_law m,
-  rw [h1,h2],
-  field_simp,
-end
-
+/-!### Gas Laws-/
+def boyles_law (M : thermo_system) :=  ∃ (k : ℝ), ∀ n : ℕ, (pressure n) * (volume n)= k
+def charles_law (M : thermo_system) :=  ∃ (k : ℝ), ∀ n : ℕ, (volume n) = k * (temperature n)
+def avogadros_law (M : thermo_system):=  ∃ (k : ℝ), ∀ n : ℕ, (volume n) = k * (substance_amount n)
+variables {M : thermo_system}
 theorem boyles_law_relation 
-: boyles_law M →  ∀ n m, (@pressure 𝕜 _ _ n)*volume n = pressure m * volume m:=
+
+: boyles_law M →  ∀ n m, pressure n*volume n = pressure m * volume m:=
 begin
   intros h n m,
   simp [boyles_law] at h,
@@ -75,7 +57,8 @@ begin
 end
 
 theorem boyles_law_relation'
-: (∀ n m, (@pressure 𝕜 _ _ n)*volume n = pressure m * volume m) → boyles_law M :=
+
+: (∀ n m, pressure n * volume n = pressure m * volume m) → boyles_law M :=
 begin
   intros h,
   simp [boyles_law],
@@ -85,82 +68,120 @@ begin
 end
 
 theorem charles_law_relation 
-: charles_law M →  ∀ n m, (@volume 𝕜 _ _ n) / temperature n = volume m / temperature m:=
+: charles_law M →  ∀ n m, volume n * temperature m = volume m * temperature n:=
 begin
   intros h n m,
   simp [charles_law] at h,
   cases h with k h,
-  field_simp [h n, h m],
+  rw [h n, h m],
+  ring_exp
 end
 
 theorem charles_law_relation'
-: (∀ n m, (@volume 𝕜 _ _ n) / temperature n = volume m / temperature m) → charles_law M :=
+(hT : temperature 1 ≠ 0)
+: (∀ n m, volume n * temperature m = volume m * temperature n) → charles_law M :=
 begin
   intros h,
   simp [charles_law],
   use (volume 1 / temperature 1),
   intro,
-  exact h n 1,
+  field_simp [h n 1],
 end
 
 theorem avogadros_law_relation 
-: avogadros_law M →  ∀ n m, (@volume 𝕜 _ _ n) / substance_amount n = volume m / substance_amount m:=
+: avogadros_law M →  ∀ n m, volume n * substance_amount m = volume m * substance_amount n :=
 begin
   intros h n m,
   simp [avogadros_law] at h,
   cases h with k h,
-  field_simp [h n, h m],
+  rw [h n, h m],
+  ring_exp,
 end
 
 theorem avogadros_law_relation'
-: (∀ n m, (@volume 𝕜 _ _ n) / substance_amount n = volume m / substance_amount m) → avogadros_law M :=
+(hn : substance_amount 1 ≠ 0)
+: (∀ n m, volume n * substance_amount m = volume m * substance_amount n) → avogadros_law M :=
 begin
   intros h,
   simp [avogadros_law],
   use (volume 1 / substance_amount 1),
   intro,
-  exact h n 1,
+  field_simp [h n 1],
 end
 
-theorem boyles_from_ideal_gas {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜} (iso1 : isothermal M.to_thermo_system)
+/-! ### System models-/
+class ideal_gas
+  extends thermo_system  :=
+(R : ℝ)
+(ideal_gas_law : ∀ n : ℕ, (pressure n)*(volume n) = (substance_amount n)*R*(temperature n))
+
+
+
+/-! ### Properties about the ideal gas law-/
+
+theorem ideal_gas_law_relation 
+{M : ideal_gas}
+: ∀ n m : ℕ, (@pressure M.to_thermo_system n)*(volume n)*((substance_amount m)*(temperature m)) = 
+(pressure m)*(volume m)*((substance_amount n)*(temperature n)):=
+begin
+  intros,
+  let h1 := ideal_gas.ideal_gas_law n,
+  let h2 := ideal_gas.ideal_gas_law m,
+  rw [h1,h2],
+  ring_exp,
+end
+
+
+
+theorem boyles_from_ideal_gas {M : ideal_gas} (iso1 : isothermal M.to_thermo_system)
 (iso2 : closed_system M.to_thermo_system)
-: boyles_law M:=
+(hT : ∀ n, temperature n ≠ 0)
+(hn : ∀ n, substance_amount n ≠ 0)
+: boyles_law M.to_thermo_system:=
 begin
   simp [boyles_law, isothermal, closed_system] at *,
-  let h := @ideal_gas_law_relation 𝕜 _ M,
+  let h := ideal_gas_law_relation,
   apply boyles_law_relation',
   intros,
   specialize h n m,
-  simp [iso1 n m] at h,
-  simp [iso2 n m] at h,
-  exact h,  
+  rw [iso1 n m, iso2 n m] at h,
+  field_simp [hT m, hn m] at h,
+  exact h,
 end
 
-theorem charles_from_ideal_gas {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜} (iso1 : isobaric M.to_thermo_system)
+theorem charles_from_ideal_gas {M : ideal_gas} (iso1 : isobaric M.to_thermo_system)
 (iso2 : closed_system M.to_thermo_system)
-: charles_law M:=
+(hT : ∀ n, temperature n ≠ 0)
+(hn : ∀ n, substance_amount n ≠ 0)
+(hP : ∀ n, pressure n ≠ 0)
+: charles_law M.to_thermo_system:=
 begin
   simp [charles_law, isobaric, closed_system] at *,
-  let h := @ideal_gas_law_relation 𝕜 _ M,
-  apply charles_law_relation',
+  let h := ideal_gas_law_relation,
+  apply charles_law_relation' (hT 1),
   intros,
   specialize h n m,
-  iterate 2 {rw mul_div_mul_comm at h,},
-  simp [iso1 n m, iso2 n m] at h,
-  exact h,  
+  rw [iso1 n m, iso2 n m] at h,
+  field_simp [mul_mul_mul_comm, hP m, hn m] at h,
+  exact h, 
 end
 
-theorem avogadros_from_ideal_gas {𝕜 : Type u}[comm_group 𝕜] {M : ideal_gas 𝕜} (iso1 : isothermal M.to_thermo_system)
+theorem avogadros_from_ideal_gas {M : ideal_gas} (iso1 : isothermal M.to_thermo_system)
 (iso2 : isobaric M.to_thermo_system) 
-: avogadros_law M:=
+(hT : ∀ n, temperature n ≠ 0)
+(hn : ∀ n, substance_amount n ≠ 0)
+(hP : ∀ n, pressure n ≠ 0)
+: avogadros_law M.to_thermo_system:=
 begin
   simp [avogadros_law, isothermal, isobaric] at *,
-  let h := @ideal_gas_law_relation 𝕜 _ M,
-  apply avogadros_law_relation',
+  let h := ideal_gas_law_relation,
+  apply avogadros_law_relation' (hn 1),
   intros,
   specialize h n m,
-  rw [mul_comm (pressure n) _,mul_comm (pressure m) _]  at h,
-  iterate 2 {rw mul_div_mul_comm at h,},
-  simp [iso1 n m, iso2 n m] at h,
+  rw [iso1 n m, iso2 n m] at h,
+  rw [mul_mul_mul_comm (pressure m), mul_comm (pressure m) _, mul_mul_mul_comm (substance_amount _)] at h,
+  rw [mul_mul_mul_comm (pressure m), mul_comm (pressure m) (substance_amount n), mul_mul_mul_comm (substance_amount n)] at h,
+  field_simp [hP m, hT m] at h,
+  rw [mul_comm, mul_comm _ (volume m)] at h,
   exact h,  
 end
