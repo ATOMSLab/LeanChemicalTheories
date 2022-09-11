@@ -26,7 +26,7 @@ instead, molecules can stack on top of each other in layers.
 
 noncomputable theory
 
-constants (C_1 C_L θ₀: ℝ) (P₀ : nnreal) (hCL : 0 < C_L) (hC1 : 0 < C_1) (hθ₀ : 0 < θ₀) (hP₀ : 0 < P₀)
+constants (C_1 C_L s₀: ℝ) (P₀ : nnreal) (hCL : 0 < C_L) (hC1 : 0 < C_1) (hs₀ : 0 < s₀) (hP₀ : 0 < P₀)
 
 def BET_first_layer_adsoprtion_rate (P : nnreal) := (C_1)*P
 local notation `y` := BET_first_layer_adsoprtion_rate
@@ -39,13 +39,13 @@ local notation `C` := BET_constant
 
 
 def seq (P: nnreal) : ℕ → ℝ
-|(0 : ℕ)            := θ₀
-|(nat.succ n) := (x P)^(n+1)*θ₀*C
+|(0 : ℕ)            := s₀
+|(nat.succ n) := (x P)^(n+1)*s₀*C
 
 section BET
 
 lemma sequence_math  (P : nnreal) (hx1: (x P) < 1) (hx2 : 0 < (x P)):
-  (∑' k : ℕ, ((k + 1 : ℝ)*(seq P (k+1:ℕ))))/(θ₀ + ∑' k, (seq P (k+1:ℕ))) = C*(x P)/((1 - (x P))*(1 - (x P) + (x P)*C)):=
+  (∑' k : ℕ, ((k + 1 : ℝ)*(seq P (k+1:ℕ))))/(s₀ + ∑' k, (seq P (k+1:ℕ))) = C*(x P)/((1 - (x P))*(1 - (x P) + (x P)*C)):=
 begin
   simp [seq],
   have hxnorm : ∥x P∥ < 1, by refine abs_lt.mpr ⟨_, _⟩ ; linarith,
@@ -54,9 +54,9 @@ begin
   tsum_geometric_of_lt_1_pow_succ hx1 hx2, pow_two],
   have h1 : (1-(x P)) ≠ 0 := by linarith,
   field_simp,
-  rw [mul_comm, mul_assoc (1-(x P)) _ _, mul_div_mul_left, mul_comm, mul_comm (x P) θ₀, mul_comm C _, mul_assoc θ₀ (x P) C, 
-  ← mul_add θ₀ _ _, ← mul_assoc (1-(x P)) _ _,  mul_comm _ θ₀, mul_assoc θ₀ _ _, mul_div_mul_left, mul_comm C (x P)],
-  iterate 2 {linarith [hθ₀, h1],},
+  rw [mul_comm, mul_assoc (1-(x P)) _ _, mul_div_mul_left, mul_comm, mul_comm (x P) s₀, mul_comm C _, mul_assoc s₀ (x P) C, 
+  ← mul_add s₀ _ _, ← mul_assoc (1-(x P)) _ _,  mul_comm _ s₀, mul_assoc s₀ _ _, mul_div_mul_left, mul_comm C (x P)],
+  iterate 2 {linarith [hs₀, h1],},
 end
 
 theorem regression_form
@@ -64,7 +64,7 @@ theorem regression_form
 {V₀: ℝ}
 (hx1: (x P) < 1)
 (hx2 : 0 < (x P))
-(hθ : 0 < θ₀ )
+(hθ : 0 < s₀ )
 (hP : 0 < P)
 :
   let a := V₀*C_1,
@@ -93,7 +93,7 @@ intros,
   simp only [a, b, c, q, Vads, A],
   rw [tsum_eq_zero_add hsum, tsum_eq_zero_add hsum2],
   simp only [nat.cast_zero, zero_mul, zero_add, nat.cast_one, pow_zero, one_mul, mul_assoc, nat.cast_add, mul_div_assoc],
-  rw [show seq P 0 = θ₀, by {simp [seq]}], 
+  rw [show seq P 0 = s₀, by {simp [seq]}], 
   rw [sequence_math P hx1 hx2, BET_constant, BET_n_layer_adsorption_rate],
   have h1 : C_L ≠ 0 := by {linarith [hCL],},
   field_simp,
@@ -133,7 +133,7 @@ begin
   simp only [Vads, A],
   rw [tsum_eq_zero_add hsum, tsum_eq_zero_add hsum2],
   simp only [nat.cast_zero, zero_mul, zero_add, nat.cast_one, pow_zero, one_mul, mul_assoc, nat.cast_add, mul_div_assoc],
-  rw [show seq P 0 = θ₀, by {simp [seq]}], 
+  rw [show seq P 0 = s₀, by {simp [seq]}], 
   rw [sequence_math P hx1 hx2],
   field_simp [mul_comm (x P) C],
 end
