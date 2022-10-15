@@ -29,9 +29,9 @@ noncomputable theory
 
 variables (ε minRadius: ℝ)
 
-def LJ (ε minRadius : ℝ)  : ℝ → ℝ := 
+def LJ (ε minRadius r : ℝ)  :  ℝ := 
   let σ := (1 / 2 ^ (1 / 6:ℝ):ℝ)*minRadius in
-  λ r, 4*ε*(∥σ/r∥^(12)-∥σ/r∥^(6))
+  4*ε*(∥σ/r∥^(12)-∥σ/r∥^(6))
 
 open real
 
@@ -145,7 +145,7 @@ end
 theorem deriv_of_LJ
 (hminRadius : 0 < minRadius)
 :
-set.eq_on (deriv ( LJ ε minRadius)) (λ r, 4*ε*((-3)*(minRadius^(12))/r^(13)-(-3)*(minRadius^(6))/r^(7))) ({r : ℝ | r = 0})ᶜ :=
+set.eq_on (deriv ( λ r, LJ ε minRadius r)) (λ r, 4*ε*((-3)*(minRadius^(12))/r^(13)-(-3)*(minRadius^(6))/r^(7))) ({r : ℝ | r = 0})ᶜ :=
 begin
   simp_rw [LJ, real.norm_eq_abs, set.eq_on],
   intros x hx,
@@ -169,7 +169,7 @@ theorem has_deriv_at_of_LJ
 (hminRadius : 0 < minRadius)
 (hr : r ≠ 0)
 :
-has_deriv_at ( LJ ε minRadius) (4*ε*((-3)*(minRadius^(12))/r^(13)-(-3)*(minRadius^(6))/r^(7))) r:=
+has_deriv_at ( λ r, LJ ε minRadius r) (4*ε*((-3)*(minRadius^(12))/r^(13)-(-3)*(minRadius^(6))/r^(7))) r:=
 begin
   simp_rw [LJ, real.norm_eq_abs],
   apply has_deriv_at.const_mul (4*ε),
@@ -666,12 +666,12 @@ begin
   funext,
   exact H (hx x),
 end
+
 /--The `Lennard-Jones` potential tendsto to positive infinity as radius approaches zero from the right-/
 theorem tendsto_at_top_at_zero_radius
-(hx : ∀ x, x ∈ {r : ℝ | r ≠ 0})
 (hε : 0 < ε)
 (hm :  0 < minRadius)
-: filter.tendsto (LJ ε minRadius ) (nhds_within 0 (set.Ioi 0)) filter.at_top:=
+: filter.tendsto (λ r, LJ ε minRadius r) (nhds_within 0 (set.Ioi 0)) filter.at_top:=
 begin
   simp only [LJ, norm_eq_abs],
   apply filter.tendsto.const_mul_at_top,

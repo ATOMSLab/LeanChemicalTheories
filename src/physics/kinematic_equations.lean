@@ -23,55 +23,55 @@ coutner-part.
 
 noncomputable theory
 
-class motion (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜]
-  extends inner_product_space 𝕜 E:=
+structure motion (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜] [inner_product_space 𝕜 E]:=
 {position velocity acceleration : 𝕜 → E}
 (hvel : velocity = deriv position)
 (hacc : acceleration = deriv velocity)
 
-export motion (position velocity acceleration)
 
 /-Given the definition of motion and the relation between position, velocity, and acceleration, we extend the motion class
 to require that our functions be continously differentiable n times (Cⁿ).-/
-class motion_cont_diff_everywhere (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜]
+structure motion_cont_diff_everywhere (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜] [inner_product_space 𝕜 E]
   extends motion 𝕜 E:=
-(contdiff : ∀ n : with_top ℕ, ∀ m : ℕ, (↑m < n) ∧ (cont_diff 𝕜 n (deriv^[m] to_motion.position)))
+(contdiff : ∀ n : with_top ℕ, ∀ m : ℕ, (↑m < n) → (cont_diff 𝕜 n (deriv^[m] to_motion.position)))
 
 /-When defining the four kinematic equations, we require the field to be real or complex-/
-variables {𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [M : motion_cont_diff_everywhere 𝕜 E]
+variables {𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] {M : motion_cont_diff_everywhere 𝕜 E}
 
-local notation `𝕩` := @motion.position 𝕜 E _inst_1 M.to_motion
-local notation `𝕧` := @motion.velocity 𝕜 E _inst_1 M.to_motion
-local notation `𝕒` := @motion.acceleration 𝕜 E _inst_1 M.to_motion
+local notation `𝕩` := M.position
+local notation `𝕧` := M.velocity
+local notation `𝕒` := M.acceleration
 
 lemma acceleration_eq_deriv2_position
-:𝕒 = (deriv^[2] 𝕩):=
+{𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] (M : motion 𝕜 E)
+:M.acceleration = (deriv^[2] M.position):=
 begin
-  simp [M.to_motion.hacc, M.to_motion.hvel],
-  
+  simp [M.hacc, M.hvel],
 end
 
 lemma acceleration_eq_deriv2_position_iff_acceleration_eq_deriv_velocity
-:𝕒 = (deriv^[2] 𝕩) ↔ 𝕒 = deriv 𝕧:=
+{𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] (M : motion 𝕜 E)
+:M.acceleration = (deriv^[2] M.position) ↔ M.acceleration = deriv M.velocity:=
 begin
-  simp [M.to_motion.hacc, M.to_motion.hvel],
+  simp [M.hacc, M.hvel],
 end
 
 lemma deriv2_position_eq_deriv_velocity
-:(deriv^[2] 𝕩) = deriv 𝕧:= by simp [M.to_motion.hvel]
+{𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] (M : motion 𝕜 E)
+:(deriv^[2] M.position) = deriv M.velocity:= by simp [M.hvel]
 
 lemma velocity_eq_deriv1_position
-:𝕧 =(deriv^[1] 𝕩) := by simp [M.to_motion.hvel]
+:M.velocity =(deriv^[1] M.position) := by simp [M.hvel]
 
 
 theorem cont_diff_acceleration 
 {n : with_top ℕ}
+(hn : 2 < n)
 :
 cont_diff 𝕜 n 𝕒 :=
 begin
   let hconf := M.contdiff,
-  specialize hconf n 2,
-  cases hconf with hn hconf,
+  specialize hconf n 2 hn,
   simp [M.to_motion.hacc],
   rw ← deriv2_position_eq_deriv_velocity,
   exact hconf,
@@ -79,76 +79,83 @@ end
 
 theorem cont_diff_velocity 
 {n : with_top ℕ}
+(hn : 1 < n)
 :
 cont_diff 𝕜 n 𝕧:=
 begin
   let hconf := M.contdiff,
-  specialize hconf n 1,
-  cases hconf with hn hconf,
+  specialize hconf n 1 hn,
   simp at hconf,
-  simp [M.to_motion.hvel],
+  simp [M.hvel],
   exact hconf,
 end
 
 
 theorem cont_diff_position 
 {n : with_top ℕ}
+(hn : 0 < n)
 :
 cont_diff 𝕜 n 𝕩:=
 begin
   let hconf := M.contdiff,
-  specialize hconf n 0,
-  cases hconf with hn hconf,
+  specialize hconf n 0 hn,
   simp at hconf,
   exact hconf,
 end
 
 theorem acceleration_differentiable
 {n : with_top ℕ}
+(hn : 2 < n)
 :
 differentiable 𝕜 𝕒 :=
 begin
   let hconf := M.contdiff,
-  specialize hconf n 2,
+  specialize hconf n 2 hn,
   rw [acceleration_eq_deriv2_position, ← iterated_deriv_eq_iterate],
-  cases hconf with hn hconf,
   rw ← iterated_deriv_eq_iterate at hconf,
-  apply cont_diff.differentiable_iterated_deriv 2 cont_diff_position hn,
+  apply cont_diff.differentiable_iterated_deriv 2 (cont_diff_position _) hn,
+  apply lt_trans _ hn,
+  norm_cast,
+  linarith,
 end
 
 
 theorem velocity_differentiable
 {n : with_top ℕ}
+(hn : 1 < n)
 :
 differentiable 𝕜 𝕧 :=
 begin
   let hconf := M.contdiff,
   rw [velocity_eq_deriv1_position, ← iterated_deriv_eq_iterate],
-  specialize hconf n 1,
-  cases hconf with hn hconf,
+  specialize hconf n 1 hn,
   rw ← iterated_deriv_eq_iterate at hconf,
-  apply cont_diff.differentiable_iterated_deriv 1 cont_diff_position hn,
+  apply cont_diff.differentiable_iterated_deriv 1 (cont_diff_position _) hn,
+  apply lt_trans _ hn,
+  norm_cast,
+  linarith,
 end
 
 theorem position_differentiable
 {n : with_top ℕ}
+(hn : 0 < n)
 :
 differentiable 𝕜 𝕩 :=
 begin
-  apply cont_diff.differentiable cont_diff_position,
+  apply cont_diff.differentiable (cont_diff_position hn),
   let hconf := M.contdiff,
-  specialize hconf n 0,
-  cases hconf with hn hconf,
-  norm_cast at hn,
+  specialize hconf n 0 hn,
   rw show (1 : with_top ℕ) = 0 + 1, by simp,
   apply with_top.add_one_le_of_lt hn,
 end
 
 open inner_product_space
 variables {𝔸 : E}
+
 theorem const_accel
 (accel_const : 𝕒 = λ (t : 𝕜), 𝔸)
 {n : with_top ℕ}
+(hn : 1 < n)
 :
 𝕧 =  λ t:𝕜, t•𝔸 + 𝕧 0:=
 begin
@@ -156,72 +163,97 @@ begin
   simp [M.to_motion.hacc] at accel_const,
   intro,
   rw ← show deriv M.to_motion.velocity x = 𝔸, by {rw accel_const, funext},
-  apply differentiable_at.has_deriv_at (differentiable.differentiable_at velocity_differentiable),
-  exact n,
+  apply differentiable_at.has_deriv_at (differentiable.differentiable_at (velocity_differentiable hn)),
 end
 
 theorem const_accel'
 (accel_const : 𝕒 = λ (t : 𝕜), 𝔸)
 {n : with_top ℕ}
+(hn : 1 < n)
 :
 𝕩 = (λ t:𝕜, ((t^2/2)•𝔸) + t•(𝕧 0) + (𝕩 0)) :=
 begin
-  have h1 : 𝕧 =  λ t:𝕜, t•𝔸 + 𝕧 0 := by {apply const_accel accel_const, exact n},
+  have h1 : 𝕧 =  λ t:𝕜, t•𝔸 + 𝕧 0 := (const_accel accel_const hn),
   apply antideriv_first_order_poly',
   intro,
   rw [show x•𝔸 + 𝕧 0 = 𝕧 x, by {rw h1, simp,}, M.to_motion.hvel],
-  apply differentiable_at.has_deriv_at (differentiable.differentiable_at position_differentiable),
+  apply differentiable_at.has_deriv_at (differentiable.differentiable_at (position_differentiable _)),
   exact n,
+  apply lt_trans _ hn,
+  norm_cast,
+  linarith,
 end
 
 theorem const_accel''
 (accel_const : 𝕒 = λ (t : 𝕜), 𝔸)
 {n : with_top ℕ}
+(hn : 1 < n)
 :
 ∀ t, 𝕩 t =  (t/2)•((𝕧 t) + (𝕧 0)) + (𝕩 0):=
 begin
-  rw [show  𝕧 =  λ t:𝕜, t•𝔸 + 𝕧 0, by {apply const_accel accel_const, exact n},
-   show 𝕩 = (λ t:𝕜, ((t^2/2)•𝔸) + t•(𝕧 0) + (𝕩 0)), by {apply const_accel' accel_const, exact n}],
-   field_simp,
-   intro t,
-   rw [add_assoc, ← add_smul, show t/2+t/2 = t, by finish, ← smul_assoc, show (t/2)•t = t^2/2, by {rw smul_eq_mul, ring_nf,}],
+  rw [const_accel accel_const hn, const_accel' accel_const hn],
+  field_simp,
+  intro t,
+  rw [add_assoc, ← add_smul, show t/2+t/2 = t, by finish, ← smul_assoc, show (t/2)•t = t^2/2, by {rw smul_eq_mul, ring_nf,}],
 end
 
-/- theorem const_accel'''
-(accel_const : 𝕒 = λ (t : 𝕜), 𝔸)
-{n : with_top ℕ}
+lemma inner_add_add_self' {𝕜 : Type u_1} {E : Type u_2} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] {x y : E}
 :
-∀ t : 𝕜, inner (𝕧 t) (𝕧 t) = inner(𝕧 (0:𝕜)) (𝕧 (0:𝕜)) + (2:𝕜) * inner ((𝕩 t) - (𝕩 (0:𝕜))) 𝔸
-:=
-begin
-  intro,
-  have : semiring 𝕜 := by apply ring.to_semiring,
-  rw [@real_inner_self_eq_norm_sq E (inner_product_space.is_R_or_C_to_real 𝕜 E), show  𝕧 =  λ t:𝕜, t•𝔸 + 𝕧 0, by {apply const_accel accel_const, exact n},
-      norm_add_pow_two, norm_smul, mul_pow, inner_smul_left, show (𝕩 t) - (𝕩 (0:𝕜)) = ((t^2/2)•𝔸) + t•(𝕧 0), by {rw const_accel' accel_const, simp, exact n,},
-      @inner_add_left _ _ _ (inner_product_space.is_R_or_C_to_real 𝕜 E) ((t ^ 2 / 2) • 𝔸) _ 𝔸, real_inner_eq_re_inner 𝕜 ((t ^ 2 / 2) • 𝔸) 𝔸,
-      real_inner_eq_re_inner 𝕜 _ 𝔸, inner_smul_left, inner_smul_left],
-  simp,
-  rw [← real_inner_eq_re_inner 𝕜 𝔸 _, ← real_inner_eq_re_inner 𝕜 𝔸 _, @real_inner_self_eq_norm_sq _ (inner_product_space.is_R_or_C_to_real 𝕜 E) (velocity (0:𝕜)),
-      add_comm,@real_inner_self_eq_norm_sq _ (inner_product_space.is_R_or_C_to_real 𝕜 E) 𝔸, mul_add, mul_add],
-  field_simp,
-  rw [inner_re_symm, ← real_inner_eq_re_inner 𝕜 𝔸 _, mul_add],
-  
-end -/
+(@inner 𝕜 _ _ x y) + inner y x = inner (x + y) (x + y) - inner x x - inner y y
+:= by rw inner_add_add_self; ring
+
+
+-- theorem const_accel'''
+-- (accel_const : 𝕒 = λ (t : 𝕜), 𝔸)
+-- {n : with_top ℕ}
+-- (hn : 1 < n)
+-- :
+-- ∀ t : 𝕜, @inner 𝕜 _ _ (𝕧 t) (𝕧 t) = inner(𝕧 (0:𝕜)) (𝕧 (0:𝕜)) + inner ((𝕩 t) - (𝕩 (0:𝕜))) 𝔸 + inner 𝔸 ((𝕩 t) - (𝕩 (0:𝕜)))
+-- :=
+-- begin
+--   intro,
+--   have h1 : @inner 𝕜 _ _ (𝕧 t) (𝕧 t) = ∥t•𝔸∥^2 + t * inner 𝔸 (𝕧 (0 : 𝕜)) + (star_ring_end 𝕜) t * inner (𝕧 0) 𝔸 + ∥(𝕧 0)∥^2,
+--   { rw [const_accel accel_const hn, inner_add_add_self, ← inner_self_re_to_K, inner_self_eq_norm_sq, ← inner_self_re_to_K, inner_self_eq_norm_sq],
+--     simp [inner_smul_left, inner_smul_right],
+--     sorry, },
+--   have h2 : @inner 𝕜 _ _ (𝕧 (0:𝕜)) (𝕧 (0:𝕜)) + inner ((𝕩 t) - (𝕩 (0:𝕜))) 𝔸 + inner 𝔸 ((𝕩 t) - (𝕩 (0:𝕜))) = ∥t•𝔸∥^2 + (star_ring_end 𝕜) t * inner (𝕧 (0 : 𝕜)) 𝔸 + t * inner 𝔸 (𝕧 0) + ∥(𝕧 0)∥^2,
+--   { rw [const_accel'' accel_const hn t],
+--     simp,
+--     rw [← inner_self_re_to_K, inner_self_eq_norm_sq, inner_add_left, inner_add_right, ← inner_conj_sym, add_assoc, add_add_add_comm, add_comm ((star_ring_end 𝕜) _),
+--     is_R_or_C.add_conj, ← inner_conj_sym (𝔸) ((t / 2) • M.to_motion.velocity 0), is_R_or_C.add_conj],
+--     simp [inner_smul_left, inner_smul_right, add_assoc, add_right_cancel_iff, is_R_or_C.div_re],
+--     rw [← inner_self_re_to_K, inner_self_eq_norm_sq, show (2 : 𝕜) = 1 + 1, by norm_num, is_R_or_C.norm_sq_add, is_R_or_C.norm_sq_one],
+--     simp [norm_smul, mul_pow],
+--     norm_num,
+--     have h : is_R_or_C.re (t^2) = ∥t∥^2,
+--     { },
+
+--      },
+--   rw [const_accel accel_const hn, inner_add_add_self, const_accel' accel_const hn],
+--   simp,
+--   rw [add_assoc (inner (M.to_motion.velocity 0) (M.to_motion.velocity 0)), ← inner_conj_sym 𝔸, is_R_or_C.add_conj,
+--   inner_add_left],
+--   simp only [inner_smul_left, inner_smul_right, ← mul_assoc, is_R_or_C.mul_conj, is_R_or_C.norm_sq_eq_def'],
+
+--   field_simp,
+--   ring_nf!,
+-- end 
 
 theorem real_const_accel'''
-[N : motion_cont_diff_everywhere ℝ E]
+[inner_product_space ℝ E]
+{N : motion_cont_diff_everywhere ℝ E}
 (accel_const : N.to_motion.acceleration = λ (t : ℝ), 𝔸)
 {n : with_top ℕ}
+(hn : 1 < n)
 :
-∀ t : ℝ, @inner ℝ  E _ (@motion.velocity ℝ E real.is_R_or_C N.to_motion t) (@motion.velocity ℝ E real.is_R_or_C N.to_motion t) = 
-@inner ℝ E _ (@motion.velocity ℝ E real.is_R_or_C N.to_motion (0:ℝ)) (@motion.velocity ℝ E real.is_R_or_C N.to_motion (0:ℝ)) + 
-2 * @inner ℝ E _ 𝔸 ((@motion.position ℝ E real.is_R_or_C N.to_motion t) - (@motion.position ℝ E real.is_R_or_C N.to_motion (0:ℝ)))
+∀ t : ℝ, @inner ℝ  E _ (N.velocity t) (N.velocity t) = @inner ℝ E _ (N.velocity (0:ℝ)) (N.velocity (0:ℝ)) +  
+2 * @inner ℝ E _ 𝔸 ((N.position t) - (N.position (0:ℝ)))
 :=
 begin
   intro,
-  rw [show  (@motion.velocity ℝ E real.is_R_or_C N.to_motion) =  λ t:ℝ, t•𝔸 + (@motion.velocity ℝ E real.is_R_or_C N.to_motion) 0, 
-      by {apply const_accel accel_const, exact n}, show (@motion.position ℝ E real.is_R_or_C N.to_motion t) - (@motion.position ℝ E real.is_R_or_C N.to_motion (0:ℝ)) = 
-      ((t^2/2)•𝔸) + t•(@motion.velocity ℝ E real.is_R_or_C N.to_motion 0), by {rw const_accel' accel_const, simp, exact n,}],
+  rw [show  N.velocity  =  λ t:ℝ, t•𝔸 + N.velocity 0, 
+      by {apply const_accel accel_const hn}, show (N.position t) - (N.position (0:ℝ)) = 
+      ((t^2/2)•𝔸) + t•(N.velocity 0), by {rw const_accel' accel_const hn, simp,}],
   field_simp,
   rw [real_inner_add_add_self, inner_add_right, add_comm],
   repeat {rw real_inner_smul_left,},

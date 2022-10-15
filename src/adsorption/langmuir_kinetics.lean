@@ -29,7 +29,7 @@ the rate of desorption `r_d = k_d * A` are equal at equilibrium conditions where
 - Generalize proof from properties of system
 -/
 
-theorem Langmuir_single_site
+theorem Langmuir_single_site_old
 (Pₐ k_ad k_d A S : ℝ)
 (hreaction : let r_ad := k_ad*Pₐ*S, r_d := k_d*A in r_ad = r_d) 
 (hS : S ≠ 0)
@@ -40,6 +40,24 @@ let θ := A/(S+A),
 θ = K*Pₐ/(1+K*Pₐ) :=
 begin
   simp at hreaction,
+  rw [mul_comm k_d A, ← div_eq_div_iff hk_d hS] at hreaction,
+  field_simp [hreaction],
+end
+
+noncomputable
+def langmuir_single_site_model (equillibrium_constant : ℝ) : ℝ → ℝ := λ P : ℝ, equillibrium_constant*P/(1+equillibrium_constant*P)
+
+theorem langmuir_single_site_kinetic_derivation
+{Pₐ k_ad k_d A S : ℝ}
+(hreaction : let r_ad := k_ad*Pₐ*S, r_d := k_d*A in r_ad = r_d) 
+(hS : S ≠ 0)
+(hk_d : k_d ≠ 0)
+:
+let θ := A/(S+A),
+    K := k_ad/k_d in 
+θ = langmuir_single_site_model K Pₐ :=
+begin
+  simp [langmuir_single_site_model] at *,
   rw [mul_comm k_d A, ← div_eq_div_iff hk_d hS] at hreaction,
   field_simp [hreaction],
 end
