@@ -1,4 +1,8 @@
-import data.real.basic
+import analysis.calculus.lhopital
+import order.filter.at_top_bot
+
+
+
 
 /-!
 # Langmuir adsorption model
@@ -45,7 +49,7 @@ begin
 end
 
 noncomputable
-def langmuir_single_site_model (equillibrium_constant : ℝ) : ℝ → ℝ := λ P : ℝ, equillibrium_constant*P/(1+equillibrium_constant*P)
+def langmuir_single_site_model (equilibrium_constant : ℝ) : ℝ → ℝ := λ P : ℝ, equilibrium_constant*P/(1+equilibrium_constant*P)
 
 theorem langmuir_single_site_kinetic_derivation
 {Pₐ k_ad k_d A S : ℝ}
@@ -62,3 +66,63 @@ begin
   field_simp [hreaction],
 end
 
+lemma lhopital_at_top_div_at_top_transformation
+(f g : ℝ → ℝ)
+(l : filter ℝ)
+: filter.tendsto (λ x, f x / g x) l = filter.tendsto ((λ x, (1 / g x) / (1 / f x))) l := by simp
+
+
+theorem langmuir_single_site_finite_loading
+{k_ad k_d : ℝ}
+(hk_ad : 0 < k_ad)
+(hk_d : 0 < k_d)
+: filter.tendsto (langmuir_single_site_model (k_ad/k_d)) filter.at_top (nhds (1 : ℝ)):=
+begin
+  simp [langmuir_single_site_model],
+  have hk_ad1 : k_ad ≠ 0 := ne_of_gt hk_ad,
+  have hk_d1 : k_d ≠ 0 := ne_of_gt hk_d,
+  rw lhopital_at_top_div_at_top_transformation,
+  apply deriv.lhopital_zero_at_top,
+  { rw filter.eventually_iff_exists_mem,
+    use ({-k_d/k_ad}ᶜ),
+    rw filter.mem_at_top_sets,
+    split,
+    use (-k_d/k_ad + 1),
+    intros,
+    apply ne_of_gt,
+    have h : -k_d/k_ad < -k_d/k_ad + 1 := by simp,
+    exact lt_of_lt_of_le h H,
+    intros,
+    apply differentiable_at.div (differentiable_at_const (1 : ℝ)),
+    simp [differentiable_at.const_add],
+    simp at H,
+    field_simp,
+    field_simp at H,
+    rw [add_comm, add_eq_zero_iff_eq_neg],
+    ring,
+    exact H,},
+  { rw filter.eventually_iff_exists_mem,
+    use (set.Ioi (0)),
+    rw filter.mem_at_top_sets,
+    split,
+    use (k_d/k_ad),
+    intros,
+    simp,
+    apply lt_of_lt_of_le _ H,
+    rw lt_div_iff hk_ad,
+    simpa using hk_d,
+    intros,
+    simp,
+    push_neg,
+    have h : y ≠ 0,
+    { simp at H,
+      apply ne_of_gt, exact H,
+      },
+    exact ⟨h, hk_d1, hk_ad1⟩,
+    },
+    { apply filter.tendsto.div_at_top tendsto_const_nhds,
+      apply filter.tendsto_at_top_add_const_left,
+      finish,},
+
+
+end
