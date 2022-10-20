@@ -3,7 +3,6 @@ import order.filter.at_top_bot
 
 
 
-
 /-!
 # Langmuir adsorption model
 This section defines Langmuir adsorption model from kinetics for a single adsorbate on a single site: <br>
