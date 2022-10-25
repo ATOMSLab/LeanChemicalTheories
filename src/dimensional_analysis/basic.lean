@@ -1,4 +1,6 @@
 import tactic
+import data.real.basic
+
 /-! ### Dimensional Analysis
   We define a new Type, called dimension, inductively, with a single constuctor function that is used to create
   any dimension. This function, Q, corresponds to the function L^aM^bT^cI^dθ^eN^fJ^g which is the product of the
@@ -47,6 +49,9 @@ protected def DimDeriv : dimension → dimension → dimension := dimension.div
 
 protected def DimIntegral : dimension → dimension → dimension := dimension.mul
 
+protected def numbers_are_dimensionless (α : Type*) [ordered_semiring α] [nontrivial α] : α → dimension
+|a := Q 0 0 0 0 0 0 0
+
 instance : has_mul dimension := ⟨dimension.mul⟩
 instance : has_pow dimension ℚ := ⟨dimension.qpow⟩
 instance : has_pow dimension ℕ := ⟨dimension.pow⟩
@@ -54,6 +59,7 @@ instance : has_pow dimension ℤ := ⟨dimension.zpow⟩
 instance : has_div dimension := ⟨dimension.div⟩
 instance : has_one dimension := ⟨Q 0 0 0 0 0 0 0⟩
 instance : has_inv dimension := ⟨dimension.inv⟩
+instance {α} [ordered_semiring α] [nontrivial α] : has_coe α dimension := ⟨dimension.numbers_are_dimensionless α⟩
 
 protected def add : dimension → dimension → dimension
 |(Q a b c d e f g) (Q h i j k l m n) := ite (a=h∧b=i∧c=j∧d=k∧e=l∧f=m∧g=n) (Q a b c d e f g) 1
@@ -204,11 +210,21 @@ begin
   induction a,
   simp,
 end
+
 protected theorem mul_right_inv (a : dimension) : a*a⁻¹ = 1:=
 begin
   rw [dimension.mul_comm, dimension.mul_left_inv],
 end
 protected theorem one_mul (a : dimension) : 1*a = a := by {rw dimension.mul_comm, exact dimension.mul_one _,}
+
+@[simp] protected lemma nat_numbers_are_dimensionless {n : ℕ}: ↑n = (1 : dimension) := rfl
+
+@[simp] protected lemma int_numbers_are_dimensionless {z : ℤ}: ↑z = (1 : dimension) := rfl
+
+@[simp] protected lemma rat_numbers_are_dimensionless {q : ℚ}: ↑q = (1 : dimension) := rfl
+
+@[simp] protected lemma real_numbers_are_dimensionless {r : ℝ}: ↑r = (1 : dimension) := rfl
+
 
 instance : comm_group dimension :=
 begin
@@ -264,7 +280,7 @@ end
 theorem volume_div_area_eq_length :V/A = L :=
 begin
   field_simp [volume, area, length],
-  norm_num,
+  norm_num,  
 end
 
 end dimension
