@@ -2,7 +2,7 @@ import data.real.basic
 import data.fin.vec_notation
 
 
-class dimension :=
+structure dimension :=
 mk ::
 (exponent : Π n : ℕ, fin n → rat)
 
