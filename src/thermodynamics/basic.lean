@@ -28,7 +28,7 @@ structure thermo_system :=
 (volume : ℕ → ℝ)
 (temperature : ℕ → ℝ)
 (substance_amount : ℕ → ℝ)
-(energy : ℕ → ℝ)
+(internal_energy : ℕ → ℝ)
 
 
 
@@ -183,3 +183,12 @@ begin
   field_simp [hP m, hT m] at h,
   exact h,  
 end
+
+/-! ### System Energy-/
+
+def enthalpy (M : thermo_system) := M.internal_energy + M.pressure*M.volume
+
+def change (f : ℕ → ℝ) := λ n, f (n + 1) - f n
+notation `Δ` := change
+#reduce Δ (enthalpy M)
+
