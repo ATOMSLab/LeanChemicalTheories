@@ -72,6 +72,11 @@ pi.single (has_length.length) 1
 def dimension.time (α) [has_time α] : dimension α :=
 pi.single (has_time.time) 1
 
-def 
+def dimension.add {α : Type*} [decidable_eq (dimension α)]: dimension α → dimension α → option (dimension α)
+| a b := ite (a = b) (option.some a) option.none
+variables (α : Type*) [decidable_eq (dimension α)] (a b : dimension α)
+#check a.add b
+#check Π a b : (dimension α), option.get 
+instance (α : Type*) [decidable_eq (dimension α)]: has_add (dimension α) := {add := (Π (a b : (dimension α)), ((@option.get _ (a.add b)) (a.add b).is_some))}
 open dimension 
 
