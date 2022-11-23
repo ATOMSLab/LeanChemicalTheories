@@ -190,5 +190,5 @@ def enthalpy (M : thermo_system) := M.internal_energy + M.pressure*M.volume
 
 def change (f : ℕ → ℝ) := λ n, f (n + 1) - f n
 notation `Δ` := change
-#reduce Δ (enthalpy M)
+
 
