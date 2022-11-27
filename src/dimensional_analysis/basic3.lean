@@ -2,47 +2,6 @@ import data.list.basic
 import algebra.group.to_additive
 import algebra.group.pi
 import data.rat.basic
-import data.fin.vec_notation
-import data.matrix.rank
-
--- class si_dimension_system (α : Type*) :=
--- [dec : decidable_eq α]
--- (time [] : α) -- etc
--- (length : α) -- etc
--- (mass [] : α) -- etc
--- (h : [time, length, mass].nodup)
-
--- attribute [instance] si_dimension_system.dec
-
--- @[derive comm_group]
--- def dimension (α : Type*) := multiplicative (α → ℚ)
-
--- def dimension.length (α) [si_dimension_system α] : dimension α :=
--- pi.single (si_dimension_system.length) 1
--- def dimension.time (α) [si_dimension_system α] : dimension α :=
--- pi.single (si_dimension_system.time α) 1
--- def dimension.mass (α) [si_dimension_system α] : dimension α :=
--- pi.single (si_dimension_system.mass α) 1
-
--- open dimension
-
--- variables (α : Type*) [si_dimension_system α]
-
--- example : length α / length α = 1 := div_self' _
-
-
--- inductive your_system
--- | T | L | M
-
--- instance : si_dimension_system your_system := sorry
-
--- inductive my_system
--- | T | L | M | ZULIP_MESSAGE_COUNT
-
--- instance : si_dimension_system my_system := sorry
-
-
---new
 universe u
 
 /-! 
@@ -94,6 +53,16 @@ attribute [instance] has_luminous_intensity.dec
 def dimension (α : Type u) := multiplicative (α → ℚ)
 namespace dimension
 
+--I would love to add unicode to make specific globabl notation for dimension derivatives and integrals, 
+--but thats more fluff than important
+
+def derivative (α) : dimension α → dimension α → dimension α
+| a b := a / b
+
+def intergral (α) : dimension α → dimension α → dimension α
+| a b := a * b
+
+
 def length (α) [has_length α] : dimension α :=
 pi.single (has_length.length) 1
 
@@ -115,12 +84,22 @@ pi.single (has_temperature.temperature) 1
 def luminous_intensity (α) [has_luminous_intensity α] : dimension α :=
 pi.single (has_luminous_intensity.luminous_intensity) 1
 
+def dimensionless (α) : dimension α := pi.single 1 1
 
-
+/-! 
+### Other dimensions
+-/
+--physics
 def velocity (α) [has_length α] [has_time α] : dimension α := length α / time α
 
+def acceleration (α) [has_length α] [has_time α] : dimension α := length α / ((time α) ^ 2)
+
+def force (α) [has_length α] [has_time α] [has_mass α] : dimension α := length α / ((time α) ^ 2) * mass α
 
 
+/-! 
+### examples for personal understanding
+-/
 inductive system1
 | time | length
 #print system1
@@ -132,7 +111,7 @@ instance : has_length system1 := {dec := system1.decidable_eq, length := system1
 
 
 variables (α : Type*) [has_time α] 
-
+--This show that we index our tuple through the specific base dimension rather than the previous way of vector number
 example : dimension.time system1 system1.time = 1 :=
 begin
   simp [dimension.time],
