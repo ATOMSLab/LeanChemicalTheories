@@ -120,7 +120,7 @@ instance : decidable_eq system1
 instance : has_time system1 := {dec := system1.decidable_eq, time := system1.time}
 instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length}
 
-
+#check dimension.comm_group
 #check pi.single (has_temperature.temperature) 1
 variables (α : Type*) [has_time α] 
 --This show that we index our tuple through the specific base dimension rather than the previous way of vector number
@@ -137,7 +137,17 @@ begin
   finish,
 end
 
+example : dimension.length system1 ^ 2 = pi.single (has_length.length) 2 :=
+begin
+  simp [dimension.length],
 
+end
+
+example : dimension.velocity system1 system1.length = 1 :=
+begin
+  simp [velocity, length, time],
+  
+end
 -- def dimension.add {α : Type u} [decidable_eq (dimension α)]: dimension α → dimension α → option (dimension α)
 -- | a b := ite (a = b) (option.some a) option.none
 
