@@ -2,6 +2,8 @@ import data.list.basic
 import algebra.group.to_additive
 import algebra.group.pi
 import data.rat.basic
+import data.fin.vec_notation
+
 universe u
 
 /-! 
@@ -84,7 +86,7 @@ pi.single (has_temperature.temperature) 1
 def luminous_intensity (α) [has_luminous_intensity α] : dimension α :=
 pi.single (has_luminous_intensity.luminous_intensity) 1
 
-def dimensionless (α) : dimension α := pi.single 1 1
+def dimensionless (α) : dimension α := 1
 
 /-! 
 ### Other dimensions
@@ -96,20 +98,30 @@ def acceleration (α) [has_length α] [has_time α] : dimension α := length α 
 
 def force (α) [has_length α] [has_time α] [has_mass α] : dimension α := length α / ((time α) ^ 2) * mass α
 
-
+lemma force_eq_mass_mul_accel {α} [has_length α] [has_time α] [has_mass α] : force α = mass α * acceleration α :=
+begin
+  simp [force, mass, acceleration, length, time],
+  finish,
+end
+ 
 /-! 
 ### examples for personal understanding
 -/
 inductive system1
 | time | length
-#print system1
-instance : decidable_eq system1 := sorry
+
+instance : decidable_eq system1 
+| system1.time system1.time := is_true rfl
+| system1.time system1.length := is_false (λ h, system1.no_confusion h)
+| system1.length system1.time := is_false (λ h, system1.no_confusion h)
+| system1.length system1.length := is_true rfl
+
 
 instance : has_time system1 := {dec := system1.decidable_eq, time := system1.time}
 instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length}
 
 
-
+#check pi.single (has_temperature.temperature) 1
 variables (α : Type*) [has_time α] 
 --This show that we index our tuple through the specific base dimension rather than the previous way of vector number
 example : dimension.time system1 system1.time = 1 :=
