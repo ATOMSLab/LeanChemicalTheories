@@ -3,6 +3,7 @@ import algebra.group.to_additive
 import algebra.group.pi
 import data.rat.basic
 import data.fin.vec_notation
+import data.real.basic
 
 universe u
 
@@ -132,11 +133,49 @@ def dimensionless (α) : dimension α := λ i, 0
 
 instance {α} : has_one (dimension α) := ⟨dimension.dimensionless α⟩
 
+protected def numbers_are_dimensionless (α : Type*) [ordered_semiring α] [nontrivial α] {β}: α → dimension β
+|a := dimension.dimensionless β 
+instance {α} [ordered_semiring α] [nontrivial α] {β}: has_coe α (dimension β):= ⟨dimension.numbers_are_dimensionless α⟩
+
+
 @[simp] lemma one_eq_dimensionless {α} : 1 = dimensionless α := rfl
 @[simp] lemma dimensionless_def' {α} : dimensionless α = λ i, 0 := rfl
 
-protected theorem mul_one {α} (a : dimension α ) : a*1 = a := by simp
- 
+protected theorem mul_one {α} (a : dimension α) : a*1 = a := by simp
+protected theorem one_mul {α} (a : dimension α) : 1*a = a := by simp
+protected theorem div_eq_mul_inv {α} (a b : dimension α) : a / b = a * b⁻¹ := by {simp, funext, rw sub_eq_add_neg}
+protected theorem mul_left_inv {α} (a : dimension α) : a⁻¹*a = 1 := by {simp}
+protected theorem mul_right_inv {α} (a : dimension α) : a*a⁻¹ = 1 := by {simp}
+@[simp] protected lemma nat_numbers_are_dimensionless {α} {n : ℕ}: ↑n = (1 : dimension α) := rfl
+@[simp] protected lemma int_numbers_are_dimensionless {α} {z : ℤ}: ↑z = (1 : dimension α) := rfl
+@[simp] protected lemma rat_numbers_are_dimensionless {α} {q : ℚ}: ↑q = (1 : dimension α) := rfl
+@[simp] protected lemma real_numbers_are_dimensionless {α} {r : ℝ}: ↑r = (1 : dimension α) := rfl
+
+instance {α} : comm_group (dimension α) :=
+begin
+  refine_struct { mul := dimension.mul,
+                  div := dimension.div,
+                  inv := dimension.inv,
+                  mul_assoc := dimension.mul_assoc,
+                  one := (1:dimension),
+                  npow := @npow_rec dimension dimension.has_one dimension.has_mul,
+                  zpow := @zpow_rec dimension dimension.has_one dimension.has_mul dimension.has_inv,
+                  one_mul := dimension.one_mul,
+                  mul_one := dimension.mul_one,
+                  mul_comm := dimension.mul_comm,
+                  div_eq_mul_inv := dimension.div_eq_mul_inv,
+                  mul_left_inv := dimension.mul_left_inv,}, 
+  repeat {rintro ⟨_⟩, },
+  try { refl },
+  iterate 2 {rw npow_rec,},
+  try { refl },
+  iterate 2 {rw [zpow_rec, zpow_rec, npow_rec, npow_rec],},
+  rw [zpow_rec, inv_def, show ↑(1:ℕ) = int.of_nat 1, by finish, zpow_rec],
+  rw [zpow_rec, inv_def, show ↑(n.succ.succ) = int.of_nat n.succ.succ, by finish, zpow_rec],
+end
+
+
+
 /-! 
 ### Other dimensions
 -/
@@ -149,7 +188,8 @@ def force (α) [has_length α] [has_time α] [has_mass α] : dimension α := len
 
 lemma force_eq_mass_mul_accel {α} [has_length α] [has_time α] [has_mass α] : force α = mass α * acceleration α :=
 begin
-  rw [force, acceleration],
+  simp [force, acceleration],
+  funext,
   finish,
 end
  
