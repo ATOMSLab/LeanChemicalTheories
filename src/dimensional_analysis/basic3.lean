@@ -98,13 +98,6 @@ protected def intergral {α} : dimension α → dimension α → dimension α
 @[simp] lemma inv_def {α} (a : dimension α) : a.inv = a⁻¹ := by refl
 @[simp] lemma inv_def' {α} (a : dimension α) : a⁻¹ = λ (i : α), (-1 : ℤ) • (a i) := by refl
 
-protected theorem mul_comm {α} (a b : dimension α) : a * b = b * a := by {simp, funext, rw add_comm}
-protected theorem div_mul_comm {α} (a b c : dimension α) : a / c * b  = b / c * a := by {simp, funext, rw sub_add_comm}
-protected theorem mul_assoc {α} (a b c : dimension α) : a * b * c = a * (b * c) := by {simp, funext, rw add_assoc}
-
-
-
-
 /-!
 ### Definition of the base dimensions
 -/
@@ -137,10 +130,12 @@ protected def numbers_are_dimensionless (α : Type*) [ordered_semiring α] [nont
 |a := dimension.dimensionless β 
 instance {α} [ordered_semiring α] [nontrivial α] {β}: has_coe α (dimension β):= ⟨dimension.numbers_are_dimensionless α⟩
 
-
 @[simp] lemma one_eq_dimensionless {α} : 1 = dimensionless α := rfl
 @[simp] lemma dimensionless_def' {α} : dimensionless α = λ i, 0 := rfl
 
+protected theorem mul_comm {α} (a b : dimension α) : a * b = b * a := by {simp, funext, rw add_comm}
+protected theorem div_mul_comm {α} (a b c : dimension α) : a / c * b  = b / c * a := by {simp, funext, rw sub_add_comm}
+protected theorem mul_assoc {α} (a b c : dimension α) : a * b * c = a * (b * c) := by {simp, funext, rw add_assoc}
 protected theorem mul_one {α} (a : dimension α) : a*1 = a := by simp
 protected theorem one_mul {α} (a : dimension α) : 1*a = a := by simp
 protected theorem div_eq_mul_inv {α} (a b : dimension α) : a / b = a * b⁻¹ := by {simp, funext, rw sub_eq_add_neg}
@@ -166,15 +161,8 @@ begin
                   div_eq_mul_inv := dimension.div_eq_mul_inv,
                   mul_left_inv := dimension.mul_left_inv,}, 
   repeat {rintro ⟨_⟩, },
-  try { refl },
-  iterate 2 {rw npow_rec,},
-  try { refl },
-  iterate 2 {rw [zpow_rec, zpow_rec, npow_rec, npow_rec],},
-  rw [zpow_rec, inv_def, show ↑(1:ℕ) = int.of_nat 1, by finish, zpow_rec],
-  rw [zpow_rec, inv_def, show ↑(n.succ.succ) = int.of_nat n.succ.succ, by finish, zpow_rec],
+  iterate 8 {intro, refl,},
 end
-
-
 
 /-! 
 ### Other dimensions
