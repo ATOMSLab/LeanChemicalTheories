@@ -69,7 +69,7 @@ protected def qpow {α} : dimension α → ℚ → dimension α
 protected def inv {α} : dimension α → dimension α 
 | a := λ (i : α), (-1 : ℤ) • (a i)
 
-instance {α} : has_mul (dimension α) := ⟨dimension.mul⟩
+instance {α} : has_mul (dimension α) := ⟨dimension.mul⟩ 
 instance {α} : has_div (dimension α) := ⟨dimension.div⟩
 instance {α} : has_pow (dimension α) ℕ := ⟨dimension.npow⟩
 instance {α} : has_pow (dimension α) ℤ := ⟨dimension.zpow⟩
@@ -157,9 +157,9 @@ begin
                   div := dimension.div,
                   inv := dimension.inv,
                   mul_assoc := dimension.mul_assoc,
-                  one := (1:dimension),
-                  npow := @npow_rec dimension dimension.has_one dimension.has_mul,
-                  zpow := @zpow_rec dimension dimension.has_one dimension.has_mul dimension.has_inv,
+                  one := dimensionless α,
+                  npow := @npow_rec (dimension α) dimension.has_one dimension.has_mul,
+                  zpow := @zpow_rec (dimension α) dimension.has_one dimension.has_mul dimension.has_inv,
                   one_mul := dimension.one_mul,
                   mul_one := dimension.mul_one,
                   mul_comm := dimension.mul_comm,
@@ -210,7 +210,6 @@ instance : has_time system1 := {dec := system1.decidable_eq, time := system1.tim
 instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length}
 
 
-variables (α : Type*) [has_time α] 
 --This show that we index our tuple through the specific base dimension rather than the previous way of vector number
 example : (dimension.time system1) system1.time = 1 :=
 begin
@@ -235,11 +234,12 @@ begin
   finish,
 end
 
-example : dimension.velocity system1 system1.length = 1 :=
+example : ((dimension.length system1) * (dimension.length system1)) system1.length = 2 :=
 begin
-  simp [velocity, length, time],
-  
+  simp [dimension.length],
+  finish,
 end
+
 -- def dimension.add {α : Type u} [decidable_eq (dimension α)]: dimension α → dimension α → option (dimension α)
 -- | a b := ite (a = b) (option.some a) option.none
 
