@@ -1,8 +1,8 @@
 [package]
 name = "LeanChemicalTheories"
 version = "0.1"
-lean_version = "leanprover-community/lean:3.45.0"
+lean_version = "leanprover-community/lean:3.48.0"
 path = "src"
 
 [dependencies]
-mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "c59720b460605812986068342d81f50d3740fd8e"}
+mathlib = {git = "https://github.com/leanprover-community/mathlib", rev = "5118ae328cb0cfc45ac55c3374e62d80534a5d23"}
