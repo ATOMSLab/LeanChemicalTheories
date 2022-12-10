@@ -53,9 +53,14 @@ attribute [instance] has_luminous_intensity.dec
 -/
 
 
+
 def dimension (α : Type u) := α → ℚ
 
 namespace dimension
+def dimensionless (α) : dimension α := λ i, 0
+
+protected def add {α} [decidable_eq (dimension α)]: dimension α → dimension α → dimension α
+| a b := ite (a = b) a (dimensionless α)
 protected def mul {α} : dimension α → dimension α → dimension α 
 | a b := λ (i : α), a i + b i
 protected def div {α} : dimension α → dimension α → dimension α 
@@ -69,6 +74,7 @@ protected def qpow {α} : dimension α → ℚ → dimension α
 protected def inv {α} : dimension α → dimension α 
 | a := λ (i : α), (-1 : ℤ) • (a i)
 
+instance {α} [decidable_eq (dimension α)] : has_add (dimension α) := ⟨dimension.add⟩ 
 instance {α} : has_mul (dimension α) := ⟨dimension.mul⟩ 
 instance {α} : has_div (dimension α) := ⟨dimension.div⟩
 instance {α} : has_pow (dimension α) ℕ := ⟨dimension.npow⟩
@@ -85,6 +91,10 @@ protected def derivative {α} : dimension α → dimension α → dimension α
 protected def intergral {α} : dimension α → dimension α → dimension α
 | a b := a * b
 
+@[simp] lemma add_def {α} (a b : dimension α) [decidable_eq (dimension α)] : a.add b = a + b := by refl
+@[simp] lemma add_def' {α} (a : dimension α) [decidable_eq (dimension α)] : a.add a = a := by {simp [dimension.add]}
+@[simp] lemma add_def'' {α} (a : dimension α) [decidable_eq (dimension α)] : a + a = a := by {rw [← add_def, add_def'],}
+        lemma add_def''' {α} (a b : dimension α) [decidable_eq (dimension α)] (h : a ≠ b): a + b = dimensionless α := by {rw [← add_def], simp [dimension.add, h]}
 @[simp] lemma mul_def {α} (a b : dimension α) : a.mul b = a * b := by refl
 @[simp] lemma mul_def' {α} (a b : dimension α) : a * b = λ (i : α), a i + b i := by refl
 @[simp] lemma div_def {α} (a b : dimension α) : a.div b = a / b := by refl
@@ -122,7 +132,6 @@ pi.single (has_temperature.temperature) 1
 def luminous_intensity (α) [has_luminous_intensity α] : dimension α :=
 pi.single (has_luminous_intensity.luminous_intensity) 1
 
-def dimensionless (α) : dimension α := λ i, 0
 
 instance {α} : has_one (dimension α) := ⟨dimension.dimensionless α⟩
 
@@ -146,6 +155,7 @@ protected theorem mul_right_inv {α} (a : dimension α) : a*a⁻¹ = 1 := by {si
 @[simp] protected lemma rat_numbers_are_dimensionless {α} {q : ℚ}: ↑q = (1 : dimension α) := rfl
 @[simp] protected lemma real_numbers_are_dimensionless {α} {r : ℝ}: ↑r = (1 : dimension α) := rfl
 
+
 instance {α} : comm_group (dimension α) :=
 begin
   refine_struct { mul := dimension.mul,
@@ -164,6 +174,7 @@ begin
   iterate 8 {intro, refl,},
 end
 
+
 /-! 
 ### Other dimensions
 -/
@@ -180,7 +191,8 @@ begin
   funext,
   finish,
 end
- 
+
+end dimension
 /-! 
 ### examples for personal understanding
 -/
@@ -196,13 +208,17 @@ instance : decidable_eq system1
 
 instance : has_time system1 := {dec := system1.decidable_eq, time := system1.time}
 instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length}
+instance : fintype system1 := ⟨⟨{system1.length, system1.time}, by simp⟩⟩ 
+
+@[simp] lemma system1_length_to_has_length : system1.length = has_length.length := by refl
+@[simp] lemma system1_time_to_has_time : system1.time = has_time.time := by refl
+
 
 
 --This show that we index our tuple through the specific base dimension rather than the previous way of vector number
 example : (dimension.time system1) system1.time = 1 :=
 begin
   simp [dimension.time],
-  apply pi.single_eq_same,
 end
 
 example : (dimension.time system1) system1.length = 0 :=
@@ -228,12 +244,4 @@ begin
   finish,
 end
 
--- def dimension.add {α : Type u} [decidable_eq (dimension α)]: dimension α → dimension α → option (dimension α)
--- | a b := ite (a = b) (option.some a) option.none
-
--- variables (α : Type u) [decidable_eq (dimension α)] (a b : dimension α) (h : ↥(dimension.add a b).is_some)
--- #check h
--- instance {α : Type*} [decidable_eq (dimension α)] (h : ↥(dimension.add a b).is_some) : has_add (dimension α) := ⟨λ (a b : (dimension α)), (option.get h)⟩
-
-open dimension 
 
