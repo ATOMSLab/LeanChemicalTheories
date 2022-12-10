@@ -69,7 +69,7 @@ protected def qpow {α} : dimension α → ℚ → dimension α
 protected def inv {α} : dimension α → dimension α 
 | a := λ (i : α), (-1 : ℤ) • (a i)
 
-instance {α} : has_mul (dimension α) := ⟨dimension.mul⟩
+instance {α} : has_mul (dimension α) := ⟨dimension.mul⟩ 
 instance {α} : has_div (dimension α) := ⟨dimension.div⟩
 instance {α} : has_pow (dimension α) ℕ := ⟨dimension.npow⟩
 instance {α} : has_pow (dimension α) ℤ := ⟨dimension.zpow⟩
@@ -97,13 +97,6 @@ protected def intergral {α} : dimension α → dimension α → dimension α
 @[simp] lemma zpow_def' {α} (a : dimension α) (b : ℤ) : a ^ b = λ (i : α), b • (a i) := by refl
 @[simp] lemma inv_def {α} (a : dimension α) : a.inv = a⁻¹ := by refl
 @[simp] lemma inv_def' {α} (a : dimension α) : a⁻¹ = λ (i : α), (-1 : ℤ) • (a i) := by refl
-
-protected theorem mul_comm {α} (a b : dimension α) : a * b = b * a := by {simp, funext, rw add_comm}
-protected theorem div_mul_comm {α} (a b c : dimension α) : a / c * b  = b / c * a := by {simp, funext, rw sub_add_comm}
-protected theorem mul_assoc {α} (a b c : dimension α) : a * b * c = a * (b * c) := by {simp, funext, rw add_assoc}
-
-
-
 
 /-!
 ### Definition of the base dimensions
@@ -137,10 +130,12 @@ protected def numbers_are_dimensionless (α : Type*) [ordered_semiring α] [nont
 |a := dimension.dimensionless β 
 instance {α} [ordered_semiring α] [nontrivial α] {β}: has_coe α (dimension β):= ⟨dimension.numbers_are_dimensionless α⟩
 
-
 @[simp] lemma one_eq_dimensionless {α} : 1 = dimensionless α := rfl
 @[simp] lemma dimensionless_def' {α} : dimensionless α = λ i, 0 := rfl
 
+protected theorem mul_comm {α} (a b : dimension α) : a * b = b * a := by {simp, funext, rw add_comm}
+protected theorem div_mul_comm {α} (a b c : dimension α) : a / c * b  = b / c * a := by {simp, funext, rw sub_add_comm}
+protected theorem mul_assoc {α} (a b c : dimension α) : a * b * c = a * (b * c) := by {simp, funext, rw add_assoc}
 protected theorem mul_one {α} (a : dimension α) : a*1 = a := by simp
 protected theorem one_mul {α} (a : dimension α) : 1*a = a := by simp
 protected theorem div_eq_mul_inv {α} (a b : dimension α) : a / b = a * b⁻¹ := by {simp, funext, rw sub_eq_add_neg}
@@ -157,24 +152,17 @@ begin
                   div := dimension.div,
                   inv := dimension.inv,
                   mul_assoc := dimension.mul_assoc,
-                  one := (1:dimension),
-                  npow := @npow_rec dimension dimension.has_one dimension.has_mul,
-                  zpow := @zpow_rec dimension dimension.has_one dimension.has_mul dimension.has_inv,
+                  one := dimensionless α,
+                  npow := @npow_rec (dimension α) dimension.has_one dimension.has_mul,
+                  zpow := @zpow_rec (dimension α) dimension.has_one dimension.has_mul dimension.has_inv,
                   one_mul := dimension.one_mul,
                   mul_one := dimension.mul_one,
                   mul_comm := dimension.mul_comm,
                   div_eq_mul_inv := dimension.div_eq_mul_inv,
                   mul_left_inv := dimension.mul_left_inv,}, 
   repeat {rintro ⟨_⟩, },
-  try { refl },
-  iterate 2 {rw npow_rec,},
-  try { refl },
-  iterate 2 {rw [zpow_rec, zpow_rec, npow_rec, npow_rec],},
-  rw [zpow_rec, inv_def, show ↑(1:ℕ) = int.of_nat 1, by finish, zpow_rec],
-  rw [zpow_rec, inv_def, show ↑(n.succ.succ) = int.of_nat n.succ.succ, by finish, zpow_rec],
+  iterate 8 {intro, refl,},
 end
-
-
 
 /-! 
 ### Other dimensions
@@ -210,7 +198,6 @@ instance : has_time system1 := {dec := system1.decidable_eq, time := system1.tim
 instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length}
 
 
-variables (α : Type*) [has_time α] 
 --This show that we index our tuple through the specific base dimension rather than the previous way of vector number
 example : (dimension.time system1) system1.time = 1 :=
 begin
@@ -235,11 +222,12 @@ begin
   finish,
 end
 
-example : dimension.velocity system1 system1.length = 1 :=
+example : ((dimension.length system1) * (dimension.length system1)) system1.length = 2 :=
 begin
-  simp [velocity, length, time],
-  
+  simp [dimension.length],
+  finish,
 end
+
 -- def dimension.add {α : Type u} [decidable_eq (dimension α)]: dimension α → dimension α → option (dimension α)
 -- | a b := ite (a = b) (option.some a) option.none
 
