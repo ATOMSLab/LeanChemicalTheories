@@ -13,31 +13,38 @@ universe u
 
 class has_time (α : Type u) :=
 [dec : decidable_eq α]
-(time : α)
+(time [] : α)
+(h : [time].nodup)
 
 class has_length (α : Type u) :=
 [dec : decidable_eq α]
-(length : α)
+(length [] : α)
+(h : [length].nodup)
 
 class has_mass (α : Type u) :=
 [dec : decidable_eq α]
-(mass : α)
+(mass [] : α)
+(h : [mass].nodup)
 
 class has_amount_of_substance (α : Type u) :=
 [dec : decidable_eq α]
-(amount_of_substance : α)
+(amount_of_substance [] : α)
+(h : [amount_of_substance].nodup)
 
 class has_electric_current (α : Type u) :=
 [dec : decidable_eq α]
-(electric_current : α)
+(electric_current [] : α)
+(h : [electric_current].nodup)
 
 class has_temperature (α : Type u) :=
 [dec : decidable_eq α]
-(temperature : α)
+(temperature [] : α)
+(h : [temperature].nodup)
 
 class has_luminous_intensity (α : Type u) :=
 [dec : decidable_eq α]
-(luminous_intensity : α)
+(luminous_intensity [] : α)
+(h : [luminous_intensity].nodup)
 
 attribute [instance] has_time.dec
 attribute [instance] has_length.dec
@@ -112,25 +119,25 @@ protected def intergral {α} : dimension α → dimension α → dimension α
 ### Definition of the base dimensions
 -/
 def length (α) [has_length α] : dimension α :=
-pi.single (has_length.length) 1
+pi.single (has_length.length α) 1
 
 def time (α) [has_time α] : dimension α :=
-pi.single (has_time.time) 1
+pi.single (has_time.time α) 1
 
 def mass (α) [has_mass α] : dimension α :=
-pi.single (has_mass.mass) 1
+pi.single (has_mass.mass α) 1
 
 def amount_of_substance (α) [has_amount_of_substance α] : dimension α :=
-pi.single (has_amount_of_substance.amount_of_substance) 1
+pi.single (has_amount_of_substance.amount_of_substance α) 1
 
 def electric_current (α) [has_electric_current α] : dimension α :=
-pi.single (has_electric_current.electric_current) 1
+pi.single (has_electric_current.electric_current α) 1
 
 def temperature (α) [has_temperature α] : dimension α :=
-pi.single (has_temperature.temperature) 1
+pi.single (has_temperature.temperature α) 1
 
 def luminous_intensity (α) [has_luminous_intensity α] : dimension α :=
-pi.single (has_luminous_intensity.luminous_intensity) 1
+pi.single (has_luminous_intensity.luminous_intensity α) 1
 
 
 instance {α} : has_one (dimension α) := ⟨dimension.dimensionless α⟩
@@ -205,16 +212,17 @@ instance : decidable_eq system1
 | system1.length system1.time := is_false (λ h, system1.no_confusion h)
 | system1.length system1.length := is_true rfl
 
+lemma system1.time_nodup : [system1.time].nodup := by finish
+lemma system1.length_nodup : [system1.length].nodup := by finish
+ 
+instance : has_time system1 := {dec := system1.decidable_eq, time := system1.time, h := system1.time_nodup}
+instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length, h := system1.length_nodup}
+instance : fintype system1 := ⟨⟨multiset.cons system1.time (multiset.cons system1.length ∅), by simp⟩, λ x, by cases x; simp⟩ 
 
-instance : has_time system1 := {dec := system1.decidable_eq, time := system1.time}
-instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length}
-instance : fintype system1 := ⟨⟨{system1.length, system1.time}, by simp⟩⟩ 
-
-@[simp] lemma system1_length_to_has_length : system1.length = has_length.length := by refl
-@[simp] lemma system1_time_to_has_time : system1.time = has_time.time := by refl
-
-
-
+@[simp] lemma system1_length_to_has_length : system1.length = has_length.length system1:= by refl
+@[simp] lemma system1_time_to_has_time : system1.time = has_time.time system1:= by refl
+#check has_repr
+#eval fintype.trunc_equiv_fin system1
 --This show that we index our tuple through the specific base dimension rather than the previous way of vector number
 example : (dimension.time system1) system1.time = 1 :=
 begin
@@ -228,14 +236,13 @@ begin
   finish,
 end
 
-example : (dimension.length system1) * (dimension.length system1) = pi.single (has_length.length) 2 :=
+example : (dimension.length system1) * (dimension.length system1) = pi.single (has_length.length system1) 2 :=
 begin
   simp [dimension.length],
   ext1,
   cases x,
   rw [pi.single_eq_of_ne, pi.single_eq_of_ne],
-  iterate 3 {finish},
-  finish,
+  iterate 4 {finish},
 end
 
 example : ((dimension.length system1) * (dimension.length system1)) system1.length = 2 :=

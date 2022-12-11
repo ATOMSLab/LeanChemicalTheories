@@ -5,7 +5,7 @@ import data.fin.vec_notation
 
 
 
-variables {α : Type*} {n : ℕ} 
+variables {α : Type*} {n : ℕ} [fintype α]
 
 
 noncomputable def number_of_dimensionless_parameters (M : matrix α (fin n) ℚ) := n - M.rank
