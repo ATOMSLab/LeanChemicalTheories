@@ -180,7 +180,19 @@ begin
   repeat {rintro ⟨_⟩, },
   iterate 8 {intro, refl,},
 end
+noncomputable theorem fun_equiv {α β c} (H : α ≃ β) : (α → c) → (β → c) :=
+begin
+  intros h h1,
+  apply h (H.inv_fun h1),
+end
 
+noncomputable def dimension.to_tuple {α} [fintype α] [decidable_eq α] (a : dimension α) : fin (fintype.card α) → ℚ :=
+begin
+  have h := fintype.trunc_equiv_fin α,
+  have h1 : α ≃ fin (fintype.card α) := trunc.out h,
+  intro h2,
+  apply fun_equiv h1 a h2,
+end
 
 /-! 
 ### Other dimensions
@@ -232,15 +244,22 @@ begin
   apply h (H.inv_fun h1),
 end
 
-noncomputable theorem system1.to_tuple : (system1 → ℚ) → fin (fintype.card system1) → ℚ :=
+noncomputable def system1.to_tuple : (system1 → ℚ) → fin (fintype.card system1) → ℚ :=
 begin
   apply fun_equiv,
   have h := system1.equiv_fin,
   apply trunc.out h,
 end
 
+protected def system1.repr : system1 → string
+| system1.length := "length"
+| system1.time := "time"
 
-#check has_repr
+instance : has_repr system1 := ⟨system1.repr⟩ 
+
+
+
+#eval system1.fintype.elems
 #eval fintype.trunc_equiv_fin system1
 --This show that we index our tuple through the specific base dimension rather than the previous way of vector number
 example : (dimension.time system1) system1.time = 1 :=
