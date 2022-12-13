@@ -1,4 +1,4 @@
-import dimensional_analysis.basic3
+import dimensional_analysis.basic
 import linear_algebra.dimension
 import data.matrix.rank
 import data.fin.vec_notation
