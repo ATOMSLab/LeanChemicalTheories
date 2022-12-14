@@ -95,7 +95,7 @@ instance {α} : has_inv (dimension α) := ⟨dimension.inv⟩
 
 protected def derivative {α} : dimension α → dimension α → dimension α
 | a b := a / b
-protected def intergral {α} : dimension α → dimension α → dimension α
+protected def integral {α} : dimension α → dimension α → dimension α
 | a b := a * b
 
 @[simp] lemma add_def {α} (a b : dimension α) [decidable_eq (dimension α)] : a.add b = a + b := by refl
