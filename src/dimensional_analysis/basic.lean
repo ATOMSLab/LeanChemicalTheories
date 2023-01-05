@@ -53,7 +53,6 @@ attribute [instance] has_luminous_intensity.dec
 ### Def of dimensions and its properties
 -/
 
-#eval (1/3)
 
 def dimension (α : Type u) := α → ℚ
 
@@ -282,10 +281,6 @@ theorem system1.accel_eq_vel_div_time : acceleration system1 = velocity system1 
 
 
 --This show that we index our tuple through the specific base dimension rather than the previous way of vector number
-example : (dimension.time system1) system1.time = 1 :=
-begin
-  simp [dimension.time],  
-end
 
 example : (dimension.time system1) system1.length = 0 :=
 begin
