@@ -1,4 +1,4 @@
-import dimensional_analysis.basic
+import depreciated.basic_old
 
 /-! # Proof of dimensionless numbers
 We demonstrate Grashof and Prandtl numbers are dimensionless by expressing the variables in their
