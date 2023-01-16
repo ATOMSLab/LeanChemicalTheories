@@ -1,4 +1,8 @@
 import data.real.basic
+import data.fin.vec_notation
+import data.fin_enum
+
+
 universe u
 
 /-! 
@@ -255,21 +259,21 @@ lemma system1_time_to_has_time : system1.time = has_time.time system1:= by refl
 --Working on cardinality to convert dimension as system1 → ℚ to fin n → ℚ for matrix
 instance : fintype system1 := ⟨⟨multiset.cons system1.time (multiset.cons system1.length ∅), by simp⟩, λ x, by cases x; simp⟩ 
 
-def system1.equiv_fin : trunc (system1 ≃ fin (fintype.card system1)) := fintype.trunc_equiv_fin system1
+noncomputable def system1.dimension_equiv_rat_tuple : dimension system1 ≃ (fin 2 → ℚ) := equiv.arrow_congr (fintype.equiv_fin system1) (equiv.refl ℚ)
 
-noncomputable theorem fun_equiv {α β c} (H : α ≃ β) : (α → c) → (β → c) :=
+noncomputable instance : fin_enum system1 := ⟨fintype.card system1, (fintype.equiv_fin system1)⟩
+
+theorem system1.dimension_eq_tuple (a : dimension system1) : system1.dimension_equiv_rat_tuple a = ![a system1.length, a system1.time] :=
 begin
-  intros h h1,
-  apply h (H.inv_fun h1),
+
+  
 end
 
-noncomputable def system1.to_tuple : (system1 → ℚ) → fin (fintype.card system1) → ℚ :=
+example (h) :   vector.nth h = ![1,2,3,4] :=
 begin
-  apply fun_equiv,
-  have h := system1.equiv_fin,
-  apply trunc.out h,
+  funext,
+  
 end
-
 protected def system1.repr : system1 → string
 | system1.length := "length"
 | system1.time := "time"
