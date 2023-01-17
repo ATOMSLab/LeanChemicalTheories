@@ -36,7 +36,7 @@ structure thermo_system :=
 def isobaric (M : thermo_system) : Prop := ∀ n m : ℕ, M.pressure n = M.pressure m
 def isochoric (M : thermo_system) : Prop := ∀ n m : ℕ, M.volume n = M.volume m
 def isothermal (M : thermo_system) : Prop := ∀ n m : ℕ, M.temperature n = M.temperature m
-def adiabatic (M : thermo_system) : Prop :=  ∀ n m : ℕ, M.energy  n = M.energy m
+def adiabatic (M : thermo_system) : Prop :=  ∀ n m : ℕ, M.internal_energy  n = M.internal_energy m
 def closed_system (M : thermo_system) : Prop := ∀ n m : ℕ, M.substance_amount  n = M.substance_amount m
 def isolated_system (M : thermo_system) : Prop := adiabatic M ∧ closed_system M
 
