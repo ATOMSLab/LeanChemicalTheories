@@ -1,7 +1,4 @@
-import data.real.basic
-import analysis.complex.basic
-import analysis.normed.group.basic
-
+import analysis.specific_limits.normed
 
 
 open_locale big_operators
