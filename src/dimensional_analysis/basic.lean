@@ -2,7 +2,6 @@ import data.real.basic
 import data.fin.vec_notation
 import data.fin_enum
 
-
 universe u
 
 /-! 
@@ -57,17 +56,17 @@ attribute [instance] has_luminous_intensity.dec
 ### Def of dimensions and its properties
 -/
 
-
 def dimension (α : Type u) := α → ℚ
 
 namespace dimension
 def dimensionless (α) : dimension α := λ i, 0
 instance {α} : has_one (dimension α) := ⟨dimension.dimensionless α⟩
 instance {α} : nonempty (dimension α) := has_one.nonempty
+noncomputable instance decidable_eq (α : Type*) (a b : dimension α ) : decidable (a = b) := classical.prop_decidable (a = b)
 
-protected noncomputable def add {α} [decidable_eq (dimension α)]: dimension α → dimension α → dimension α := 
+protected noncomputable def add {α}: dimension α → dimension α → dimension α := 
 classical.epsilon $ λ f, ∀ a b, a = b → f a b = a
-protected noncomputable def sub {α} [decidable_eq (dimension α)]: dimension α → dimension α → dimension α := 
+protected noncomputable def sub {α}: dimension α → dimension α → dimension α := 
 classical.epsilon $ λ f, ∀ a b, a = b → f a b = a
 protected def mul {α} : dimension α → dimension α → dimension α 
 | a b := λ (i : α), a i + b i
@@ -82,43 +81,46 @@ protected def zpow {α} : dimension α → ℤ → dimension α
 | a n := a.qpow ↑n
 protected def inv {α} : dimension α → dimension α 
 | a := a.zpow (-1)
+protected def le {α} : dimension α → dimension α → Prop
+| a b := ite (a = b) true false
+protected def lt {α} : dimension α → dimension α → Prop
+| a b := ite (a = b) true false
 
-noncomputable instance {α} [decidable_eq (dimension α)] : has_add (dimension α) := ⟨dimension.add⟩ 
-noncomputable instance {α} [decidable_eq (dimension α)] : has_sub (dimension α) := ⟨dimension.sub⟩ 
+noncomputable instance {α} : has_add (dimension α) := ⟨dimension.add⟩ 
+noncomputable instance {α} : has_sub (dimension α) := ⟨dimension.sub⟩ 
 instance {α} : has_mul (dimension α) := ⟨dimension.mul⟩ 
 instance {α} : has_div (dimension α) := ⟨dimension.div⟩
 instance {α} : has_pow (dimension α) ℕ := ⟨dimension.npow⟩
 instance {α} : has_pow (dimension α) ℤ := ⟨dimension.zpow⟩
 instance {α} : has_pow (dimension α) ℚ := ⟨dimension.qpow⟩ 
 instance {α} : has_inv (dimension α) := ⟨dimension.inv⟩
-
+instance {α} : has_lt (dimension α) := ⟨dimension.lt⟩
+instance {α} : has_le (dimension α) := ⟨dimension.le⟩ 
 
 --I would love to add unicode to make specific globabl notation for dimension derivatives and integrals, 
 --but thats more fluff than important
 
-protected def derivative {α} : ℕ → dimension α → dimension α → dimension α
-| n a b := a / (b ^ n)
-protected def integral {α} : dimension α → dimension α → dimension α
-| a b := a * b
+protected def derivative {α} (b : dimension α): dimension α → dimension α := λ a, a / b 
+protected def integral {α} (b : dimension α): dimension α → dimension α := λ a, a * b
 
-@[simp] lemma add_def {α} (a b : dimension α) [decidable_eq (dimension α)] : a.add b = a + b := by refl
-@[simp] lemma add_def' {α} (a : dimension α) [decidable_eq (dimension α)] : a.add a = a :=
+@[simp] lemma add_def {α} (a b : dimension α) : a.add b = a + b := by refl
+@[simp] lemma add_def' {α} (a : dimension α) : a.add a = a :=
 begin
   generalize hb : a = b, symmetry' at hb,
   nth_rewrite 1 hb, revert b a hb, unfold dimension.add,
   apply classical.epsilon_spec (⟨λ a _, a, λ _ _ _, rfl⟩ :
     ∃ (f : dimension α → dimension α → dimension α), ∀ a b, a = b → f a b = a),
 end
-@[simp] lemma add_def'' {α} (a : dimension α) [decidable_eq (dimension α)] : a + a = a := by {rw [← add_def, add_def'],}
-@[simp] lemma sub_def {α} (a b : dimension α) [decidable_eq (dimension α)] : a.sub b = a - b := by refl
-@[simp] lemma sub_def' {α} (a : dimension α) [decidable_eq (dimension α)] : a.sub a = a :=
+@[simp] lemma add_def'' {α} (a : dimension α) : a + a = a := by {rw [← add_def, add_def'],}
+@[simp] lemma sub_def {α} (a b : dimension α) : a.sub b = a - b := by refl
+@[simp] lemma sub_def' {α} (a : dimension α) : a.sub a = a :=
 begin
   generalize hb : a = b, symmetry' at hb,
   nth_rewrite 1 hb, revert b a hb, unfold dimension.sub,
   apply classical.epsilon_spec (⟨λ a _, a, λ _ _ _, rfl⟩ :
     ∃ (f : dimension α → dimension α → dimension α), ∀ a b, a = b → f a b = a),
 end
-@[simp] lemma sub_def'' {α} (a : dimension α) [decidable_eq (dimension α)] : a - a = a := by {rw [← sub_def, sub_def'],}
+@[simp] lemma sub_def'' {α} (a : dimension α)  : a - a = a := by {rw [← sub_def, sub_def'],}
 @[simp] lemma mul_def {α} (a b : dimension α) : a.mul b = a * b := by refl
 @[simp] lemma mul_def' {α} (a b : dimension α) : a * b = λ (i : α), a i + b i := by refl
 @[simp] lemma div_def {α} (a b : dimension α) : a.div b = a / b := by refl
@@ -131,6 +133,12 @@ end
 @[simp] lemma zpow_def' {α} (a : dimension α) (b : ℤ) : a ^ b = λ (i : α), b • (a i) := by {simp, refl}
 @[simp] lemma inv_def {α} (a : dimension α) : a.inv = a⁻¹ := by refl
 @[simp] lemma inv_def' {α} (a : dimension α) : a⁻¹ = λ (i : α), (-1 : ℤ) • (a i) := by {rw [← inv_def, dimension.inv, dimension.zpow, dimension.qpow], simp}
+@[simp] lemma le_def {α} (a b : dimension α) : a.le b ↔ a ≤ b := by refl
+@[simp] lemma le_def' {α} (a : dimension α) : a ≤ a := by {rw ← dimension.le_def, simp [dimension.le]}
+@[simp] lemma lt_def {α} (a b : dimension α) : a.lt b ↔ a < b := by refl
+@[simp] lemma lt_def' {α} (a : dimension α) : a < a := by {rw ← dimension.lt_def, simp [dimension.lt]}
+
+
 
 /-!
 ### Definition of the base dimensions
@@ -157,14 +165,10 @@ def luminous_intensity (α) [has_luminous_intensity α] : dimension α :=
 pi.single (has_luminous_intensity.luminous_intensity α) 1
 
 
-
-protected def numbers_are_dimensionless (α : Type*) [ordered_semiring α] [nontrivial α] {β}: α → dimension β
-|a := dimension.dimensionless β 
-instance {α} [ordered_semiring α] [nontrivial α] {β}: has_coe α (dimension β):= ⟨dimension.numbers_are_dimensionless α⟩
-
 @[simp] lemma one_eq_dimensionless {α} : 1 = dimensionless α := rfl
 @[simp] lemma dimensionless_def' {α} : dimensionless α = λ i, 0 := rfl
-
+@[simp] lemma bit0_dimension_eq_dimension {α} (a : dimension α) : bit0 a = a := by {simp [bit0]}
+@[simp] lemma bit1_dimensionless_eq_dimensionless {α} : bit1 (dimensionless α) = dimensionless α := by {simp [bit1]}
 protected theorem mul_comm {α} (a b : dimension α) : a * b = b * a := by {simp, funext, rw add_comm}
 protected theorem div_mul_comm {α} (a b c : dimension α) : a / c * b  = b / c * a := by {simp, funext, rw sub_add_comm}
 protected theorem mul_assoc {α} (a b c : dimension α) : a * b * c = a * (b * c) := by {simp, funext, rw add_assoc}
@@ -173,11 +177,6 @@ protected theorem one_mul {α} (a : dimension α) : 1*a = a := by simp
 protected theorem div_eq_mul_inv {α} (a b : dimension α) : a / b = a * b⁻¹ := by {simp, funext, rw sub_eq_add_neg}
 protected theorem mul_left_inv {α} (a : dimension α) : a⁻¹*a = 1 := by {simp}
 protected theorem mul_right_inv {α} (a : dimension α) : a*a⁻¹ = 1 := by {simp}
-@[simp] protected lemma nat_numbers_are_dimensionless {α} {n : ℕ}: ↑n = (1 : dimension α) := rfl
-@[simp] protected lemma int_numbers_are_dimensionless {α} {z : ℤ}: ↑z = (1 : dimension α) := rfl
-@[simp] protected lemma rat_numbers_are_dimensionless {α} {q : ℚ}: ↑q = (1 : dimension α) := rfl
-@[simp] protected lemma real_numbers_are_dimensionless {α} {r : ℝ}: ↑r = (1 : dimension α) := rfl
-
 
 instance {α} : comm_group (dimension α) :=
 begin
@@ -196,25 +195,12 @@ begin
   repeat {rintro ⟨_⟩, },
   iterate 8 {intro, refl,},
 end
-noncomputable theorem fun_equiv {α β c} (H : α ≃ β) : (α → c) → (β → c) :=
-begin
-  intros h h1,
-  apply h (H.inv_fun h1),
-end
-
-noncomputable def dimension.to_tuple {α} [fintype α] [decidable_eq α] (a : dimension α) : fin (fintype.card α) → ℚ :=
-begin
-  have h := fintype.trunc_equiv_fin α,
-  have h1 : α ≃ fin (fintype.card α) := trunc.out h,
-  intro h2,
-  apply fun_equiv h1 a h2,
-end
-
 /-! 
 ### Other dimensions
 -/
 --physics
 def velocity (α) [has_length α] [has_time α] : dimension α := length α / time α
+
 
 def acceleration (α) [has_length α] [has_time α] : dimension α := length α / ((time α) ^ 2)
 
@@ -253,27 +239,10 @@ lemma system1.length_nodup : [system1.length].nodup := by finish
 instance : has_time system1 := {dec := system1.decidable_eq, time := system1.time, h := system1.time_nodup}
 instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length, h := system1.length_nodup}
 
-lemma system1_length_to_has_length : system1.length = has_length.length system1:= by refl
-lemma system1_time_to_has_time : system1.time = has_time.time system1:= by refl
+lemma system1_length_to_has_length : system1.length = has_length.length system1 := by refl
+lemma system1_time_to_has_time : system1.time = has_time.time system1 := by refl
 
---Working on cardinality to convert dimension as system1 → ℚ to fin n → ℚ for matrix
-instance : fintype system1 := ⟨⟨multiset.cons system1.time (multiset.cons system1.length ∅), by simp⟩, λ x, by cases x; simp⟩ 
 
-noncomputable def system1.dimension_equiv_rat_tuple : dimension system1 ≃ (fin 2 → ℚ) := equiv.arrow_congr (fintype.equiv_fin system1) (equiv.refl ℚ)
-
-noncomputable instance : fin_enum system1 := ⟨fintype.card system1, (fintype.equiv_fin system1)⟩
-
-theorem system1.dimension_eq_tuple (a : dimension system1) : system1.dimension_equiv_rat_tuple a = ![a system1.length, a system1.time] :=
-begin
-
-  
-end
-
-example (h) :   vector.nth h = ![1,2,3,4] :=
-begin
-  funext,
-  
-end
 protected def system1.repr : system1 → string
 | system1.length := "length"
 | system1.time := "time"
@@ -307,5 +276,4 @@ begin
   simp [dimension.length],
   finish,
 end
-
 
