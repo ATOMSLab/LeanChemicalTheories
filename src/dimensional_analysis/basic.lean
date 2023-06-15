@@ -11,37 +11,30 @@ universe u
 class has_time (α : Type u) :=
 [dec : decidable_eq α]
 (time [] : α)
-(h : [time].nodup)
 
 class has_length (α : Type u) :=
 [dec : decidable_eq α]
 (length [] : α)
-(h : [length].nodup)
 
 class has_mass (α : Type u) :=
 [dec : decidable_eq α]
 (mass [] : α)
-(h : [mass].nodup)
 
 class has_amount_of_substance (α : Type u) :=
 [dec : decidable_eq α]
 (amount_of_substance [] : α)
-(h : [amount_of_substance].nodup)
 
 class has_electric_current (α : Type u) :=
 [dec : decidable_eq α]
 (electric_current [] : α)
-(h : [electric_current].nodup)
 
 class has_temperature (α : Type u) :=
 [dec : decidable_eq α]
 (temperature [] : α)
-(h : [temperature].nodup)
 
 class has_luminous_intensity (α : Type u) :=
 [dec : decidable_eq α]
 (luminous_intensity [] : α)
-(h : [luminous_intensity].nodup)
 
 attribute [instance] has_time.dec
 attribute [instance] has_length.dec
@@ -233,11 +226,9 @@ instance : decidable_eq system1
 | system1.length system1.time := is_false (λ h, system1.no_confusion h)
 | system1.length system1.length := is_true rfl
 
-lemma system1.time_nodup : [system1.time].nodup := by finish
-lemma system1.length_nodup : [system1.length].nodup := by finish
  
-instance : has_time system1 := {dec := system1.decidable_eq, time := system1.time, h := system1.time_nodup}
-instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length, h := system1.length_nodup}
+instance : has_time system1 := {dec := system1.decidable_eq, time := system1.time}
+instance : has_length system1 := {dec := system1.decidable_eq, length := system1.length}
 
 lemma system1_length_to_has_length : system1.length = has_length.length system1 := by refl
 lemma system1_time_to_has_time : system1.time = has_time.time system1 := by refl
