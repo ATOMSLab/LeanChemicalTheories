@@ -11,7 +11,7 @@ jobs:
     steps:
 
     - name: 📁 Checkout project
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
       with:
         fetch-depth: 0
 
@@ -22,12 +22,12 @@ jobs:
         ~/.elan/bin/lean --version
         echo "$HOME/.elan/bin" >> $GITHUB_PATH
     - name: 🐍 Install Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v1
       with:
         python-version: 3.8
-        cache: 'pip'
+
     - name: 📁 Checkout Lean's doc-gen
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
       with:
         fetch-depth: 0
         repository: ATOMSLab/doc-gen
