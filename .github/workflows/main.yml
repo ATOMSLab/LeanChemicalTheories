@@ -22,7 +22,7 @@ jobs:
         ~/.elan/bin/lean --version
         echo "$HOME/.elan/bin" >> $GITHUB_PATH
     - name: 🐍 Install Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v2
       with:
         python-version: 3.8
         cache: 'pip'
