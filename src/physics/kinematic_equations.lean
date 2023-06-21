@@ -23,7 +23,7 @@ coutner-part.
 
 noncomputable theory
 
-structure motion (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜] [inner_product_space 𝕜 E]:=
+structure motion (𝕜 : Type*) (E : Type*) [normed_add_comm_group E] [is_R_or_C 𝕜] [inner_product_space 𝕜 E]:=
 {position velocity acceleration : 𝕜 → E}
 (hvel : velocity = deriv position)
 (hacc : acceleration = deriv velocity)
@@ -31,33 +31,33 @@ structure motion (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜] [inner_product_spac
 
 /-Given the definition of motion and the relation between position, velocity, and acceleration, we extend the motion class
 to require that our functions be continously differentiable n times (Cⁿ).-/
-structure motion_cont_diff_everywhere (𝕜 : Type*) (E : Type*) [is_R_or_C 𝕜] [inner_product_space 𝕜 E]
+structure motion_cont_diff_everywhere (𝕜 : Type*) (E : Type*) [normed_add_comm_group E] [is_R_or_C 𝕜] [inner_product_space 𝕜 E]
   extends motion 𝕜 E:=
 (contdiff : ∀ n : with_top ℕ, ∀ m : ℕ, (↑m < n) → (cont_diff 𝕜 n (deriv^[m] to_motion.position)))
 
 /-When defining the four kinematic equations, we require the field to be real or complex-/
-variables {𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] {M : motion_cont_diff_everywhere 𝕜 E}
+variables {𝕜 : Type*} {E : Type*} [normed_add_comm_group E] [is_R_or_C 𝕜] [inner_product_space 𝕜 E] {M : motion_cont_diff_everywhere 𝕜 E}
 
 local notation `𝕩` := M.position
 local notation `𝕧` := M.velocity
 local notation `𝕒` := M.acceleration
 
 lemma acceleration_eq_deriv2_position
-{𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] (M : motion 𝕜 E)
+{𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [normed_add_comm_group E] [inner_product_space 𝕜 E] (M : motion 𝕜 E)
 :M.acceleration = (deriv^[2] M.position):=
 begin
   simp [M.hacc, M.hvel],
 end
 
 lemma acceleration_eq_deriv2_position_iff_acceleration_eq_deriv_velocity
-{𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] (M : motion 𝕜 E)
+{𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [normed_add_comm_group E] [inner_product_space 𝕜 E] (M : motion 𝕜 E)
 :M.acceleration = (deriv^[2] M.position) ↔ M.acceleration = deriv M.velocity:=
 begin
   simp [M.hacc, M.hvel],
 end
 
 lemma deriv2_position_eq_deriv_velocity
-{𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] (M : motion 𝕜 E)
+{𝕜 : Type*} {E : Type*} [is_R_or_C 𝕜] [normed_add_comm_group E] [inner_product_space 𝕜 E] (M : motion 𝕜 E)
 :(deriv^[2] M.position) = deriv M.velocity:= by simp [M.hvel]
 
 lemma velocity_eq_deriv1_position
@@ -136,18 +136,21 @@ begin
   linarith,
 end
 
+
 theorem position_differentiable
 {n : with_top ℕ}
-(hn : 0 < n)
+(hn : 1 < n)
 :
 differentiable 𝕜 𝕩 :=
 begin
-  apply cont_diff.differentiable (cont_diff_position hn),
+  have hn1 : 0 < n := by {apply lt_trans _ hn, norm_num},
+  apply cont_diff.differentiable (cont_diff_position hn1),
   let hconf := M.contdiff,
-  specialize hconf n 0 hn,
-  rw show (1 : with_top ℕ) = 0 + 1, by simp,
-  apply with_top.add_one_le_of_lt hn,
+  specialize hconf n 0 hn1,
+  apply le_of_lt hn,
 end
+
+/-! ### Kinematic equations for translation in a vector field-/
 
 open inner_product_space
 variables {𝔸 : E}
@@ -179,9 +182,7 @@ begin
   rw [show x•𝔸 + 𝕧 0 = 𝕧 x, by {rw h1, simp,}, M.to_motion.hvel],
   apply differentiable_at.has_deriv_at (differentiable.differentiable_at (position_differentiable _)),
   exact n,
-  apply lt_trans _ hn,
-  norm_cast,
-  linarith,
+  exact hn,
 end
 
 theorem const_accel''
@@ -197,49 +198,7 @@ begin
   rw [add_assoc, ← add_smul, show t/2+t/2 = t, by finish, ← smul_assoc, show (t/2)•t = t^2/2, by {rw smul_eq_mul, ring_nf,}],
 end
 
-lemma inner_add_add_self' {𝕜 : Type u_1} {E : Type u_2} [is_R_or_C 𝕜] [inner_product_space 𝕜 E] {x y : E}
-:
-(@inner 𝕜 _ _ x y) + inner y x = inner (x + y) (x + y) - inner x x - inner y y
-:= by rw inner_add_add_self; ring
-
-
--- theorem const_accel'''
--- (accel_const : 𝕒 = λ (t : 𝕜), 𝔸)
--- {n : with_top ℕ}
--- (hn : 1 < n)
--- :
--- ∀ t : 𝕜, @inner 𝕜 _ _ (𝕧 t) (𝕧 t) = inner(𝕧 (0:𝕜)) (𝕧 (0:𝕜)) + inner ((𝕩 t) - (𝕩 (0:𝕜))) 𝔸 + inner 𝔸 ((𝕩 t) - (𝕩 (0:𝕜)))
--- :=
--- begin
---   intro,
---   have h1 : @inner 𝕜 _ _ (𝕧 t) (𝕧 t) = ∥t•𝔸∥^2 + t * inner 𝔸 (𝕧 (0 : 𝕜)) + (star_ring_end 𝕜) t * inner (𝕧 0) 𝔸 + ∥(𝕧 0)∥^2,
---   { rw [const_accel accel_const hn, inner_add_add_self, ← inner_self_re_to_K, inner_self_eq_norm_sq, ← inner_self_re_to_K, inner_self_eq_norm_sq],
---     simp [inner_smul_left, inner_smul_right],
---     sorry, },
---   have h2 : @inner 𝕜 _ _ (𝕧 (0:𝕜)) (𝕧 (0:𝕜)) + inner ((𝕩 t) - (𝕩 (0:𝕜))) 𝔸 + inner 𝔸 ((𝕩 t) - (𝕩 (0:𝕜))) = ∥t•𝔸∥^2 + (star_ring_end 𝕜) t * inner (𝕧 (0 : 𝕜)) 𝔸 + t * inner 𝔸 (𝕧 0) + ∥(𝕧 0)∥^2,
---   { rw [const_accel'' accel_const hn t],
---     simp,
---     rw [← inner_self_re_to_K, inner_self_eq_norm_sq, inner_add_left, inner_add_right, ← inner_conj_sym, add_assoc, add_add_add_comm, add_comm ((star_ring_end 𝕜) _),
---     is_R_or_C.add_conj, ← inner_conj_sym (𝔸) ((t / 2) • M.to_motion.velocity 0), is_R_or_C.add_conj],
---     simp [inner_smul_left, inner_smul_right, add_assoc, add_right_cancel_iff, is_R_or_C.div_re],
---     rw [← inner_self_re_to_K, inner_self_eq_norm_sq, show (2 : 𝕜) = 1 + 1, by norm_num, is_R_or_C.norm_sq_add, is_R_or_C.norm_sq_one],
---     simp [norm_smul, mul_pow],
---     norm_num,
---     have h : is_R_or_C.re (t^2) = ∥t∥^2,
---     { },
-
---      },
---   rw [const_accel accel_const hn, inner_add_add_self, const_accel' accel_const hn],
---   simp,
---   rw [add_assoc (inner (M.to_motion.velocity 0) (M.to_motion.velocity 0)), ← inner_conj_sym 𝔸, is_R_or_C.add_conj,
---   inner_add_left],
---   simp only [inner_smul_left, inner_smul_right, ← mul_assoc, is_R_or_C.mul_conj, is_R_or_C.norm_sq_eq_def'],
-
---   field_simp,
---   ring_nf!,
--- end 
-
-theorem real_const_accel'''
+theorem const_accel'''
 [inner_product_space ℝ E]
 {N : motion_cont_diff_everywhere ℝ E}
 (accel_const : N.to_motion.acceleration = λ (t : ℝ), 𝔸)
@@ -330,8 +289,8 @@ ring_nf,
 end
 
 lemma velocity_pow_two_eq_velocity_initial_pow_two_add_accel_mul_pos 
-(hf' : ∀(t : ℝ), has_deriv_at x (v t) t)
-(hf'' : ∀(t : ℝ), has_deriv_at v (a t) t)
+(hf' : ∀ (t : ℝ), has_deriv_at x (v t) t)
+(hf'' : ∀ (t : ℝ), has_deriv_at v (a t) t)
 (accel_const : a = λ (t : ℝ), α)
 :
 ∀ t,(v t)^2 = (v 0)^2 + 2*(a t)*((x t) - (x 0))

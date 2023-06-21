@@ -1,7 +1,7 @@
-import analysis.special_functions.pow
+import analysis.special_functions.pow.real
 
-open real
 
+open real 
 
 lemma rpow_ne_zero
 {x y : ℝ} (hx : 0 < x) (hy : 0 < y)

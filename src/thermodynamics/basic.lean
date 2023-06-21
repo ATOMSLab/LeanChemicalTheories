@@ -22,30 +22,30 @@ how the boyles law follows form the ideal gas law and the assumption of isotherm
 
 universe u
 
-structure thermo_system :=
+structure thermo_system (α) [nontrivial α]:=
 
-(pressure : ℕ → ℝ)
-(volume : ℕ → ℝ)
-(temperature : ℕ → ℝ)
-(substance_amount : ℕ → ℝ)
-(internal_energy : ℕ → ℝ)
-
-
+(pressure : α → ℝ)
+(volume : α → ℝ)
+(temperature : α → ℝ)
+(substance_amount : α → ℝ)
+(internal_energy : α → ℝ)
 
 
-def isobaric (M : thermo_system) : Prop := ∀ n m : ℕ, M.pressure n = M.pressure m
-def isochoric (M : thermo_system) : Prop := ∀ n m : ℕ, M.volume n = M.volume m
-def isothermal (M : thermo_system) : Prop := ∀ n m : ℕ, M.temperature n = M.temperature m
-def adiabatic (M : thermo_system) : Prop :=  ∀ n m : ℕ, M.internal_energy  n = M.internal_energy m
-def closed_system (M : thermo_system) : Prop := ∀ n m : ℕ, M.substance_amount  n = M.substance_amount m
-def isolated_system (M : thermo_system) : Prop := adiabatic M ∧ closed_system M
+
+
+def isobaric {α} [nontrivial α] (M : thermo_system α) : Prop := ∀ n m, M.pressure n = M.pressure m
+def isochoric {α} [nontrivial α] (M : thermo_system α) : Prop := ∀ n m, M.volume n = M.volume m
+def isothermal {α} [nontrivial α] (M : thermo_system α) : Prop := ∀ n m, M.temperature n = M.temperature m
+def adiabatic {α} [nontrivial α] (M : thermo_system α) : Prop :=  ∀ n m, M.internal_energy  n = M.internal_energy m
+def closed_system {α} [nontrivial α] (M : thermo_system α) : Prop := ∀ n m, M.substance_amount  n = M.substance_amount m
+def isolated_system {α} [nontrivial α] (M : thermo_system α) : Prop := adiabatic M ∧ closed_system M
 
 /-!### Gas Laws-/
-def boyles_law (M : thermo_system) :=  ∃ (k : ℝ), ∀ n : ℕ, (M.pressure n) * (M.volume n)= k
-def charles_law (M : thermo_system) :=  ∃ (k : ℝ), ∀ n : ℕ, (M.volume n) = k * (M.temperature n)
-def avogadros_law (M : thermo_system):=  ∃ (k : ℝ), ∀ n : ℕ, (M.volume n) = k * (M.substance_amount n)
+def boyles_law {α} [nontrivial α] (M : thermo_system α) :=  ∃ (k : ℝ), ∀ n, (M.pressure n) * (M.volume n)= k
+def charles_law {α} [nontrivial α] (M : thermo_system α) :=  ∃ (k : ℝ), ∀ n, (M.volume n) = k * (M.temperature n)
+def avogadros_law {α} [nontrivial α] (M : thermo_system α) :=  ∃ (k : ℝ), ∀ n, (M.volume n) = k * (M.substance_amount n)
 
-variables {M : thermo_system}
+variables {α : Type*} [nontrivial α] (M : thermo_system α)
 
 theorem boyles_law_relation 
 : boyles_law M →  ∀ n m, M.pressure n*M.volume n = M.pressure m * M.volume m:=
@@ -61,10 +61,12 @@ theorem boyles_law_relation'
 : (∀ n m, M.pressure n * M.volume n = M.pressure m * M.volume m) → boyles_law M :=
 begin
   intros h,
-  simp [boyles_law],
-  use (M.pressure 1 * M.volume 1),
+  simp [boyles_law], 
+  rw nontrivial_iff at _inst_1,
+  cases _inst_1,
+  use (M.pressure w * M.volume w),
   intro,
-  exact h n 1,
+  exact h n w,
 end
 
 theorem charles_law_relation 
@@ -74,18 +76,20 @@ begin
   simp [charles_law] at h,
   cases h with k h,
   rw [h n, h m],
-  ring_exp
+  ring_nf,
 end
 
 theorem charles_law_relation'
-(hT : M.temperature 1 ≠ 0)
+(hT : ∀ n, M.temperature n ≠ 0)
 : (∀ n m, M.volume n * M.temperature m = M.volume m * M.temperature n) → charles_law M :=
 begin
   intros h,
   simp [charles_law],
-  use (M.volume 1 / M.temperature 1),
+  rw nontrivial_iff at _inst_1,
+  cases _inst_1,
+  use (M.volume w / M.temperature w),
   intro,
-  field_simp [h n 1],
+  field_simp [h n w, hT w, hT n],
 end
 
 theorem avogadros_law_relation 
@@ -95,52 +99,53 @@ begin
   simp [avogadros_law] at h,
   cases h with k h,
   rw [h n, h m],
-  ring_exp,
+  ring_nf,
 end
 
 theorem avogadros_law_relation'
-(hn : M.substance_amount 1 ≠ 0)
+(hN : ∀ n, M.substance_amount n ≠ 0)
 : (∀ n m, M.volume n * M.substance_amount m = M.volume m * M.substance_amount n) → avogadros_law M :=
 begin
   intros h,
   simp [avogadros_law],
-  use (M.volume 1 / M.substance_amount 1),
+  rw nontrivial_iff at _inst_1,
+  cases _inst_1,
+  use (M.volume w / M.substance_amount w),
   intro,
-  field_simp [h n 1],
+  field_simp [h n w, hN n, hN w],
 end
 
 /-! ### System models-/
-structure ideal_gas
-  extends thermo_system  :=
+structure ideal_gas (α) [nontrivial α]
+  extends thermo_system α :=
 (R : ℝ)
-(ideal_gas_law : ∀ n : ℕ, (pressure n)*(volume n) = (substance_amount n)*R*(temperature n))
-
+(ideal_gas_law : ∀ n, (pressure n)*(volume n) = (substance_amount n)*R*(temperature n))
 
 
 /-! ### Properties about the ideal gas law-/
 
 theorem ideal_gas_law_relation 
-{M : ideal_gas}
-: ∀ n m : ℕ, (M.pressure n)*(M.volume n)*((M.substance_amount m)*(M.temperature m)) = 
+{α} [nontrivial α] (M : ideal_gas α)
+: ∀ n m, (M.pressure n)*(M.volume n)*((M.substance_amount m)*(M.temperature m)) = 
 (M.pressure m)*(M.volume m)*((M.substance_amount n)*(M.temperature n)):=
 begin
   intros,
   let h1 := M.ideal_gas_law n,
   let h2 := M.ideal_gas_law m,
   rw [h1,h2],
-  ring_exp,
+  ring_nf,
 end
 
 
 
-theorem boyles_from_ideal_gas {M : ideal_gas} (iso1 : isothermal M.to_thermo_system)
+theorem boyles_from_ideal_gas (M : ideal_gas α) (iso1 : isothermal M.to_thermo_system)
 (iso2 : closed_system M.to_thermo_system)
 (hT : ∀ n, M.temperature n ≠ 0)
 (hn : ∀ n, M.substance_amount n ≠ 0)
 : boyles_law M.to_thermo_system:=
 begin
   simp [boyles_law, isothermal, closed_system] at *,
-  let h := ideal_gas_law_relation,
+  let h := ideal_gas_law_relation M,
   apply boyles_law_relation',
   intros,
   specialize h n m,
@@ -149,7 +154,7 @@ begin
   exact h,
 end
 
-theorem charles_from_ideal_gas {M : ideal_gas} (iso1 : isobaric M.to_thermo_system)
+theorem charles_from_ideal_gas (M : ideal_gas α) (iso1 : isobaric M.to_thermo_system)
 (iso2 : closed_system M.to_thermo_system)
 (hT : ∀ n, M.temperature n ≠ 0)
 (hn : ∀ n, M.substance_amount n ≠ 0)
@@ -157,8 +162,8 @@ theorem charles_from_ideal_gas {M : ideal_gas} (iso1 : isobaric M.to_thermo_syst
 : charles_law M.to_thermo_system:=
 begin
   simp [charles_law, isobaric, closed_system] at *,
-  let h := ideal_gas_law_relation,
-  apply charles_law_relation' (hT 1),
+  let h := ideal_gas_law_relation M,
+  apply charles_law_relation' M.to_thermo_system hT,
   intros,
   specialize h n m,
   rw [iso1 n m, iso2 n m] at h,
@@ -166,7 +171,7 @@ begin
   exact h, 
 end
 
-theorem avogadros_from_ideal_gas {M : ideal_gas} (iso1 : isothermal M.to_thermo_system)
+theorem avogadros_from_ideal_gas (M : ideal_gas α) (iso1 : isothermal M.to_thermo_system)
 (iso2 : isobaric M.to_thermo_system) 
 (hT : ∀ n, M.temperature n ≠ 0)
 (hn : ∀ n, M.substance_amount n ≠ 0)
@@ -174,8 +179,8 @@ theorem avogadros_from_ideal_gas {M : ideal_gas} (iso1 : isothermal M.to_thermo_
 : avogadros_law M.to_thermo_system:=
 begin
   simp [avogadros_law, isothermal, isobaric] at *,
-  let h := ideal_gas_law_relation,
-  apply avogadros_law_relation' (hn 1),
+  let h := ideal_gas_law_relation M,
+  apply avogadros_law_relation' M.to_thermo_system (hn),
   intros,
   specialize h n m,
   rw [iso1 n m, iso2 n m] at h,
@@ -186,7 +191,7 @@ end
 
 /-! ### System Energy-/
 
-def enthalpy (M : thermo_system) := M.internal_energy + M.pressure*M.volume
+def enthalpy (M : thermo_system α) := M.internal_energy + M.pressure*M.volume
 
 def change (f : ℕ → ℝ) := λ n, f (n + 1) - f n
 notation `Δ` := change

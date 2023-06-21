@@ -1,7 +1,6 @@
 import analysis.calculus.mean_value
-import analysis.special_functions.pow_deriv
-
-
+import analysis.calculus.deriv.inv
+import analysis.special_functions.pow.deriv
 import math.rpow
 
 

@@ -31,9 +31,7 @@ variables (ε minRadius: ℝ)
 
 def LJ (ε minRadius r : ℝ)  :  ℝ := 
   let σ := (1 / 2 ^ (1 / 6:ℝ):ℝ)*minRadius in
-  4*ε*(∥σ/r∥^(12)-∥σ/r∥^(6))
-
-open real
+  4*ε*(‖ σ/r‖^(12)-‖σ/r‖^(6))
 
 lemma two_pow_one_div_six_pow_six_eq_two
 :
@@ -53,20 +51,14 @@ begin
   norm_num,
 end
 
-lemma one_lt_six {α : Type*} [ordered_semiring α] [nontrivial α] : (1 : α) < 6 := 
+lemma one_lt_six : 1 < 6 := 
 begin
-  rw show (6 : α) = 2*3, by norm_num,
-  apply one_lt_mul one_lt_two.le,
-  simp [bit1, zero_lt_two],
-  finish,
+  norm_num,
 end
 
-lemma one_lt_twelve {α : Type*} [ordered_semiring α] [nontrivial α] : (1 : α) < 12 := 
+lemma one_lt_twelve : 1 < 12 := 
 begin
-  rw show (12 : α) = 6*2, by norm_num,
-  apply one_lt_mul (one_lt_six.le) (one_lt_two),
-  finish,
-  finish,
+  norm_num,
 end
 
 
@@ -666,51 +658,4 @@ begin
   funext,
   exact H (hx x),
 end
-
-/--The `Lennard-Jones` potential tendsto to positive infinity as radius approaches zero from the right-/
-theorem tendsto_at_top_at_zero_radius
-(hε : 0 < ε)
-(hm :  0 < minRadius)
-: filter.tendsto (λ r, LJ ε minRadius r) (nhds_within 0 (set.Ioi 0)) filter.at_top:=
-begin
-  simp only [LJ, norm_eq_abs],
-  apply filter.tendsto.const_mul_at_top,
-  simpa using hε,
-  rw [mul_comm, mul_div, mul_one],
-  simp [repulsive_2 minRadius hm, attractive_2 minRadius hm],
-  rw sub_to_div'' _ hm hx,  
-  apply @filter.tendsto.at_top_mul _ _ _ _ _ _ _ _ (1 : ℝ) zero_lt_one,  
-  simp only [div_eq_mul_inv],
-  apply filter.tendsto.const_mul_at_top,
-  rw zero_lt_mul_left (pow_pos hm _),
-  simp,
-  apply pow_pos,
-  apply zero_lt_rpow zero_lt_two _,
-  norm_num,
-  refine (filter.at_top_basis' 1).tendsto_right_iff.2 (λ b hb, _),
-  have hb' : 0 < b := by positivity,
-  filter_upwards [Ioc_mem_nhds_within_Ioi ⟨le_rfl, inv_pos.2 hb'⟩],
-  intros a ha,
-  simp,
-  cases ha with hal hau,
-  rw le_inv hal hb' at hau,
-  rw ← inv_pow,
-  transitivity,
-  exact hau,
-  conv { find (a⁻¹) {rw ← pow_one (a⁻¹),}, },
-  apply pow_le_pow,
-  apply le_trans hb hau,
-  norm_num,
-  field_simp [two_pow_one_div_six_pow_six_eq_two, two_pow_one_div_six_pow_twelve_eq_four],
-  conv {find (_/_) {rw [show minRadius ^ 6 * (4 * x ^ 12) = x^12 * (minRadius^6*4), by ring_nf, show (2 * x ^ 6 * minRadius ^ 12) = x^6*(minRadius^12*2), by ring_nf],
-                    simp [mul_div_mul_comm],
-                    simp only [div_eq_mul_inv],},},
-  rw show nhds (1 : ℝ) = nhds (1 - 0), by simp,
-  apply filter.tendsto.const_sub (1 : ℝ),
-  rw show nhds (0 : ℝ) = nhds (0 * ((minRadius ^ 6 * (minRadius ^ 12)⁻¹ * (4 * 2⁻¹)))), by simp,
-  apply filter.tendsto.mul_const,
-  simp [← div_eq_mul_inv],
-  apply tendsto_at_zero_pow_twelve_div_pow_six,
-end
-
 end LJ
