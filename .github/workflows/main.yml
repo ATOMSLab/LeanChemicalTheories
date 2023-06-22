@@ -21,6 +21,7 @@ jobs:
         curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
         ~/.elan/bin/lean --version
         echo "$HOME/.elan/bin" >> $GITHUB_PATH
+        
     - name: 🐍 Install Python
       uses: actions/setup-python@v1
       with:
@@ -39,6 +40,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r doc-gen/requirements.txt
         ls doc-gen
+        
     - name: ✏️ Mangle paths for doc-gen
       run: |
         lean_version="$(sed '/^lean_version/!d;s/.*"\(.*\)".*/\1/' leanpkg.toml)"
@@ -50,6 +52,7 @@ jobs:
         # If they are incompatible, something in doc_gen will fail to compile,
         # but this is better than trying to recompile all of mathlib.
         elan override set "$lean_version"
+        
         leanproject get-mathlib-cache
         echo -e "path ../src" >> leanpkg.path
         cat leanpkg.path
@@ -62,17 +65,12 @@ jobs:
         cp _target/deps/mathlib/docs/references.bib ../docs
         cat ../src/all.lean
         lean --path
+        
     - name: 📝 Export Lean symbol information
       run: |
         cd doc-gen
-        lean -v
-        # the json and diagnostics are emitted on stdout, but the json is always the last (very long) line.
-        lean --run src/entrypoint.lean > export.json || true
-        head -n -1 export.json
-        tail -n1 export.json > export2.json
-        rm export.json
-        mv export2.json export.json
-        head -c1000 export.json
+        lean --run src/entrypoint.lean > export.json
+        
     - name: 📚 Build HTML docs
       run: |
         cd doc-gen
