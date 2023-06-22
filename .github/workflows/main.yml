@@ -41,6 +41,12 @@ jobs:
         pip install -r doc-gen/requirements.txt
         ls doc-gen
         
+    - name: 🔧 Build the lean code
+      run: |
+        cd doc-gen
+        lean -v
+        lean --make src/entrypoint.lean
+        
     - name: ✏️ Mangle paths for doc-gen
       run: |
         lean_version="$(sed '/^lean_version/!d;s/.*"\(.*\)".*/\1/' leanpkg.toml)"
@@ -65,12 +71,7 @@ jobs:
         cp _target/deps/mathlib/docs/references.bib ../docs
         cat ../src/all.lean
         lean --path
-        
-    - name: 🔧 Build the lean code
-      run: |
-        cd doc-gen
-        lean -v
-        lean --make src/entrypoint.lean
+      
         
     - name: 📝 Export Lean symbol information
       run: |
