@@ -18,14 +18,14 @@ To run programs smoothly in Lean Theorem Prover, we need to set up Lean, an edit
 
 ### Linux
 
-1. Install `elan`
+1. Install `elan`:
   In the terminal, run the command
   ```bash
   curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
   ```
   and hit enter when a question is asked. It will live in $HOME/.elan and add a line to $HOME/.profile.
 
-2. Get `Visual Studio Code`
+2. Get `Visual Studio Code`:
    Next step is getting the lean editor, [Visual Studio Code](https://code.visualstudio.com/). The alternative is to use Emacs, and its [lean-mode](https://github.com/leanprover/lean-mode).
 
   * Install and launch [VS Code](https://code.visualstudio.com/).
@@ -52,7 +52,7 @@ To run programs smoothly in Lean Theorem Prover, we need to set up Lean, an edit
    Install [Git for Windows](https://gitforwindows.org/) (you can accept all default answers during installation).
    Then open a terminal by typing `git bash` in the Windows search bar.
 
-2. Install `elan`
+2. Install `elan`:
    In the terminal, run the command
    `curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh`
    and hit enter when a question is asked.
@@ -60,16 +60,16 @@ To run programs smoothly in Lean Theorem Prover, we need to set up Lean, an edit
    To make sure the terminal will find the installed files, run `echo 'PATH="$HOME/.elan/bin:$PATH"' >> "$HOME/.profile"`.
    Then close and reopen Git Bash.
 
-4. Configure `Git`
+4. Configure `Git`:
    Run `git config --global core.autocrlf input` in Git Bash
    Alternatively, you can set it to `false`. If it is set to `true`, you might run into issues when running `leanproject`.
 
-5. Get Scripts
+5. Get Scripts:
    Then, at a terminal, run the command
     ```bash
     pip3 install mathlibtools
     ```
-5. Get `Visual Studio Code`
+5. Get `Visual Studio Code`:
    * Install and launch [VS Code](https://code.visualstudio.com/).
    * Install the `lean' extension (unique name `jroesch.lean`).
    * Setup the default profile:
