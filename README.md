@@ -11,10 +11,11 @@ To download the project after installing `Lean` (see instructions below), run in
       ```bash
       leanproject get ATOMSLab/LeanChemicalTheories 
       ```
+
 To confirm the completeness and accuracy of the proofs, run in the root directory of the project: 
       ```bash 
       bash ./test
-      ``` 
+      ```
 If everything builds successfully, the script will display "Result: Success."
 
 ## Instructions to install `Lean`, `mathlib`, and its supporting tools
