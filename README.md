@@ -7,25 +7,35 @@ Moving forward, all of our upcoming proofs will be written in the latest version
 
 
 ## Instructions to run this project
-To download the project after installing `Lean` (see instructions below), run `leanproject get ATOMSLab/LeanChemicalTheories` in your terminal window.
-
-To confirm the completeness and accuracy of the proofs, run `bash ./test` in the root directory of the project.
+To download the project after installing `Lean` (see instructions below), run in the terminal window: 
+      ```bash
+      leanproject get ATOMSLab/LeanChemicalTheories 
+      ```
+To confirm the completeness and accuracy of the proofs, run in the root directory of the project: 
+      ```bash 
+      bash ./test
+      ``` 
 If everything builds successfully, the script will display "Result: Success."
 
 ## Instructions to install `Lean`, `mathlib`, and its supporting tools
-These instructions are adapted from the [Lean 3 community website](https://leanprover-community.github.io/lean3/get_started.html) which has been archived and is currently being deprecated. 
+These instructions are adapted from the [Lean 3 community website](https://leanprover-community.github.io/lean3/get_started.html) which has been archived 
+and is currently being deprecated. 
 
-Lean itself doesn't depend on much infrastructure, but supporting tools needed by most users require `git`, `curl`, and `python3` (on Debian and Ubuntu also `python3-pip` and `python3-venv`). 
+Lean itself doesn't depend on much infrastructure, but supporting tools needed by most users require `git`, `curl`, and `python3` 
+(on Debian and Ubuntu also `python3-pip` and `python3-venv`). 
 
-To run programs smoothly in the Lean Theorem Prover, we need to set up Lean, an editor that knows about `Lean` (VSCode is recommended), and `mathlib` (the standard library). Rather than installing Lean directly, the installation is handled through a small program called [`elan`](https://github.com/leanprover/elan) that automatically provides the correct version of Lean on a per-project basis. This is recommended for all users.
+To run programs smoothly in the Lean Theorem Prover, we need to set up `Lean`, an editor that knows about `Lean` (VSCode is recommended), 
+and `mathlib` (the standard library). Rather than installing Lean directly, the installation is handled through a small program 
+called [`elan`](https://github.com/leanprover/elan) that automatically provides the correct version of Lean on a per-project basis. 
+This is recommended for all users.
 
 #### Linux
 
 1. Install `elan`:
   In the terminal, run the command
-  ```bash
-  curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
-  ```
+      ```bash
+      curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
+      ```
   and hit enter when a question is asked. It will live in $HOME/.elan and add a line to $HOME/.profile.
 
 2. Get `Visual Studio Code`:
@@ -55,23 +65,25 @@ To run programs smoothly in the Lean Theorem Prover, we need to set up Lean, an 
    Then open a terminal by typing `git bash` in the Windows search bar.
 
 2. Install `elan`:
-   In the terminal, run the command
-   `curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh`
+   In the terminal, run the command:
+       ```bash
+       curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
+       ```
    and hit enter when a question is asked.
 
    To make sure the terminal will find the installed files, run `echo 'PATH="$HOME/.elan/bin:$PATH"' >> "$HOME/.profile"`.
    Then close and reopen Git Bash.
 
-3. Configure `Git`:
+4. Configure `Git`:
    Run `git config --global core.autocrlf input` in Git Bash
    Alternatively, you can set it to `false`. If it is set to `true`, you might run into issues when running `leanproject`.
 
-4. Get `Scripts`:
+5. Get `Scripts`:
    Then, at the terminal, run the command
     ```bash
     pip3 install mathlibtools
     ```
-5. Get `VS Code`:
+6. Get `VS Code`:
    * Install and launch [VS Code](https://code.visualstudio.com/).
    * Install the `lean' extension (unique name `jroesch.lean`).
    * Setup the default profile:
