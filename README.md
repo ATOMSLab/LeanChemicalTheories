@@ -24,7 +24,7 @@ Lean itself doesn't depend on much infrastructure, but supporting tools needed b
 (on Debian and Ubuntu also `python3-pip` and `python3-venv`). 
 
 To run programs smoothly in the Lean Theorem Prover, we need to set up `Lean`, an editor that knows about `Lean` (VSCode is recommended), 
-and `mathlib` (the standard library).\ Rather than installing Lean directly, the installation is handled through a small program 
+and `mathlib` (the standard library). Rather than installing Lean directly, the installation is handled through a small program 
 called [`elan`](https://github.com/leanprover/elan) that automatically provides the correct version of Lean on a per-project basis.\
 This is recommended for all users.
 
