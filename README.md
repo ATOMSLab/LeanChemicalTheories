@@ -64,8 +64,8 @@ To run programs smoothly in Lean Theorem Prover, we need to set up Lean, an edit
    Run `git config --global core.autocrlf input` in Git Bash
    Alternatively, you can set it to `false`. If it is set to `true`, you might run into issues when running `leanproject`.
 
-5. Get Scripts:
-   Then, at a terminal, run the command
+5. Get `Scripts`:
+   Then, at the terminal, run the command
     ```bash
     pip3 install mathlibtools
     ```
