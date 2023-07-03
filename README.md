@@ -1,22 +1,20 @@
 # Chemical Theories in Lean
-The repository is a collection of lean documentation created to formalize theorem statements and proofs in chemical sciences and engineering for the published work [Formalizing Chemical Theory using the Lean Theorem Prover](https://arxiv.org/abs/2210.12150) on arXiv.
+The repository is a collection of Lean documentation created to formalize theorem statements and proofs in chemical sciences and engineering, as described in [Formalizing Chemical Theory using the Lean Theorem Prover](https://arxiv.org/abs/2210.12150).
 
-The paper and its proofs are written in Lean 3. We have created a [static branch](https://github.com/ATOMSLab/LeanChemicalTheories/tree/static-branch_2023-06-18) of our repository where all the proofs are in the state as it was on 2023/06/22 and aligns with the code referenced in the paper. The code is compatible with `Lean` version `3.51.1` and `mathlib` commit `2ad3645af9effcdb587637dc28a6074edc813f9`. The proofs have been reproduced without errors on both Windows and MacOS platforms.
+The paper and its proofs are written in Lean 3. We have created a [static branch](https://github.com/ATOMSLab/LeanChemicalTheories/tree/static-branch_2023-06-18) of our repository where all the proofs are in the state as it was on 2023/06/22 and aligns with the code referenced in the paper. 
+The code is compatible with `Lean` version `3.51.1` and `mathlib` commit `2ad3645af9effcdb587637dc28a6074edc813f9`. 
+The proofs have been reproduced without errors on both MacOS and Windows platforms.
 
-Moving forward, all of our upcoming proofs will be written in the latest version of Lean, which is [Lean 4](https://github.com/leanprover/lean4). Some of these proofs might be updated to remain in line with new releases of both `Lean` and `mathlib`. For those looking to access the most current version, it can be found on the main branch, which is also hosted at https://atomslab.github.io/LeanChemicalTheories/ using [doc-gen](https://github.com/ATOMSLab/doc-gen/tree/master). 
+Moving forward, all of our upcoming proofs will be written in the latest version of Lean, which is [Lean 4](https://github.com/leanprover/lean4). 
+Some of these proofs might be updated to remain in line with new releases of both `Lean` and `mathlib`. For those looking to access the most current version, it can be found on the main branch, which is also hosted at https://atomslab.github.io/LeanChemicalTheories/ using [doc-gen](https://github.com/ATOMSLab/doc-gen/tree/master). 
 
 
 ## Instructions to run this project
-To download the project after installing `Lean` (see instructions below), run in the terminal window: 
-      ```bash
-      leanproject get ATOMSLab/LeanChemicalTheories 
-      ```
+To download the project after installing `Lean` (see instructions below), run `leanproject get ATOMSLab/LeanChemicalTheories` in the terminal window: 
 
-To confirm the completeness and accuracy of the proofs, run in the root directory of the project: 
-      ```bash 
-      bash ./test
-      ```
-If everything builds successfully, the script will display "Result: Success."
+To confirm the completeness and accuracy of the proofs, run `bash ./test` in the root directory of the project.
+
+If everything builds successfully, the script will display `Result: Success`.
 
 ## Instructions to install `Lean`, `mathlib`, and its supporting tools
 These instructions are adapted from the [Lean 3 community website](https://leanprover-community.github.io/lean3/get_started.html) which has been archived 
@@ -26,8 +24,8 @@ Lean itself doesn't depend on much infrastructure, but supporting tools needed b
 (on Debian and Ubuntu also `python3-pip` and `python3-venv`). 
 
 To run programs smoothly in the Lean Theorem Prover, we need to set up `Lean`, an editor that knows about `Lean` (VSCode is recommended), 
-and `mathlib` (the standard library). Rather than installing Lean directly, the installation is handled through a small program 
-called [`elan`](https://github.com/leanprover/elan) that automatically provides the correct version of Lean on a per-project basis. 
+and `mathlib` (the standard library).\ Rather than installing Lean directly, the installation is handled through a small program 
+called [`elan`](https://github.com/leanprover/elan) that automatically provides the correct version of Lean on a per-project basis.\
 This is recommended for all users.
 
 #### Linux
@@ -40,7 +38,7 @@ This is recommended for all users.
   and hit enter when a question is asked. It will live in $HOME/.elan and add a line to $HOME/.profile.
 
 2. Get `Visual Studio Code`:
-   Next step is getting the lean editor, [Visual Studio Code](https://code.visualstudio.com/). The alternative is to use Emacs, and its [lean-mode](https://github.com/leanprover/lean-mode).
+   Next step is getting the lean editor, [VS Code](https://code.visualstudio.com/). 
 
   * Install and launch [VS Code](https://code.visualstudio.com/).
   * Install the `lean' extension (unique name `jroesch.lean`).
