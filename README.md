@@ -1,8 +1,6 @@
 # Chemical Theories in Lean
 The repository is a collection of lean documentation created to formalize theorem statements and proofs in chemical sciences and engineering for the published work [Formalizing Chemical Theory using the Lean Theorem Prover](https://arxiv.org/abs/2210.12150) in the arXiv.
 
-To access all the proofs in the exact state as of June 18, 2023, which were mentioned in the paper, you can find them in the [repository's static branch](https://github.com/ATOMSLab/LeanChemicalTheories/tree/static-branch_2023-06-18). It compiles with Lean version 3.51.1 and mathlib commit `f2ad3645af9effcdb587637dc28a6074edc813f9` and has been reproduced on both Windows and MacOS operating systems.
-
 ## Instructions to run this project
 To download the project, simply run `leanproject get ATOMSLab/LeanChemicalTheories` in your terminal window.
 
