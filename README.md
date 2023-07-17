@@ -3,7 +3,7 @@ The repository is a collection of Lean documentation created to formalize theore
 
 The paper and its proofs are written in Lean 3. We have created a [static branch](https://github.com/ATOMSLab/LeanChemicalTheories/tree/static-branch_2023-06-18) of our repository where all the proofs are in the state as it was on 2023/06/22 and aligns with the code referenced in the paper. 
 The code is compatible with `Lean` version `3.51.1` and `mathlib` commit `2ad3645af9effcdb587637dc28a6074edc813f9`. 
-The proofs have been reproduced without errors on both MacOS and Windows platforms.
+The proofs have been reproduced without errors on both MacOS and Windows 10 platforms.
 
 Moving forward, all of our upcoming proofs will be written in the latest version of Lean, which is [Lean 4](https://github.com/leanprover/lean4). 
 Some of these proofs might be updated to remain in line with new releases of both `Lean` and `mathlib`. For those looking to access the most current version, it can be found on the main branch, which is also hosted at https://atomslab.github.io/LeanChemicalTheories/ using [doc-gen](https://github.com/ATOMSLab/doc-gen/tree/master). 
