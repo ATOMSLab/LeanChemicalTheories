@@ -1,0 +1,51 @@
+import Mathlib.Data.Real.Sqrt
+import Mathlib.Algebra.Algebra.Pi
+import Mathlib.Tactic
+
+
+open Real
+
+
+theorem Kepler_from_Newton {m_1 m_2 d_1 d_2 d w F_g F_c p : ℝ}
+ (h1 : m_1*d_1 = m_2*d_2) -- Center of mass
+ (h2 : d = d_1 + d_2 ) -- Distance between two bodies
+ (h3 : F_g = G*m_1*m_2/d^2) -- Gravitational Force
+ (h4 : F_c=  m_2*d_2*w^2 ) -- Centrifugal Force
+ (h5 : F_c = F_g) -- Force Balance
+ (h6 : p = 2*π/w) -- Period definition
+ -- {Positivity constraints}
+ (h7 : 0<m_1)
+ (h8 : 0<m_2)
+ (h9 : 0<d_1)
+ (h10 : 0<d_2)
+ (h11: 0 ≤p) :
+ p= Real.sqrt ((4* π^2*d^3)/(G*(m_1+ m_2))) :=
+  have h12: w^2=F_c/(m_2*d_2) := by
+    rw[h4,mul_comm,mul_div_cancel]
+    apply ne_of_gt
+    rw [zero_lt_mul_left h8]
+    exact h10
+  calc
+  p= Real.sqrt (p^2) := by rw [Real.sqrt_sq h11]
+ _= Real.sqrt ((2*π/w)^2) := by rw [h6]
+ _= Real.sqrt ((4*π^2)/w^2) := by ring_nf
+ _= Real.sqrt ((4*π^2)/(F_c/(m_2*d_2))) := by rw [h12]
+ _= Real.sqrt ((4*π^2*m_2*d_2)/F_c) := by rw [mul_assoc (4*π^2) m_2 d_2, div_div_eq_mul_div]
+ _= Real.sqrt ((4*π^2*m_2*d_2)/F_g) := by rw [h5]
+ _= Real.sqrt ((4*π^2*m_2*d_2*d^2)/(G*m_1*m_2)) := by rw [h3, div_div_eq_mul_div]
+ _= Real.sqrt (((4*π^2*d_2*d^2)*m_2)/((G*m_1)*m_2)) := by ring_nf
+ _= Real.sqrt ((4*π^2*d_2*d^2)/(G*m_1)) := by rw [mul_div_mul_right _ _ (ne_of_gt h8)]
+ _= Real.sqrt (((4*π^2*d^2)*d_2)/(G*m_1)) := by ring_nf
+ _= Real.sqrt ((d_2*(4*π^2*d^2))/(G*m_1)) := by rw[ mul_comm (4*π^2*d^2) d_2]
+ _= Real.sqrt (d_2*((4*π^2*d^2)/(G*m_1))) := by rw[mul_div_assoc d_2 (4*π^2*d^2) (G*m_1)]
+ _= Real.sqrt (((4*π^2*d^2)/(G*m_1))*d_2) := by rw[mul_comm ((4*π^2*d^2)/(G*m_1)) d_2]
+ _= Real.sqrt ((4*π^2*d^2)/((G*m_1)/d_2)) := by rw[div_mul (4*π^2*d^2) (G*m_1) d_2]
+ _= Real.sqrt ((4*π^2*d^2)/((G*m_1)/d_2)*((d_1+d_2)/(d_1+d_2))) := by rw [div_self]; ring_nf; apply ne_of_gt; rw [show (0 : ℝ) = 0 + 0 by simp]; exact add_lt_add h9 h10
+ _= Real.sqrt ((4*π^2*d^2*(d_1+d_2))/(((G*m_1)/d_2)*(d_1+d_2))) := by rw[div_mul_div_comm (4*π^2*d^2) ((G*m_1)/d_2) (d_1+d_2) (d_1+d_2)]
+ _= Real.sqrt (4*π^2*d^2*(d_1+d_2)/(G*((m_1/d_2*d_1)+(m_1/d_2*d_2)))) := by rw [mul_div_assoc G m_1, mul_assoc G (m_1/d_2), mul_add (m_1/d_2) d_1 d_2];
+ _= Real.sqrt ((4*π^2*d^2*(d_1+d_2))/(G*((m_1/d_2*d_1)+m_1))) := by rw[mul_comm (m_1/d_2) d_2, ← mul_div_assoc d_2, mul_comm d_2 m_1, mul_div_cancel m_1 (ne_of_gt h10)]
+ _= Real.sqrt ((4*π^2*d^2*(d_1+d_2))/(G*((m_1*d_1/d_2)+m_1))) := by ring_nf
+ _= Real.sqrt ((4*π^2*d^2*(d_1 + d_2))/(G*(m_1+m_2))) := by rw [h1, mul_div_cancel _ (ne_of_gt h10)]; ring_nf
+ _= Real.sqrt ((4*π^2*d^2*d)/(G*(m_1+m_2))) := by rw [← h2]
+ _= Real.sqrt ((4*π^2*d^3)/(G*(m_1 +m_2))) := by ring_nf
+
